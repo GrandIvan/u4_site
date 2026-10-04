@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Принципы — Левая демократическая организация «Участие»</title>
+<meta name="description" content="Принципы Левой демократической организации «Участие».">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="favicon.png">
+<style>
+:root{
+  --purple:#87179D;
+  --purple-dark:#4F0F5D;
+  --ink:#1a1a1a;
+  --muted:#4a4a4a;
+  --line:#e6e6e6;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Manrope',-apple-system,system-ui,'Segoe UI',Roboto,sans-serif;
+  color:var(--ink);
+  background:#fff;
+  line-height:1.75;
+  font-size:17px;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  position:relative;
+}
+a{text-decoration:none;color:inherit}
+
+/* ---------- ФОНОВЫЕ СТРЕЛКИ (слева, столбиком) ---------- */
+.bg-arrows{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  overflow:hidden;
+}
+.bg-arrows svg{
+  position:absolute;
+  color:var(--purple);
+  display:block;
+}
+.bg-arrows .bg-1{
+  width:340px;height:340px;
+  top:20%;left:-100px;
+  transform:rotate(45deg);
+  opacity:.08;
+}
+.bg-arrows .bg-2{
+  width:340px;height:340px;
+  top:45%;left:-100px;
+  transform:rotate(45deg);
+  opacity:.08;
+}
+.bg-arrows .bg-3{
+  width:340px;height:340px;
+  top:70%;left:-100px;
+  transform:rotate(45deg);
+  opacity:.08;
+}
+
+/* ---------- Верхняя навигация ---------- */
+.top-back{
+  position:absolute;
+  top:36px;left:40px;
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:.85rem;font-weight:600;
+  color:var(--muted);
+  transition:color .25s;
+  z-index:5;
+}
+.top-back:hover{color:var(--purple)}
+.top-back svg{width:16px;height:16px}
+.top-logo{
+  position:absolute;
+  top:32px;right:40px;
+  width:44px;height:44px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid #fff;
+  padding:2px;
+  background:#fff;
+  box-shadow:0 0 0 2px #F4DCF7, 0 6px 16px rgba(135,23,157,.20);
+  z-index:5;
+}
+
+/* ---------- Документ ---------- */
+.document{
+  max-width:820px;
+  margin:0 auto;
+  padding:110px 60px 140px;
+  position:relative;
+  z-index:1;
+}
+
+/* ---------- Декоративные стрелки у заголовка ---------- */
+.arrows{
+  position:absolute;
+  display:flex;
+  flex-direction:column;
+  pointer-events:none;
+  z-index:1;
+}
+.arrows-top{
+  top:120px;
+  right:60px;
+  align-items:flex-end;
+  gap:0;
+}
+.arrow{
+  display:block;
+  width:46px;
+  height:46px;
+  color:var(--purple);
+  transform:rotate(45deg);
+}
+.arrow svg{width:100%;height:100%;display:block}
+.arrow-1{opacity:.95}
+.arrow-2{opacity:.75;transform:rotate(45deg) translate(-14px,-14px)}
+.arrow-3{opacity:.55;transform:rotate(45deg) translate(-28px,-28px)}
+
+/* ---------- Титул ---------- */
+.title-block{
+  position:relative;
+  z-index:2;
+  padding-bottom:70px;
+  border-bottom:1px solid var(--line);
+  margin-bottom:70px;
+}
+.title-block h1{
+  font-size:clamp(2.8rem,7vw,4.5rem);
+  line-height:1.05;
+  letter-spacing:-.035em;
+  font-weight:800;
+  color:var(--purple);
+  margin-bottom:22px;
+}
+.title-block .subtitle{
+  font-size:clamp(1.1rem,2vw,1.35rem);
+  font-weight:600;
+  color:var(--purple);
+  letter-spacing:-.01em;
+  line-height:1.4;
+  max-width:26ch;
+}
+.title-block .arrows-mid{
+  position:absolute;
+  bottom:-22px;
+  left:0;
+  display:flex;
+  flex-direction:row;
+  gap:8px;
+}
+.title-block .arrows-mid .arrow{
+  width:30px;height:30px;
+}
+
+/* ---------- Секции ---------- */
+.section-label{
+  display:block;
+  font-size:1rem;
+  font-weight:800;
+  color:var(--purple);
+  letter-spacing:.02em;
+  margin-bottom:26px;
+}
+.section-label span{
+  color:var(--muted);
+  font-weight:600;
+  margin-left:8px;
+}
+
+.principles{
+  margin-bottom:70px;
+}
+.principles:last-of-type{margin-bottom:40px}
+
+.principles p{
+  margin-bottom:22px;
+  color:var(--ink);
+  font-size:1rem;
+  line-height:1.75;
+}
+.principles p .num{
+  color:var(--purple);
+  font-weight:800;
+  margin-right:6px;
+}
+.principles p .name{
+  font-weight:700;
+  color:var(--ink);
+}
+
+/* ---------- Финальные стрелки ---------- */
+.arrows-end{
+  display:flex;
+  justify-content:flex-start;
+  gap:6px;
+  margin:60px 0 0;
+}
+.arrows-end .arrow{
+  width:38px;height:38px;
+}
+.arrows-end .arrow-2{transform:rotate(45deg) translate(-12px,-12px)}
+.arrows-end .arrow-3{transform:rotate(45deg) translate(-24px,-24px)}
+
+/* ---------- Кнопки ---------- */
+.actions{
+  margin-top:70px;
+  padding-top:40px;
+  border-top:1px solid var(--line);
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  padding:14px 28px;border-radius:100px;border:none;cursor:pointer;
+  font-weight:700;font-size:.95rem;
+  transition:transform .25s cubic-bezier(.22,.8,.3,1),
+             box-shadow .25s cubic-bezier(.22,.8,.3,1),
+             background .25s,color .25s;
+}
+.btn-primary{
+  background:var(--purple);color:#fff;
+  box-shadow:0 10px 26px rgba(135,23,157,.28);
+}
+.btn-primary:hover{
+  background:var(--purple-dark);
+  transform:translateY(-2px);
+  box-shadow:0 16px 34px rgba(135,23,157,.36);
+}
+.btn-outline{
+  background:#fff;color:var(--purple);
+  border:1.5px solid #E8B5EE;
+}
+.btn-outline:hover{
+  background:#FAF0FC;
+  border-color:#D47DE0;
+  transform:translateY(-2px);
+}
+
+/* ---------- Мобильные ---------- */
+@media (max-width:760px){
+  .document{padding:110px 28px 100px}
+  .top-back{top:26px;left:20px;font-size:.78rem}
+  .top-logo{top:22px;right:20px;width:38px;height:38px}
+  .arrows-top{top:130px;right:20px}
+  .arrows-top .arrow{width:34px;height:34px}
+  .title-block{padding-bottom:56px;margin-bottom:56px}
+  .title-block .subtitle{max-width:none}
+  .principles{margin-bottom:56px}
+  .principles p{font-size:.96rem}
+  .actions .btn{width:100%}
+
+  .bg-arrows .bg-1{width:220px;height:220px;top:22%;left:-70px}
+  .bg-arrows .bg-2{width:220px;height:220px;top:46%;left:-70px}
+  .bg-arrows .bg-3{width:220px;height:220px;top:70%;left:-70px}
+}
+@media (max-width:480px){
+  .arrows-top{display:none}
+  .document{padding-top:100px}
+
+  .bg-arrows .bg-1{width:160px;height:160px;left:-50px}
+  .bg-arrows .bg-2{width:160px;height:160px;left:-50px}
+  .bg-arrows .bg-3{width:160px;height:160px;left:-50px}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ ФОН: ТРИ СТРЕЛКИ СЛЕВА ============ -->
+<div class="bg-arrows" aria-hidden="true">
+  <svg class="bg-1" viewBox="0 0 60 100" fill="currentColor">
+    <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
+  </svg>
+  <svg class="bg-2" viewBox="0 0 60 100" fill="currentColor">
+    <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
+  </svg>
+  <svg class="bg-3" viewBox="0 0 60 100" fill="currentColor">
+    <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
+  </svg>
+</div>
+
+<a href="index.html" class="top-back">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M19 12H5M11 18l-6-6 6-6"/>
+  </svg>
+  На главную
+</a>
+<img src="logo.png" alt="Участие" class="top-logo">
+
+<main class="document">
+
+  <!-- ============ ДЕКОР: СТРЕЛКИ СВЕРХУ СПРАВА ============ -->
+  <div class="arrows arrows-top" aria-hidden="true">
+    <span class="arrow arrow-1">
+      <svg viewBox="0 0 60 100" fill="currentColor">
+        <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
+      </svg>
+    </span>
+    <span class="arrow arrow-2">
+      <svg viewBox="0 0 60 100" fill="currentColor">
+        <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
+      </svg>
+    </span>
+    <span class="arrow arrow-3">
+      <svg viewBox="0 0 60 100" fill="currentColor">
+        <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
+      </svg>
+    </span>
+  </div>
+
+  <!-- ============ ТИТУЛ ============ -->
+  <header class="title-block">
+    <h1>Принципы</h1>
+    <p class="subtitle">Левой демократической организации «Участие»</p>
+
+    <div class="arrows-mid" aria-hidden="true">
+      <span class="arrow">
+        <svg viewBox="0 0 60 100" fill="currentColor">
+          <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
+        </svg>
+      </span>
+      <span class="arrow">
+        <svg viewBox="0 0 60 100" fill="currentColor">
+          <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
+        </svg>
+      </span>
+      <span class="arrow">
+        <svg viewBox="0 0 60 100" fill="currentColor">
+          <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
+        </svg>
+      </span>
+    </div>
+  </header>
+
+  <!-- ============ БЛОК I. ИДЕОЛОГИЯ ============ -->
+  <section class="principles" aria-labelledby="block-1">
+    <span class="section-label" id="block-1">I.<span>Идеология</span></span>
+
+    <p>
+      <span class="num">1.</span>
+      <span class="name">Мы — левая демократическая организация.</span>
+      Левая демократическая идеология включает в себя множество принципов, за которые мы выступаем: равенство, рабочие права, солидарность, расширенные права человека, самоуправление, максимальное распространение демократии, общественное благо выше частной прибыли, мирная внешняя политика, антишовинизм.
+    </p>
+
+    <p>
+      <span class="num">2.</span>
+      <span class="name">Прогрессивность, в том числе в культуре.</span>
+      Сюда также входит множество принципов: экология, борьба с дискриминацией по полу и сексуальной ориентации, затраты на образование и популяризация науки. Все эти пункты неотделимы от анти-элитарных настроений и общей левой политики.
+    </p>
+
+    <p>
+      <span class="num">3.</span>
+      <span class="name">Отказ от косплея XX века.</span>
+      Мы не отказываемся от изучения истории для извлечения уроков. Но мы отказываемся от построения всей идентичности организации на ответах на вопросы, кто из левых был прав во время революции в России, в Веймаре и т. д. Мы живём в XXI веке и сосредоточены на современных задачах, методах, вызовах и стремлении к реальным изменениям. Мы учимся у прошлого, но не живём в нём.
+    </p>
+
+    <p>
+      <span class="num">4.</span>
+      <span class="name">Мы против элит, олигархии.</span>
+      Именно они виноваты в бедности и в сегодняшней ситуации в целом. История доказывает: прогрессивные преобразования в крупных странах совершаются не по доброй воле «просвещённой» части элиты, а под давлением миллионов объединённых обычных людей.
+    </p>
+
+    <p>
+      <span class="num">5.</span>
+      <span class="name">Мы хотим стать последовательными и надёжными защитниками интересов людей труда.</span>
+      Трудящиеся — это основа общества, и их права, достоинство и благополучие являются основным приоритетом. Мы выступаем за справедливые условия труда, достойную заработную плату, социальные гарантии и право на объединение в профсоюзы.
+    </p>
+
+    <p>
+      <span class="num">6.</span>
+      <span class="name">Антисектантство, плюрализм.</span>
+      Мы демократические левые с достаточно разными взглядами на философские вопросы, религию, методы реализации будущего и другие темы. При этом мы категорически не допускаем в наши ряды тех, кто прикрывается левыми идеями, но при этом проповедует шовинизм, милитаризм или авторитаризм.
+    </p>
+  </section>
+
+  <!-- ============ БЛОК II. СТРАТЕГИЯ ============ -->
+  <section class="principles" aria-labelledby="block-2">
+    <span class="section-label" id="block-2">II.<span>Стратегия</span></span>
+
+    <p>
+      <span class="num">1.</span>
+      <span class="name">Рациональность.</span>
+      Это наш главный метод. Мы выбираем концепцию политики, ориентированную на результат. Организация основывает свои действия и анализ на объективных условиях и фактах и исходя из них пытается выбрать наиболее эффективные решения. Мы пытаемся найти практические способы реализации наших целей и левых демократических идей, опираясь на трезвый расчёт. Подходить к политике нужно стратегически, а не эмоционально.
+    </p>
+
+    <p>
+      <span class="num">2.</span>
+      <span class="name">Политическая борьба.</span>
+      Мы существуем, чтобы добиться изменений, чтобы воплощать левые демократические принципы и построить справедливое общество.
+    </p>
+
+    <p>
+      <span class="num">3.</span>
+      <span class="name">Мы — протопартия.</span>
+      Мы надеемся стать значимой силой, способной влиять не только на локальную, но и на глобальную российскую политику. Наша цель — не создание закрытой секты, клуба или избы-читальни для самоутверждения в узком кругу, а построение широкого, открытого и эффективного движения, способного бороться за интересы людей.
+    </p>
+
+    <p>
+      <span class="num">4.</span>
+      <span class="name">Активное участие в самых разных инициативах.</span>
+      Ошибиться и сделать что-то лучше, чем отказаться от действий. Политическая борьба требует смелости, гибкости и готовности пробовать новые пути, даже если они кажутся неидеальными.
+    </p>
+
+    <p>
+      <span class="num">5.</span>
+      <span class="name">Солидарность.</span>
+      Мы стремимся к сотрудничеству с другими демократическими организациями, в первую очередь левыми, а также с независимыми общественными деятелями: прогрессивными кандидатами на выборах, блогерами и другими.
+    </p>
+  </section>
+
+  <!-- ============ БЛОК III. ОРГАНИЗАЦИЯ ============ -->
+  <section class="principles" aria-labelledby="block-3">
+    <span class="section-label" id="block-3">III.<span>Организация</span></span>
+
+    <p>
+      <span class="num">1.</span>
+      <span class="name">Рациональность, эффективность.</span>
+      Структурно-организационные вопросы в первую очередь строятся исходя из общего принципа рациональности. Структура должна быть настроена на достижение наших целей в современных условиях и основана на анализе. Мы сосредоточены на построении эффективной организации.
+    </p>
+
+    <p>
+      <span class="num">2.</span>
+      <span class="name">Общая демократичность организации.</span>
+      Цели и важные решения должны быть получены путём демократии из воли участников. При этом этот принцип для организации выводится из принципа рациональности, и демократия не должна превращаться в карго-культ голосований ради самих голосований.
+    </p>
+
+    <p>
+      <span class="num">3.</span>
+      <span class="name">Аргументированность.</span>
+      Важные решения должны приниматься только по итогам всестороннего и честного обсуждения. Качество решения напрямую зависит от качества дискуссии.
+    </p>
+
+    <p>
+      <span class="num">4.</span>
+      <span class="name">Гибкость.</span>
+      Создание новых организационных структур в зависимости от перехода на новые этапы развития организации. Нам придётся пройти множество этапов развития организации, а также, скорее всего, пережить сильные изменения в политической реальности, поэтому мы нацелены на быструю адаптацию.
+    </p>
+
+    <p>
+      <span class="num">5.</span>
+      <span class="name">Разумная безопасность.</span>
+      Мы пытаемся увеличивать возможную безопасность организации и членов всеми способами: как техническими, так и юридическими. При этом безопасность — это средство продолжения борьбы, а не оправдание для отказа от любых возможных действий.
+    </p>
+
+    <p>
+      <span class="num">6.</span>
+      <span class="name">Баланс между автономией и централизацией исходя из лучшей работы организации.</span>
+      Разные аспекты работы требуют разных подходов. Например, вопросы безопасности и контроль рисков разрушения организации должны быть максимально централизованы, а создание мероприятий — автономными.
+    </p>
+
+    <p>
+      <span class="num">7.</span>
+      <span class="name">Прозрачность.</span>
+      Решения и обсуждения, если они не касаются вопросов безопасности или особо чувствительных тем, должны быть открыты для всех членов организации. Мы стремимся к тому, чтобы каждый активист мог видеть, как принимаются решения, и понимать логику этих процессов.
+    </p>
+
+    <p>
+      <span class="num">8.</span>
+      <span class="name">Антитоксичность.</span>
+      Забота о настроении и потребностях активистов, избегание чрезмерной токсичности. Мы стремимся создать здоровую атмосферу, где учитываются настроения и потребности активистов, а токсичность и конфликты сведены к минимуму. Это не означает избегания критики — она должна быть конструктивной и направленной на решение проблем, а не на разжигание ненависти. Мы ценим открытый диалог, взаимное уважение и поддержку.
+    </p>
+  </section>
+
+  <!-- ============ ФИНАЛЬНЫЕ СТРЕЛКИ ============ -->
+  <div class="arrows-end" aria-hidden="true">
+    <span class="arrow arrow-1">
+      <svg viewBox="0 0 60 100" fill="currentColor">
+        <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
+      </svg>
+    </span>
+    <span class="arrow arrow-2">
+      <svg viewBox="0 0 60 100" fill="currentColor">
+        <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
+      </svg>
+    </span>
+    <span class="arrow arrow-3">
+      <svg viewBox="0 0 60 100" fill="currentColor">
+        <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
+      </svg>
+    </span>
+  </div>
+
+  <!-- ============ КНОПКИ ============ -->
+  <div class="actions">
+    <a href="index.html#join" class="btn btn-primary">
+      Вступить в организацию
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h14M13 6l6 6-6 6"/>
+      </svg>
+    </a>
+    <a href="index.html" class="btn btn-outline">На главную</a>
+  </div>
+
+</main>
+
+</body>
+</html>
