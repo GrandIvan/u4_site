@@ -94,10 +94,15 @@ h2.title{
 .header-inner{display:flex;align-items:center;justify-content:space-between;gap:24px}
 .logo{display:flex;align-items:center;gap:12px;color:var(--hdr);transition:color .35s}
 .logo-img{
-  width:40px;          /* ширина, как у прежнего квадратика */
-  height:40px;         /* высота */
-  object-fit:contain;  /* не искажает пропорции */
+  width:44px;
+  height:44px;
+  object-fit:cover;
+  border-radius:50%;
+  border:2px solid var(--purple-300);
+  padding:2px;
+  background:#fff;
   flex:none;
+  box-shadow:0 6px 16px rgba(124,58,237,.22);
 }
 .logo-mark svg{width:22px;height:22px}
 .logo-text{font-weight:800;font-size:1.02rem;letter-spacing:.02em;text-transform:uppercase;line-height:1}
