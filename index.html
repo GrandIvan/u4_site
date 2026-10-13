@@ -236,6 +236,16 @@ h2.title{
                    radial-gradient(circle at 78% 72%,rgba(255,255,255,.22),transparent 46%);
 }
 .news-thumb svg{width:56px;height:56px;color:rgba(255,255,255,.9);position:relative;z-index:1}
+.news-thumb img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  position:absolute;
+  inset:0;
+  z-index:1;
+}
+.news-thumb img + svg,
+.news-thumb:has(img) svg{display:none}
 .news-body{padding:26px 26px 30px;display:flex;flex-direction:column;flex:1}
 .news-meta{
   display:flex;align-items:center;gap:12px;
@@ -550,19 +560,15 @@ h2.title{
   'use strict';
 
   // ============================================================
-  //  ВСТАВЬТЕ СЮДА ССЫЛКУ НА ВАШУ RSS-ЛЕНТУ
-  //  Пример: https://rss.app/feeds/AbCdEfGh.xml
+  //  RSS-лента и количество новостей
   // ============================================================
   const RSS_URL = 'https://rss.app/feeds/MqFQDVEmEcczbBix.xml';
-
-  // Сколько новостей показывать
-  const COUNT = 3;
+  const COUNT = 6;
 
   // ------------------------------------------------------------
   const grid = document.getElementById('newsGrid');
   const loading = document.getElementById('newsLoading');
 
-  // Показываем сообщение вместо карточек
   function showMessage(text, isError) {
     if (loading) {
       loading.textContent = text;
@@ -575,7 +581,6 @@ h2.title{
     console.log('[news]', text);
   }
 
-  // Формат даты: 14 марта 2026
   function formatDate(dateStr) {
     if (!dateStr) return '';
     const months = ['января','февраля','марта','апреля','мая','июня',
@@ -585,18 +590,31 @@ h2.title{
     return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
   }
 
-  // Убираем HTML-теги
   function cleanText(html) {
     const tmp = document.createElement('div');
     tmp.innerHTML = html || '';
     return (tmp.textContent || tmp.innerText || '').trim();
   }
 
-  // Обрезаем длинный текст
   function truncate(text, max) {
     text = (text || '').trim();
     if (text.length <= max) return text;
     return text.slice(0, max).replace(/\s+\S*$/, '') + '…';
+  }
+
+  // Достаём картинку из HTML-описания
+  function extractImgFromHTML(html) {
+    if (!html) return '';
+    const m = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+    return m ? m[1] : '';
+  }
+
+  // Универсальный поиск картинки в элементе rss2json
+  function pickImage(item) {
+    if (item.thumbnail) return item.thumbnail;
+    if (item.enclosure && item.enclosure.link) return item.enclosure.link;
+    if (item.enclosure && item.enclosure.url)  return item.enclosure.url;
+    return extractImgFromHTML(item.content || item.description || '');
   }
 
   const thumbSVG =
@@ -604,7 +622,6 @@ h2.title{
     'stroke-linecap="round" stroke-linejoin="round">' +
     '<path d="M3 21h18M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6"/></svg>';
 
-  // Рисуем карточки
   function renderCards(items) {
     if (!grid) { console.error('[news] Не найден #newsGrid'); return; }
     grid.innerHTML = '';
@@ -614,13 +631,18 @@ h2.title{
       const desc  = truncate(cleanText(item.description || item.content), 160);
       const date  = formatDate(item.pubDate || item.pubdate || item.date);
       const link  = item.link || item.guid || '#';
+      const img   = item.__img || '';
+
+      const thumbContent = img
+        ? '<img src="' + img + '" alt="" loading="lazy" onerror="this.remove()">' + thumbSVG
+        : thumbSVG;
 
       const card = document.createElement('article');
       card.className = 'news-card reveal';
-      card.style.transitionDelay = (i * 90) + 'ms';
+      card.style.transitionDelay = Math.min(i * 60, 400) + 'ms';
 
       card.innerHTML =
-        '<div class="news-thumb">' + thumbSVG + '</div>' +
+        '<div class="news-thumb">' + thumbContent + '</div>' +
         '<div class="news-body">' +
           '<div class="news-meta">' +
             '<span>Новость</span>' +
@@ -653,7 +675,8 @@ h2.title{
 
   // ---- Способ 1: rss2json ----
   function loadViaRss2Json() {
-    const url = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(RSS_URL) + '&count=' + COUNT;
+    const url = 'https://api.rss2json.com/v1/api.json?rss_url=' +
+                encodeURIComponent(RSS_URL) + '&count=' + COUNT;
     console.log('[news] Пробуем rss2json:', url);
 
     return fetch(url)
@@ -662,7 +685,10 @@ h2.title{
         if (data.status !== 'ok') {
           throw new Error('rss2json: ' + (data.message || 'статус ' + data.status));
         }
-        return data.items || [];
+        return (data.items || []).map(function (it) {
+          it.__img = pickImage(it);
+          return it;
+        });
       });
   }
 
@@ -676,19 +702,36 @@ h2.title{
       .then(function (data) {
         if (!data.contents) throw new Error('allorigins: пустой ответ');
         const doc = new DOMParser().parseFromString(data.contents, 'text/xml');
-        const items = Array.from(doc.querySelectorAll('item, entry'));
-        return items.map(function (node) {
+        const nodes = Array.from(doc.querySelectorAll('item, entry'));
+
+        return nodes.map(function (node) {
           const get = function (tag) {
             const el = node.querySelector(tag);
             return el ? el.textContent : '';
           };
           const linkEl = node.querySelector('link');
-          const link = linkEl ? (linkEl.getAttribute('href') || linkEl.textContent) : '';
+          const link = linkEl
+            ? (linkEl.getAttribute('href') || linkEl.textContent)
+            : '';
+
+          const descHtml = get('description') || get('summary') ||
+                           get('content') || get('content\\:encoded');
+
+          // Ищем картинку в разных местах
+          const enc   = node.querySelector('enclosure');
+          const media = node.querySelector('media\\:content, media\\:thumbnail, content');
+
+          let img = '';
+          if (enc   && enc.getAttribute('url'))   img = enc.getAttribute('url');
+          else if (media && media.getAttribute('url')) img = media.getAttribute('url');
+          else img = extractImgFromHTML(descHtml);
+
           return {
             title: get('title'),
-            description: get('description') || get('summary') || get('content'),
+            description: descHtml,
             pubDate: get('pubDate') || get('published') || get('updated'),
-            link: link
+            link: link,
+            __img: img
           };
         });
       });
