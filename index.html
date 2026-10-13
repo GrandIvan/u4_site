@@ -596,6 +596,7 @@ h2.title{
 </script>
 
 <!-- ================ НОВОСТИ ================ -->
+<!-- ================ НОВОСТИ ================ -->
 <script>
 (function () {
   'use strict';
@@ -612,11 +613,9 @@ h2.title{
       loading.textContent = text;
       loading.style.color = isError ? '#DC2626' : 'var(--muted)';
     } else if (grid) {
-      grid.innerHTML =
-        '<p style="color:' + (isError ? '#DC2626' : 'var(--muted)') +
+      grid.innerHTML = '<p style="color:' + (isError ? '#DC2626' : 'var(--muted)') +
         ';text-align:center;padding:20px 0;">' + text + '</p>';
     }
-    console.log('[news]', text);
   }
 
   function formatDate(dateStr) {
@@ -640,6 +639,25 @@ h2.title{
     return text.slice(0, max).replace(/\s+\S*$/, '') + '…';
   }
 
+  function parseXML(xmlText) {
+    const doc = new DOMParser().parseFromString(xmlText, 'text/xml');
+    const nodes = Array.from(doc.querySelectorAll('item, entry'));
+    return nodes.map(function (node) {
+      const txt = function (tag) {
+        const el = node.getElementsByTagName(tag)[0];
+        return el ? el.textContent : '';
+      };
+      const linkEl = node.querySelector('link');
+      const link = linkEl ? (linkEl.getAttribute('href') || linkEl.textContent) : '';
+      return {
+        title: txt('title'),
+        description: txt('description') || txt('summary') || txt('content') || txt('content:encoded'),
+        pubDate: txt('pubDate') || txt('published') || txt('updated'),
+        link: link
+      };
+    });
+  }
+
   function renderCards(items) {
     if (!grid) return;
     grid.innerHTML = '';
@@ -655,22 +673,15 @@ h2.title{
       card.style.transitionDelay = Math.min(i * 60, 400) + 'ms';
 
       card.innerHTML =
-        '<div class="news-thumb">' +
-          '<img src="' + FAVICON + '" alt="">' +
-        '</div>' +
+        '<div class="news-thumb"><img src="' + FAVICON + '" alt=""></div>' +
         '<div class="news-body">' +
-          '<div class="news-meta">' +
-            '<span>Новость</span>' +
-            '<span class="dot"></span>' +
-            '<span class="date">' + date + '</span>' +
-          '</div>' +
+          '<div class="news-meta"><span>Новость</span><span class="dot"></span>' +
+          '<span class="date">' + date + '</span></div>' +
           '<h3>' + title + '</h3>' +
           '<p>' + desc + '</p>' +
           '<a class="news-link" href="' + link + '" target="_blank" rel="noopener">' +
             'Читать в Telegram' +
-            '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" ' +
-            'stroke="currentColor" stroke-width="2.4" stroke-linecap="round" ' +
-            'stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>' +
+            '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>' +
           '</a>' +
         '</div>';
 
@@ -678,80 +689,80 @@ h2.title{
     });
 
     if (loading) loading.remove();
-
     requestAnimationFrame(function () {
-      grid.querySelectorAll('.reveal').forEach(function (el) {
-        el.classList.add('in');
-      });
+      grid.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in'); });
     });
-
-    console.log('[news] Загружено карточек:', Math.min(items.length, COUNT));
   }
 
-  function loadRaw() {
-    const proxy = 'https://api.allorigins.win/get?url=' + encodeURIComponent(RSS_URL);
-    return fetch(proxy)
-      .then(function (r) { return r.json(); })
-      .then(function (data) {
-        if (!data.contents) throw new Error('allorigins: пусто');
-
-        let xml = data.contents;
-        if (typeof xml === 'string' && xml.trim().startsWith('{')) {
-          try {
-            const inner = JSON.parse(xml);
-            if (inner && inner.contents) xml = inner.contents;
-          } catch (e) {}
-        }
-
-        const doc = new DOMParser().parseFromString(xml, 'text/xml');
-        const nodes = Array.from(doc.querySelectorAll('item, entry'));
-        if (!nodes.length) throw new Error('нет элементов');
-
-        return nodes.map(function (node) {
-          const txt = function (tag) {
-            const el = node.getElementsByTagName(tag)[0];
-            return el ? el.textContent : '';
-          };
-          const linkEl = node.querySelector('link');
-          const link = linkEl
-            ? (linkEl.getAttribute('href') || linkEl.textContent)
-            : '';
-
-          return {
-            title: txt('title'),
-            description: txt('description') || txt('summary') ||
-                         txt('content') || txt('content:encoded'),
-            pubDate: txt('pubDate') || txt('published') || txt('updated'),
-            link: link
-          };
-        });
-      });
-  }
-
-  function loadRss2Json() {
-    const url = 'https://api.rss2json.com/v1/api.json?rss_url=' +
-                encodeURIComponent(RSS_URL) + '&count=' + COUNT;
+  // === 1) rss2json (без count) ===
+  function viaRss2Json() {
+    const url = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(RSS_URL);
     return fetch(url)
       .then(function (r) { return r.json(); })
       .then(function (data) {
-        if (data.status !== 'ok') throw new Error(data.message || 'ошибка');
-        return data.items || [];
+        if (data.status !== 'ok' || !data.items || !data.items.length) {
+          throw new Error('rss2json: ' + (data.message || data.status));
+        }
+        return data.items;
       });
   }
 
-  loadRaw()
+  // === 2) corsproxy.io ===
+  function viaCorsProxy() {
+    const url = 'https://corsproxy.io/?url=' + encodeURIComponent(RSS_URL);
+    return fetch(url)
+      .then(function (r) { return r.text(); })
+      .then(function (xml) {
+        if (!xml || xml.indexOf('<') === -1) throw new Error('corsproxy: пусто');
+        const items = parseXML(xml);
+        if (!items.length) throw new Error('corsproxy: нет элементов');
+        return items;
+      });
+  }
+
+  // === 3) codetabs ===
+  function viaCodeTabs() {
+    const url = 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(RSS_URL);
+    return fetch(url)
+      .then(function (r) { return r.text(); })
+      .then(function (xml) {
+        if (!xml || xml.indexOf('<') === -1) throw new Error('codetabs: пусто');
+        const items = parseXML(xml);
+        if (!items.length) throw new Error('codetabs: нет элементов');
+        return items;
+      });
+  }
+
+  // === 4) allorigins (последний) ===
+  function viaAllOrigins() {
+    const url = 'https://api.allorigins.win/get?url=' + encodeURIComponent(RSS_URL);
+    return fetch(url)
+      .then(function (r) { return r.text(); })
+      .then(function (txt) {
+        // allorigins иногда отдаёт "Oops..." вместо JSON
+        if (!txt || txt.trim().charAt(0) !== '{') throw new Error('allorigins: не JSON');
+        const data = JSON.parse(txt);
+        if (!data.contents) throw new Error('allorigins: пусто');
+        const items = parseXML(data.contents);
+        if (!items.length) throw new Error('allorigins: нет элементов');
+        return items;
+      });
+  }
+
+  // Пробуем по очереди
+  viaRss2Json()
+    .catch(function (e) { console.warn('[news] rss2json:', e.message); return viaCorsProxy(); })
+    .catch(function (e) { console.warn('[news] corsproxy:', e.message); return viaCodeTabs(); })
+    .catch(function (e) { console.warn('[news] codetabs:', e.message); return viaAllOrigins(); })
     .then(renderCards)
-    .catch(function (err) {
-      console.warn('[news] allorigins не сработал:', err.message);
-      return loadRss2Json().then(renderCards);
-    })
-    .catch(function (err) {
-      console.error('[news] Всё упало:', err);
-      showMessage('Не удалось загрузить новости. F12 → Console.', true);
+    .catch(function (e) {
+      console.error('[news] Все способы не сработали:', e);
+      showMessage('Не удалось загрузить новости.', true);
     });
 })();
 </script>
 
+<!-- ================ ИНИЦИАТИВЫ ================ -->
 <!-- ================ ИНИЦИАТИВЫ ================ -->
 <script>
 (function () {
@@ -759,7 +770,7 @@ h2.title{
 
   const RSS_URL = 'https://rss.app/feeds/cPU2ZPrtiDXSpzFx.xml';
   const COUNT = 6;
-  const FAVICON = 'nolog_logo.png';
+  const FAVICON = 'android-chrome-512x512.png';
 
   const grid = document.getElementById('initiativesGrid');
   const loading = document.getElementById('initiativesLoading');
@@ -769,11 +780,9 @@ h2.title{
       loading.textContent = text;
       loading.style.color = isError ? '#DC2626' : 'var(--muted)';
     } else if (grid) {
-      grid.innerHTML =
-        '<p style="color:' + (isError ? '#DC2626' : 'var(--muted)') +
+      grid.innerHTML = '<p style="color:' + (isError ? '#DC2626' : 'var(--muted)') +
         ';text-align:center;padding:20px 0;">' + text + '</p>';
     }
-    console.log('[initiatives]', text);
   }
 
   function formatDate(dateStr) {
@@ -797,6 +806,25 @@ h2.title{
     return text.slice(0, max).replace(/\s+\S*$/, '') + '…';
   }
 
+  function parseXML(xmlText) {
+    const doc = new DOMParser().parseFromString(xmlText, 'text/xml');
+    const nodes = Array.from(doc.querySelectorAll('item, entry'));
+    return nodes.map(function (node) {
+      const txt = function (tag) {
+        const el = node.getElementsByTagName(tag)[0];
+        return el ? el.textContent : '';
+      };
+      const linkEl = node.querySelector('link');
+      const link = linkEl ? (linkEl.getAttribute('href') || linkEl.textContent) : '';
+      return {
+        title: txt('title'),
+        description: txt('description') || txt('summary') || txt('content') || txt('content:encoded'),
+        pubDate: txt('pubDate') || txt('published') || txt('updated'),
+        link: link
+      };
+    });
+  }
+
   function renderCards(items) {
     if (!grid) return;
     grid.innerHTML = '';
@@ -812,22 +840,15 @@ h2.title{
       card.style.transitionDelay = Math.min(i * 60, 400) + 'ms';
 
       card.innerHTML =
-        '<div class="news-thumb">' +
-          '<img src="' + FAVICON + '" alt="">' +
-        '</div>' +
+        '<div class="news-thumb"><img src="' + FAVICON + '" alt=""></div>' +
         '<div class="news-body">' +
-          '<div class="news-meta">' +
-            '<span>Инициатива</span>' +
-            '<span class="dot"></span>' +
-            '<span class="date">' + date + '</span>' +
-          '</div>' +
+          '<div class="news-meta"><span>Инициатива</span><span class="dot"></span>' +
+          '<span class="date">' + date + '</span></div>' +
           '<h3>' + title + '</h3>' +
           '<p>' + desc + '</p>' +
           '<a class="news-link" href="' + link + '" target="_blank" rel="noopener">' +
             'Подробнее' +
-            '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" ' +
-            'stroke="currentColor" stroke-width="2.4" stroke-linecap="round" ' +
-            'stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>' +
+            '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>' +
           '</a>' +
         '</div>';
 
@@ -835,77 +856,73 @@ h2.title{
     });
 
     if (loading) loading.remove();
-
     requestAnimationFrame(function () {
-      grid.querySelectorAll('.reveal').forEach(function (el) {
-        el.classList.add('in');
-      });
+      grid.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in'); });
     });
-
-    console.log('[initiatives] Загружено карточек:', Math.min(items.length, COUNT));
   }
 
-  function loadRaw() {
-    const proxy = 'https://api.allorigins.win/get?url=' + encodeURIComponent(RSS_URL);
-    return fetch(proxy)
-      .then(function (r) { return r.json(); })
-      .then(function (data) {
-        if (!data.contents) throw new Error('allorigins: пусто');
-
-        let xml = data.contents;
-        if (typeof xml === 'string' && xml.trim().startsWith('{')) {
-          try {
-            const inner = JSON.parse(xml);
-            if (inner && inner.contents) xml = inner.contents;
-          } catch (e) {}
-        }
-
-        const doc = new DOMParser().parseFromString(xml, 'text/xml');
-        const nodes = Array.from(doc.querySelectorAll('item, entry'));
-        if (!nodes.length) throw new Error('нет элементов');
-
-        return nodes.map(function (node) {
-          const txt = function (tag) {
-            const el = node.getElementsByTagName(tag)[0];
-            return el ? el.textContent : '';
-          };
-          const linkEl = node.querySelector('link');
-          const link = linkEl
-            ? (linkEl.getAttribute('href') || linkEl.textContent)
-            : '';
-
-          return {
-            title: txt('title'),
-            description: txt('description') || txt('summary') ||
-                         txt('content') || txt('content:encoded'),
-            pubDate: txt('pubDate') || txt('published') || txt('updated'),
-            link: link
-          };
-        });
-      });
-  }
-
-  function loadRss2Json() {
-    const url = 'https://api.rss2json.com/v1/api.json?rss_url=' +
-                encodeURIComponent(RSS_URL) + '&count=' + COUNT;
+  function viaRss2Json() {
+    const url = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(RSS_URL);
     return fetch(url)
       .then(function (r) { return r.json(); })
       .then(function (data) {
-        if (data.status !== 'ok') throw new Error(data.message || 'ошибка');
-        return data.items || [];
+        if (data.status !== 'ok' || !data.items || !data.items.length) {
+          throw new Error('rss2json: ' + (data.message || data.status));
+        }
+        return data.items;
       });
   }
 
-  loadRaw()
-    .then(renderCards)
-    .catch(function (err) {
-      console.warn('[initiatives] allorigins не сработал:', err.message);
-      return loadRss2Json().then(renderCards);
-    })
-    .catch(function (err) {
-      console.error('[initiatives] Всё упало:', err);
-      showMessage('Не удалось загрузить инициативы. F12 → Console.', true);
-    });
+  function viaCorsProxy() {
+    const url = 'https://corsproxy.io/?url=' + encodeURIComponent(RSS_URL);
+    return fetch(url)
+      .then(function (r) { return r.text(); })
+      .then(function (xml) {
+        if (!xml || xml.indexOf('<') === -1) throw new Error('corsproxy: пусто');
+        const items = parseXML(xml);
+        if (!items.length) throw new Error('corsproxy: нет элементов');
+        return items;
+      });
+  }
+
+  function viaCodeTabs() {
+    const url = 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(RSS_URL);
+    return fetch(url)
+      .then(function (r) { return r.text(); })
+      .then(function (xml) {
+        if (!xml || xml.indexOf('<') === -1) throw new Error('codetabs: пусто');
+        const items = parseXML(xml);
+        if (!items.length) throw new Error('codetabs: нет элементов');
+        return items;
+      });
+  }
+
+  function viaAllOrigins() {
+    const url = 'https://api.allorigins.win/get?url=' + encodeURIComponent(RSS_URL);
+    return fetch(url)
+      .then(function (r) { return r.text(); })
+      .then(function (txt) {
+        if (!txt || txt.trim().charAt(0) !== '{') throw new Error('allorigins: не JSON');
+        const data = JSON.parse(txt);
+        if (!data.contents) throw new Error('allorigins: пусто');
+        const items = parseXML(data.contents);
+        if (!items.length) throw new Error('allorigins: нет элементов');
+        return items;
+      });
+  }
+
+  // Запуск с задержкой, чтобы не грузить прокси одновременно с новостями
+  setTimeout(function () {
+    viaRss2Json()
+      .catch(function (e) { console.warn('[initiatives] rss2json:', e.message); return viaCorsProxy(); })
+      .catch(function (e) { console.warn('[initiatives] corsproxy:', e.message); return viaCodeTabs(); })
+      .catch(function (e) { console.warn('[initiatives] codetabs:', e.message); return viaAllOrigins(); })
+      .then(renderCards)
+      .catch(function (e) {
+        console.error('[initiatives] Все способы не сработали:', e);
+        showMessage('Не удалось загрузить инициативы.', true);
+      });
+  }, 900);
 })();
 </script>
 </body>
