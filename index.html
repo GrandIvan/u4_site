@@ -245,12 +245,17 @@ h2.title{
   z-index:1;
 }
 .news-thumb img{
-  width:64px;
-  height:64px;
-  object-fit:contain;
+  width:72px;
+  height:72px;
+  object-fit:cover;
   border-radius:50%;
+  border:3px solid #fff;
+  padding:2px;
+  background:rgba(255,255,255,.15);
   position:relative;
   z-index:1;
+  box-shadow:0 6px 18px rgba(0,0,0,.20);
+}
 }
 .news-body{padding:26px 26px 30px;display:flex;flex-direction:column;flex:1}
 .news-meta{
@@ -568,7 +573,7 @@ h2.title{
 
   const RSS_URL = 'https://rss.app/feeds/MqFQDVEmEcczbBix.xml';
   const COUNT = 9;
-  const FAVICON = 'favicon-32x32.png';   // ← путь к фавикону
+  const FAVICON = 'android-chrome-512x512.png';   // ← путь к фавикону
 
   const grid = document.getElementById('newsGrid');
   const loading = document.getElementById('newsLoading');
