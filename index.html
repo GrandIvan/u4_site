@@ -238,12 +238,6 @@ h2.title{
   background-image:radial-gradient(circle at 22% 28%,rgba(255,255,255,.35),transparent 42%),
                    radial-gradient(circle at 78% 72%,rgba(255,255,255,.22),transparent 46%);
 }
-.news-thumb svg{
-  width:56px;height:56px;
-  color:rgba(255,255,255,.9);
-  position:relative;
-  z-index:1;
-}
 .news-thumb img{
   width:72px;
   height:72px;
@@ -255,7 +249,6 @@ h2.title{
   position:relative;
   z-index:1;
   box-shadow:0 6px 18px rgba(0,0,0,.20);
-}
 }
 .news-body{padding:26px 26px 30px;display:flex;flex-direction:column;flex:1}
 .news-meta{
@@ -571,9 +564,12 @@ h2.title{
 (function () {
   'use strict';
 
+  /* ============================================================
+     RSS-лента, количество новостей и картинка для карточек
+     ============================================================ */
   const RSS_URL = 'https://rss.app/feeds/MqFQDVEmEcczbBix.xml';
   const COUNT = 9;
-  const FAVICON = 'android-chrome-512x512.png';   // ← путь к фавикону
+  const FAVICON = 'android-chrome-512x512.png';
 
   const grid = document.getElementById('newsGrid');
   const loading = document.getElementById('newsLoading');
@@ -621,14 +617,14 @@ h2.title{
       const date  = formatDate(item.pubDate);
       const link  = item.link || item.guid || '#';
 
-      const thumb = '<img src="' + FAVICON + '" alt="">';
-
       const card = document.createElement('article');
       card.className = 'news-card reveal';
       card.style.transitionDelay = Math.min(i * 60, 400) + 'ms';
 
       card.innerHTML =
-        '<div class="news-thumb">' + thumb + '</div>' +
+        '<div class="news-thumb">' +
+          '<img src="' + FAVICON + '" alt="">' +
+        '</div>' +
         '<div class="news-body">' +
           '<div class="news-meta">' +
             '<span>Новость</span>' +
@@ -725,4 +721,5 @@ h2.title{
     });
 })();
 </script>
+</body>
 </html>
