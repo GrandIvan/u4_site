@@ -566,11 +566,9 @@ h2.title{
 (function () {
   'use strict';
 
-  /* ============================================================
-     RSS-лента и количество новостей
-     ============================================================ */
   const RSS_URL = 'https://rss.app/feeds/MqFQDVEmEcczbBix.xml';
   const COUNT = 9;
+  const FAVICON = 'favicon-32x32.png';   // ← путь к фавикону
 
   const grid = document.getElementById('newsGrid');
   const loading = document.getElementById('newsLoading');
@@ -608,17 +606,6 @@ h2.title{
     return text.slice(0, max).replace(/\s+\S*$/, '') + '…';
   }
 
-  function extractImgFromHTML(html) {
-    if (!html) return '';
-    const m = html.match(/<img[^>]+src=["']([^"']+)["']/i);
-    return m ? m[1] : '';
-  }
-
-  const thumbSVG =
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" ' +
-    'stroke-linecap="round" stroke-linejoin="round">' +
-    '<path d="M3 21h18M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6"/></svg>';
-
   function renderCards(items) {
     if (!grid) return;
     grid.innerHTML = '';
@@ -628,12 +615,8 @@ h2.title{
       const desc  = truncate(cleanText(item.description || item.content), 160);
       const date  = formatDate(item.pubDate);
       const link  = item.link || item.guid || '#';
-      const img   = item.__img || '';
 
-      const thumb = img
-        ? '<img src="' + img + '" alt="" loading="lazy" referrerpolicy="no-referrer" ' +
-          'onerror="this.remove()">' + thumbSVG
-        : thumbSVG;
+      const thumb = '<img src="' + FAVICON + '" alt="">';
 
       const card = document.createElement('article');
       card.className = 'news-card reveal';
@@ -674,8 +657,6 @@ h2.title{
   /* === Способ 1: allorigins + сырой XML === */
   function loadRaw() {
     const proxy = 'https://api.allorigins.win/get?url=' + encodeURIComponent(RSS_URL);
-    console.log('[news] allorigins:', proxy);
-
     return fetch(proxy)
       .then(function (r) { return r.json(); })
       .then(function (data) {
@@ -691,47 +672,24 @@ h2.title{
 
         const doc = new DOMParser().parseFromString(xml, 'text/xml');
         const nodes = Array.from(doc.querySelectorAll('item, entry'));
-        if (!nodes.length) throw new Error('allorigins: нет элементов');
+        if (!nodes.length) throw new Error('нет элементов');
 
         return nodes.map(function (node) {
           const txt = function (tag) {
             const el = node.getElementsByTagName(tag)[0];
             return el ? el.textContent : '';
           };
-
           const linkEl = node.querySelector('link');
           const link = linkEl
             ? (linkEl.getAttribute('href') || linkEl.textContent)
             : '';
 
-          const descHtml =
-            txt('description') ||
-            txt('summary') ||
-            txt('content') ||
-            txt('content:encoded');
-
-          let img = '';
-
-          const enc = node.getElementsByTagName('enclosure')[0];
-          if (enc && enc.getAttribute('url')) img = enc.getAttribute('url');
-
-          if (!img) {
-            const media = node.getElementsByTagName('media:content')[0]
-                       || node.getElementsByTagName('media:thumbnail')[0];
-            if (media && media.getAttribute('url')) img = media.getAttribute('url');
-          }
-
-          if (!img) {
-            const imgs = descHtml.match(/<img[^>]+src=["']([^"']+)["']/i);
-            if (imgs) img = imgs[1];
-          }
-
           return {
             title: txt('title'),
-            description: descHtml,
+            description: txt('description') || txt('summary') ||
+                         txt('content') || txt('content:encoded'),
             pubDate: txt('pubDate') || txt('published') || txt('updated'),
-            link: link,
-            __img: img
+            link: link
           };
         });
       });
@@ -741,28 +699,15 @@ h2.title{
   function loadRss2Json() {
     const url = 'https://api.rss2json.com/v1/api.json?rss_url=' +
                 encodeURIComponent(RSS_URL) + '&count=' + COUNT;
-    console.log('[news] rss2json:', url);
-
     return fetch(url)
       .then(function (r) { return r.json(); })
       .then(function (data) {
         if (data.status !== 'ok') throw new Error(data.message || 'ошибка');
-        return (data.items || []).map(function (it) {
-          let img = it.thumbnail || '';
-          if (!img && it.enclosure) img = it.enclosure.link || it.enclosure.url || '';
-          if (!img) img = extractImgFromHTML(it.content || it.description || '');
-          it.__img = img;
-          return it;
-        });
+        return data.items || [];
       });
   }
 
   /* === Запуск === */
-  if (!RSS_URL || RSS_URL.indexOf('ВАШ_ID') !== -1) {
-    showMessage('Укажите ссылку на RSS-ленту.', true);
-    return;
-  }
-
   loadRaw()
     .then(renderCards)
     .catch(function (err) {
