@@ -219,7 +219,7 @@ h2.title{
 .value-item h4{font-size:1.1rem;font-weight:800;letter-spacing:-.02em;margin-bottom:7px}
 .value-item p{color:var(--muted);font-size:.94rem}
 
-/* ---------- NEWS ---------- */
+/* ---------- NEWS / INITIATIVES (общие карточки) ---------- */
 .news-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
 .news-card{
   border-radius:var(--radius);overflow:hidden;background:#fff;
@@ -266,6 +266,20 @@ h2.title{
   transition:gap .3s var(--ease);
 }
 .news-card:hover .news-link{gap:14px}
+
+/* ---------- INITIATIVES (фон и акценты) ---------- */
+.initiatives{background:var(--purple-25);position:relative;overflow:hidden}
+.initiatives::before{
+  content:"";position:absolute;width:520px;height:520px;border-radius:50%;
+  background:radial-gradient(circle,rgba(188,61,208,.18),transparent 68%);
+  bottom:-240px;right:-180px;
+  pointer-events:none;
+}
+.initiatives .container{position:relative;z-index:1}
+.initiatives .news-card{border-color:var(--purple-200)}
+.initiatives .news-thumb{
+  background:linear-gradient(140deg,var(--purple-800),var(--purple-600) 60%,var(--purple-500));
+}
 
 /* ---------- FOOTER ---------- */
 .footer{background:var(--purple-950);color:rgba(255,255,255,.62);padding:70px 0 34px;font-size:.9rem}
@@ -336,19 +350,6 @@ h2.title{
   .reveal{opacity:1;transform:none}
   html{scroll-behavior:auto}
 }
-/* ---------- INITIATIVES ---------- */
-.initiatives{background:var(--purple-25);position:relative;overflow:hidden}
-.initiatives::before{
-  content:"";position:absolute;width:520px;height:520px;border-radius:50%;
-  background:radial-gradient(circle,rgba(188,61,208,.18),transparent 68%);
-  bottom:-240px;right:-180px;
-  pointer-events:none;
-}
-.initiatives .container{position:relative;z-index:1}
-.initiatives .news-card{border-color:var(--purple-200)}
-.initiatives .news-thumb{
-  background:linear-gradient(140deg,var(--purple-800),var(--purple-600) 60%,var(--purple-500));
-}
 </style>
 </head>
 <body>
@@ -365,6 +366,7 @@ h2.title{
       <a href="printsipy.html">Принципы</a>
       <a href="concept.html">Концептуальная основа</a>
       <a href="#news">Новости</a>
+      <a href="#initiatives">Инициативы</a>
       <a href="https://t.me/Uchastie_join_bot" class="nav-cta">Вступить в организацию</a>
     </nav>
 
@@ -473,6 +475,7 @@ h2.title{
     </p>
   </div>
 </section>
+
 <!-- ================= INITIATIVES ================= -->
 <section class="section initiatives" id="initiatives">
   <div class="container">
@@ -528,6 +531,7 @@ h2.title{
         <ul>
           <li><a href="https://t.me/Uchastie_join_bot">Вступить в организацию</a></li>
           <li><a href="#news">Новости</a></li>
+          <li><a href="#initiatives">Инициативы</a></li>
         </ul>
       </div>
     </div>
@@ -591,16 +595,14 @@ h2.title{
 })();
 </script>
 
+<!-- ================ НОВОСТИ ================ -->
 <script>
 (function () {
   'use strict';
 
-  /* ============================================================
-     RSS-лента, количество новостей и картинка для карточек
-     ============================================================ */
   const RSS_URL = 'https://rss.app/feeds/MqFQDVEmEcczbBix.xml';
-  const COUNT = 6;
-  const FAVICON = 'favicon-32x32.png';
+  const COUNT = 9;
+  const FAVICON = 'android-chrome-512x512.png';
 
   const grid = document.getElementById('newsGrid');
   const loading = document.getElementById('newsLoading');
@@ -686,7 +688,6 @@ h2.title{
     console.log('[news] Загружено карточек:', Math.min(items.length, COUNT));
   }
 
-  /* === Способ 1: allorigins + сырой XML === */
   function loadRaw() {
     const proxy = 'https://api.allorigins.win/get?url=' + encodeURIComponent(RSS_URL);
     return fetch(proxy)
@@ -727,7 +728,6 @@ h2.title{
       });
   }
 
-  /* === Способ 2: rss2json (запасной) === */
   function loadRss2Json() {
     const url = 'https://api.rss2json.com/v1/api.json?rss_url=' +
                 encodeURIComponent(RSS_URL) + '&count=' + COUNT;
@@ -739,7 +739,6 @@ h2.title{
       });
   }
 
-  /* === Запуск === */
   loadRaw()
     .then(renderCards)
     .catch(function (err) {
@@ -752,16 +751,15 @@ h2.title{
     });
 })();
 </script>
+
+<!-- ================ ИНИЦИАТИВЫ ================ -->
 <script>
 (function () {
   'use strict';
 
-  /* ============================================================
-     RSS-лента инициатив
-     ============================================================ */
   const RSS_URL = 'https://rss.app/feeds/cPU2ZPrtiDXSpzFx.xml';
-  const COUNT = 3;
-  const FAVICON = 'favicon-32x32.png';
+  const COUNT = 6;
+  const FAVICON = 'android-chrome-512x512.png';
 
   const grid = document.getElementById('initiativesGrid');
   const loading = document.getElementById('initiativesLoading');
