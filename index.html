@@ -434,59 +434,16 @@ h2.title{
     <div class="section-head reveal">
       <span class="eyebrow">Новости</span>
       <h2 class="title">Что происходит в движении</h2>
-      <p class="lead">Отчёты о работе, инициативы и встречи с жителями регионов.</p>
+      <p class="lead">Последние публикации из нашего Telegram-канала.</p>
     </div>
 
-    <div class="news-grid">
-      <article class="news-card reveal">
-        <div class="news-thumb">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 21h18M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6"/>
-          </svg>
-        </div>
-        <div class="news-body">
-          <div class="news-meta"><span>Инициатива</span><span class="dot"></span><span class="date">14 марта 2026</span></div>
-          <h3>Внесён законопроект о бесплатном питании в школах</h3>
-          <p>Документ охватит все младшие классы уже с нового учебного года. Финансирование заложено в бюджет.</p>
-          <span class="news-link">Читать далее
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </span>
-        </div>
-      </article>
-
-      <article class="news-card reveal">
-        <div class="news-thumb">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/>
-            <path d="M22 21v-2a4 4 0 0 0-3-3.87M16.5 3.13A4 4 0 0 1 16.5 11"/>
-          </svg>
-        </div>
-        <div class="news-body">
-          <div class="news-meta"><span>Встречи</span><span class="dot"></span><span class="date">8 марта 2026</span></div>
-          <h3>Открытый форум с жителями: 12 городов за месяц</h3>
-          <p>Команда движения провела серию встреч, где каждый мог задать вопрос напрямую и предложить идею в программу.</p>
-          <span class="news-link">Читать далее
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </span>
-        </div>
-      </article>
-
-      <article class="news-card reveal">
-        <div class="news-thumb">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2 4 6v6c0 5 3.4 9.2 8 10 4.6-.8 8-5 8-10V6l-8-4Z"/><path d="M9.2 12.2l2 2 3.6-4"/>
-          </svg>
-        </div>
-        <div class="news-body">
-          <div class="news-meta"><span>Отчёт</span><span class="dot"></span><span class="date">28 февраля 2026</span></div>
-          <h3>Публичный отчёт о расходах движения за год</h3>
-          <p>Полная финансовая отчётность в открытом доступе: источники средств, статьи расходов, аудит независимой компании.</p>
-          <span class="news-link">Читать далее
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </span>
-        </div>
-      </article>
+    <div class="news-grid" id="newsGrid">
+      <!-- Карточки подгрузятся автоматически -->
     </div>
+
+    <p id="newsLoading" style="color:var(--muted); text-align:center; padding:20px 0;">
+      Загружаем новости…
+    </p>
   </div>
 </section>
 
@@ -586,6 +543,96 @@ h2.title{
   } else {
     revealEls.forEach(el => el.classList.add('in'));
   }
+})();
+</script>
+  <script>
+(function () {
+  'use strict';
+
+  // ↓↓↓ ВСТАВЬТЕ СЮДА ССЫЛКУ НА ВАШУ RSS-ЛЕНТУ
+  const RSS_URL = 'https://rss.app/feeds/MqFQDVEmEcczbBix.xml';
+
+  const grid = document.getElementById('newsGrid');
+  const loading = document.getElementById('newsLoading');
+
+  // Форматируем дату: 14 марта 2026
+  function formatDate(dateStr) {
+    const months = ['января','февраля','марта','апреля','мая','июня',
+                    'июля','августа','сентября','октября','ноября','декабря'];
+    const d = new Date(dateStr);
+    return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  // Убираем HTML-теги из описания
+  function cleanText(html) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html || '';
+    return (tmp.textContent || '').trim();
+  }
+
+  // Обрезаем длинный текст
+  function truncate(text, max) {
+    if (text.length <= max) return text;
+    return text.slice(0, max).replace(/\s+\S*$/, '') + '…';
+  }
+
+  // Иконка-заглушка (та же, что была в статичных карточках)
+  const thumbSVG = `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"
+         stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 21h18M5 21V8l7-5 7 5v13"/>
+      <path d="M9 21v-6h6v6"/>
+    </svg>`;
+
+  fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(RSS_URL))
+    .then(res => res.json())
+    .then(data => {
+      loading.remove();
+      if (!data.items || !data.items.length) {
+        grid.innerHTML = '<p style="color:var(--muted);">Новостей пока нет.</p>';
+        return;
+      }
+
+      // Берём только 3 последние
+      data.items.slice(0, 3).forEach((item, i) => {
+        const title = truncate(cleanText(item.title), 100);
+        const desc  = truncate(cleanText(item.description), 160);
+        const date  = formatDate(item.pubDate);
+
+        const card = document.createElement('article');
+        card.className = 'news-card reveal';
+        card.style.transitionDelay = (i * 90) + 'ms';
+
+        card.innerHTML = `
+          <div class="news-thumb">${thumbSVG}</div>
+          <div class="news-body">
+            <div class="news-meta">
+              <span>Новость</span>
+              <span class="dot"></span>
+              <span class="date">${date}</span>
+            </div>
+            <h3>${title}</h3>
+            <p>${desc}</p>
+            <a class="news-link" href="${item.link}" target="_blank" rel="noopener">
+              Читать в Telegram
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
+                   stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      // Запускаем анимацию появления
+      requestAnimationFrame(() => {
+        grid.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+      });
+    })
+    .catch(() => {
+      loading.textContent = 'Не удалось загрузить новости.';
+      loading.style.color = '#DC2626';
+    });
 })();
 </script>
 </body>
