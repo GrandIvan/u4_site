@@ -2,8 +2,11 @@ name: Sync RSS Data
 
 on:
   schedule:
-    - cron: '0 * * * *' # Запуск каждый час ровно
-  workflow_dispatch: # Позволяет запустить вручную кнопкой во вкладке Actions
+    - cron: '0 * * * *' # Каждый час
+  workflow_dispatch: # Кнопка ручного запуска
+
+permissions:
+  contents: write # ← КРИТИЧЕСКИ ВАЖНО! Без этого git push упадет с ошибкой
 
 jobs:
   build:
@@ -16,6 +19,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+
+      - name: Install dependencies
+        run: npm install rss-parser
 
       - name: Run parser script
         run: node fetch-rss.js
