@@ -229,9 +229,9 @@ h2.title{
 }
 .news-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-md)}
 
-/* Высота картинки — 260px */
+/* Высота картинки — 350px */
 .news-thumb{
-  height:260px;
+  height:350px;
   position:relative;overflow:hidden;
   background:linear-gradient(140deg,var(--purple-700),var(--purple-500) 60%,var(--purple-400));
 }
@@ -251,19 +251,20 @@ h2.title{
   z-index:1;
 }
 /* Логотип-заглушка — тоже на всю плашку, но с вписыванием */
-.news-thumb img.is-full{
-  inset:0;
-  top:0;
-  left:0;
-  transform:none;
-  width:100%;
-  height:100%;
-  border-radius:0;
-  border:none;
-  padding:20px;
-  background:transparent;
-  box-shadow:none;
-  object-fit:contain;
+.news-thumb img.is-full {
+  inset: 0;
+  top: 0;
+  left: 0;
+  transform: none;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  border: none;
+  padding: 0;              /* Убрали отступы */
+  background: transparent;
+  box-shadow: none;
+  object-fit: cover;       /* Теперь картинка заполняет всё (может обрезаться по краям) */
+}
 }
 .news-body{padding:26px 26px 30px;display:flex;flex-direction:column;flex:1}
 .news-meta{
