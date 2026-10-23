@@ -266,7 +266,12 @@ h2.title{
   object-fit: cover;       /* Теперь картинка заполняет всё (может обрезаться по краям) */
 }
 }
-.news-body{padding:26px 26px 30px;display:flex;flex-direction:column;flex:1}
+.news-body{
+  padding: 26px 32px 32px;  /* Увеличили отступы по бокам */
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
 .news-meta{
   display:flex;align-items:center;gap:12px;
   font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
@@ -275,10 +280,18 @@ h2.title{
 .news-meta .dot{width:4px;height:4px;border-radius:50%;background:var(--purple-300)}
 .news-meta .date{color:var(--muted);font-weight:600;letter-spacing:.02em;text-transform:none;font-size:.84rem}
 .news-card h3{
-  font-size:1.12rem;font-weight:800;letter-spacing:-.02em;
-  line-height:1.35;margin-bottom:12px;
+  font-size:1.05rem;           /* Чуть уменьшили заголовок */
+  font-weight:800;
+  letter-spacing:-.02em;
+  line-height:1.35;
+  margin-bottom:12px;
 }
-.news-card p{color:var(--muted);font-size:.94rem;flex:1;line-height:1.6}
+.news-card p{
+  color:var(--muted);
+  font-size:.92rem;            /* Чуть уменьшили основной текст */
+  flex:1;
+  line-height:1.6;
+}
 .news-link{
   margin-top:20px;display:inline-flex;align-items:center;gap:8px;
   font-weight:700;font-size:.9rem;color:var(--purple-600);
@@ -335,7 +348,13 @@ h2.title{
 
 /* ---------- RESPONSIVE ---------- */
 @media (max-width:1024px){
-  .news-grid{grid-template-columns:repeat(2,1fr)}
+  .news-grid{
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 24px;
+  max-width: 1100px; /* Карточки станут чуть компактнее */
+  margin-inline: auto;
+}
   .values-grid{grid-template-columns:1fr;gap:36px}
   .values-left{position:static}
   .footer-top{grid-template-columns:1fr 1fr;gap:36px}
