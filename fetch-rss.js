@@ -6,6 +6,8 @@ const INIT_CHANNEL = 'uchastie_official';
 
 async function fetchTelegram(channel, limit) {
   const url = `https://t.me/s/${channel}`;
+  console.log(`Скачиваем: ${url}`);
+
   const res = await fetch(url, {
     headers: {
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
@@ -20,22 +22,9 @@ async function fetchTelegram(channel, limit) {
 
   $('.tgme_widget_message_wrap').each((i, el) => {
     const textEl = $(el).find('.tgme_widget_message_text');
+    // Сохраняем переносы строк
     textEl.find('br').replaceWith('\n');
-
-    // ВЫТАСКИВАЕМ ФИРМЕННЫЕ ЭМОДЗИ
-    textEl.find('i.emoji').each((_, emojiEl) => {
-      const style = $(emojiEl).attr('style') || '';
-      const match = style.match(/background-image:\s*url\(['"]?(https?:\/\/[^'"]+)['"]?\)/);
-      if (match) {
-        const imgTag = `<img src="${match[1]}" class="tg-emoji" alt="emoji">`;
-        $(emojiEl).replaceWith(imgTag);
-      }
-    });
-
-    // Очищаем текст от лишних тегов, но оставляем <img> и <br>
-    let cleanHtml = textEl.html() || '';
-    cleanHtml = cleanHtml.replace(/<(?!\/?(br|img)\b)[^>]+>/gi, '');
-    const text = cleanHtml.trim();
+    const text = textEl.text().trim();
 
     const link = $(el).find('.tgme_widget_message_date').attr('href') || '';
     const date = $(el).find('time').attr('datetime') || '';
@@ -49,21 +38,30 @@ async function fetchTelegram(channel, limit) {
       if (match) image = match[1];
     }
 
-    // Заголовок и описание
+    // Разбиваем текст на заголовок и описание
     let title = '';
     let description = '';
 
     if (text) {
       const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-      if (lines.length > 1) {
+
+      if (lines.length > 1 && lines[0].length <= 100) {
         title = lines[0];
         description = lines.slice(1).join(' ');
       } else {
-        title = text;
+        const match = text.match(/^(.{10,120}?[.!?])(\s|$)/);
+        if (match) {
+          title = match[1].trim();
+          description = text.slice(match[0].length).trim();
+        } else {
+          title = text.slice(0, 110).trim();
+          description = text.slice(110).trim();
+        }
       }
     }
 
     if (!title && image) title = 'Новый пост';
+    if (!description) description = '';
 
     if (text.length > 3 || image) {
       items.push({
@@ -81,16 +79,22 @@ async function fetchTelegram(channel, limit) {
 
 async function start() {
   try {
+    console.log(`--- Новости ---`);
     const news = await fetchTelegram(NEWS_CHANNEL, 9);
     fs.writeFileSync('news.json', JSON.stringify(news, null, 2));
     console.log(`✓ news.json (${news.length} шт)`);
-  } catch (e) { console.error(`✗ Новости: ${e.message}`); }
+  } catch (e) {
+    console.error(`✗ ${e.message}`);
+  }
 
   try {
+    console.log(`--- Инициативы ---`);
     const inits = await fetchTelegram(INIT_CHANNEL, 6);
     fs.writeFileSync('initiatives.json', JSON.stringify(inits, null, 2));
     console.log(`✓ initiatives.json (${inits.length} шт)`);
-  } catch (e) { console.error(`✗ Инициативы: ${e.message}`); }
+  } catch (e) {
+    console.error(`✗ ${e.message}`);
+  }
 }
 
 start();
