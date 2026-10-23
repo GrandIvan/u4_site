@@ -1,9 +1,8 @@
 const fs = require('fs');
 const cheerio = require('cheerio');
 
-
 const NEWS_CHANNEL = 'uchastie_official';
-const INIT_CHANNEL = 'luxury_tax_2026'; 
+const INIT_CHANNEL = 'uchastie_official'; 
 
 async function fetchTelegram(channel, limit) {
   const url = `https://t.me/s/${channel}`;
@@ -27,25 +26,33 @@ async function fetchTelegram(channel, limit) {
     const link = $(el).find('.tgme_widget_message_date').attr('href') || '';
     const date = $(el).find('time').attr('datetime') || '';
     
-    // Пропускаем пустые посты (только фото без текста)
-    if (text && text.length > 5) {
+    // Ищем картинку
+    let image = '';
+    const photoWrap = $(el).find('.tgme_widget_message_photo_wrap');
+    if (photoWrap.length) {
+      const style = photoWrap.attr('style') || '';
+      const match = style.match(/background-image:url\('([^']+)'\)/);
+      if (match) image = match[1];
+    }
+
+    // Если есть текст ИЛИ картинка — добавляем пост
+    if (text.length > 5 || image) {
       items.push({
-        title: text.split('\n')[0].substring(0, 80) + (text.length > 80 ? '...' : ''),
-        description: text,
+        title: text ? text.split('\n')[0].substring(0, 80) + (text.length > 80 ? '...' : '') : 'Фото',
+        description: text || 'Пост с изображением',
         pubDate: date,
-        link: link.startsWith('http') ? link : 'https://t.me/' + link.replace(/^\//, '')
+        link: link.startsWith('http') ? link : 'https://t.me/' + link.replace(/^\//, ''),
+        image: image // <--- Сохраняем ссылку на картинку
       });
     }
   });
 
-  // Переворачиваем массив, чтобы свежие посты были первыми
   return items.reverse().slice(0, limit);
 }
 
 async function start() {
   try {
-    // Новости (9 штук)
-    console.log(`--- Скачиваем новости из @${NEWS_CHANNEL} ---`);
+    console.log(`--- Скачиваем новости ---`);
     const news = await fetchTelegram(NEWS_CHANNEL, 9);
     fs.writeFileSync('news.json', JSON.stringify(news, null, 2));
     console.log(`✓ news.json сохранен (${news.length} шт)`);
@@ -55,8 +62,7 @@ async function start() {
   }
 
   try {
-    // Инициативы (6 штук)
-    console.log(`--- Скачиваем инициативы из @${INIT_CHANNEL} ---`);
+    console.log(`--- Скачиваем инициативы ---`);
     const inits = await fetchTelegram(INIT_CHANNEL, 6);
     fs.writeFileSync('initiatives.json', JSON.stringify(inits, null, 2));
     console.log(`✓ initiatives.json сохранен (${inits.length} шт)`);
