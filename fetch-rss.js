@@ -22,14 +22,27 @@ async function fetchTelegram(channel, limit) {
 
   $('.tgme_widget_message_wrap').each((i, el) => {
     const textEl = $(el).find('.tgme_widget_message_text');
-    // Сохраняем переносы строк вместо того, чтобы склеивать всё в одну строку
     textEl.find('br').replaceWith('\n');
-    const text = textEl.text().trim();
+
+    // --- НОВОЕ: Вытаскиваем фирменные эмодзи ---
+    textEl.find('i.emoji').each((_, emojiEl) => {
+      const style = $(emojiEl).attr('style') || '';
+      const match = style.match(/background-image:url\(['"]?(https?:\/\/[^'"]+)['"]?\)/);
+      if (match) {
+        // Заменяем тег эмодзи на картинку
+        $(emojiEl).replaceWith(`<img src="${match[1]}" class="tg-emoji" style="width:1.2em;height:1.2em;vertical-align:-0.2em;display:inline-block;margin:0 2px;">`);
+      }
+    });
+
+    // Очищаем от всех тегов, кроме <img> и <br>
+    let cleanHtml = textEl.html() || '';
+    cleanHtml = cleanHtml.replace(/<(?!\/?(br|img)\b)[^>]+>/gi, '');
+    const text = cleanHtml.trim();
 
     const link = $(el).find('.tgme_widget_message_date').attr('href') || '';
     const date = $(el).find('time').attr('datetime') || '';
 
-    // Картинка
+    // Картинка поста
     let image = '';
     const photoWrap = $(el).find('.tgme_widget_message_photo_wrap');
     if (photoWrap.length) {
@@ -44,27 +57,16 @@ async function fetchTelegram(channel, limit) {
 
     if (text) {
       const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-
-      if (lines.length > 1 && lines[0].length <= 100) {
-        // Первая строка короткая — это заголовок
+      if (lines.length > 1) {
         title = lines[0];
         description = lines.slice(1).join(' ');
       } else {
-        // Ищем первое предложение
-        const match = text.match(/^(.{10,120}?[.!?])(\s|$)/);
-        if (match) {
-          title = match[1].trim();
-          description = text.slice(match[0].length).trim();
-        } else {
-          // Точки нет — режем по 110 символов
-          title = text.slice(0, 110).trim();
-          description = text.slice(110).trim();
-        }
+        title = text;
+        description = '';
       }
     }
 
     if (!title && image) title = 'Новый пост';
-    if (!description) description = '';
 
     if (text.length > 3 || image) {
       items.push({
