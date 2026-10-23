@@ -11,7 +11,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="favicon.png">
 <style>
 :root{
   --purple:#87179D;
@@ -77,7 +76,6 @@ a{text-decoration:none;color:inherit}
   z-index:5;
 }
 .top-back:hover{color:var(--purple)}
-.top-back svg{width:16px;height:16px}
 .top-logo{
   position:absolute;
   top:32px;right:40px;
@@ -99,7 +97,6 @@ a{text-decoration:none;color:inherit}
   position:relative;
   z-index:1;
 }
-
 
 /* ---------- Титул ---------- */
 .title-block{
@@ -124,17 +121,6 @@ a{text-decoration:none;color:inherit}
   letter-spacing:-.01em;
   line-height:1.4;
   max-width:30ch;
-}
-.title-block .arrows-mid{
-  position:absolute;
-  bottom:-22px;
-  left:0;
-  display:flex;
-  flex-direction:row;
-  gap:8px;
-}
-.title-block .arrows-mid .arrow{
-  width:30px;height:30px;
 }
 
 /* ---------- Секции ---------- */
@@ -197,7 +183,6 @@ a{text-decoration:none;color:inherit}
   flex:none;
 }
 
-
 /* ---------- Кнопки ---------- */
 .actions{
   margin-top:70px;
@@ -208,7 +193,7 @@ a{text-decoration:none;color:inherit}
   flex-wrap:wrap;
 }
 .btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  display:inline-flex;align-items:center;justify-content:center;
   padding:14px 28px;border-radius:100px;border:none;cursor:pointer;
   font-weight:700;font-size:.95rem;
   transition:transform .25s cubic-bezier(.22,.8,.3,1),
@@ -239,8 +224,6 @@ a{text-decoration:none;color:inherit}
   .document{padding:110px 28px 100px}
   .top-back{top:26px;left:20px;font-size:.78rem}
   .top-logo{top:22px;right:20px;width:38px;height:38px}
-  .arrows-top{top:130px;right:20px}
-  .arrows-top .arrow{width:34px;height:34px}
   .title-block{padding-bottom:56px;margin-bottom:56px}
   .title-block .subtitle{max-width:none}
   .principles{margin-bottom:56px}
@@ -252,7 +235,6 @@ a{text-decoration:none;color:inherit}
   .bg-arrows .bg-3{width:220px;height:220px;top:70%;left:-70px}
 }
 @media (max-width:480px){
-  .arrows-top{display:none}
   .document{padding-top:100px}
 
   .bg-arrows .bg-1{width:160px;height:160px;left:-50px}
@@ -277,40 +259,16 @@ a{text-decoration:none;color:inherit}
 </div>
 
 <a href="index.html" class="top-back">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M19 12H5M11 18l-6-6 6-6"/>
-  </svg>
   На главную
 </a>
 <img src="logo.png" alt="Участие" class="top-logo">
 
 <main class="document">
 
-  <!-- ============ ДЕКОР: СТРЕЛКИ СВЕРХУ СПРАВА ============ -->
-  <div class="arrows arrows-top" aria-hidden="true">
-    <span class="arrow arrow-1">
-      <svg viewBox="0 0 60 100" fill="currentColor">
-        <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
-      </svg>
-    </span>
-    <span class="arrow arrow-2">
-      <svg viewBox="0 0 60 100" fill="currentColor">
-        <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
-      </svg>
-    </span>
-    <span class="arrow arrow-3">
-      <svg viewBox="0 0 60 100" fill="currentColor">
-        <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
-      </svg>
-    </span>
-  </div>
-
   <!-- ============ ТИТУЛ ============ -->
   <header class="title-block">
     <h1>Концептуальная основа</h1>
     <p class="subtitle">Левой демократической организации «Участие»</p>
-
-    
   </header>
 
   <!-- ============ ОСНОВНОЙ ТЕКСТ ============ -->
@@ -439,32 +397,10 @@ a{text-decoration:none;color:inherit}
 
   </section>
 
-  <!-- ============ ФИНАЛЬНЫЕ СТРЕЛКИ ============ -->
-  <div class="arrows-end" aria-hidden="true">
-    <span class="arrow arrow-1">
-      <svg viewBox="0 0 60 100" fill="currentColor">
-        <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
-      </svg>
-    </span>
-    <span class="arrow arrow-2">
-      <svg viewBox="0 0 60 100" fill="currentColor">
-        <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
-      </svg>
-    </span>
-    <span class="arrow arrow-3">
-      <svg viewBox="0 0 60 100" fill="currentColor">
-        <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
-      </svg>
-    </span>
-  </div>
-
   <!-- ============ КНОПКИ ============ -->
   <div class="actions">
     <a href="index.html#join" class="btn btn-primary">
       Вступить в организацию
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M5 12h14M13 6l6 6-6 6"/>
-      </svg>
     </a>
     <a href="printsipy.html" class="btn btn-outline">Принципы</a>
     <a href="index.html" class="btn btn-outline">На главную</a>
