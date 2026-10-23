@@ -1,0 +1,28 @@
+name: Sync RSS Data
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Запуск каждый час ровно
+  workflow_dispatch: # Позволяет запустить вручную кнопкой во вкладке Actions
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run parser script
+        run: node fetch-rss.js
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name 'U4astie Bot'
+          git config --global user.email 'bot@u4site.ru'
+          git add news.json initiatives.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Автообновление данных RSS" && git push)
