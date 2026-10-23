@@ -108,32 +108,6 @@ a{text-decoration:none;color:inherit}
   z-index:1;
 }
 
-/* ---------- Декоративные стрелки у заголовка ---------- */
-.arrows{
-  position:absolute;
-  display:flex;
-  flex-direction:column;
-  pointer-events:none;
-  z-index:1;
-}
-.arrows-top{
-  top:120px;
-  right:60px;
-  align-items:flex-end;
-  gap:0;
-}
-.arrow{
-  display:block;
-  width:46px;
-  height:46px;
-  color:var(--purple);
-  transform:rotate(45deg);
-}
-.arrow svg{width:100%;height:100%;display:block}
-.arrow-1{opacity:.95}
-.arrow-2{opacity:.75;transform:rotate(45deg) translate(-14px,-14px)}
-.arrow-3{opacity:.55;transform:rotate(45deg) translate(-28px,-28px)}
-
 /* ---------- Титул ---------- */
 .title-block{
   position:relative;
@@ -195,19 +169,6 @@ a{text-decoration:none;color:inherit}
   color:var(--ink);
 }
 
-/* ---------- Финальные стрелки ---------- */
-.arrows-end{
-  display:flex;
-  justify-content:flex-start;
-  gap:6px;
-  margin:60px 0 0;
-}
-.arrows-end .arrow{
-  width:38px;height:38px;
-}
-.arrows-end .arrow-2{transform:rotate(45deg) translate(-12px,-12px)}
-.arrows-end .arrow-3{transform:rotate(45deg) translate(-24px,-24px)}
-
 /* ---------- Кнопки ---------- */
 .actions{
   margin-top:70px;
@@ -250,8 +211,6 @@ a{text-decoration:none;color:inherit}
   .top-back{top:26px;left:20px;font-size:.78rem}
   .top-logo-link{top:22px;right:20px}
   .top-logo{width:38px;height:38px}
-  .arrows-top{top:130px;right:20px}
-  .arrows-top .arrow{width:34px;height:34px}
   .title-block{padding-bottom:56px;margin-bottom:56px}
   .title-block .subtitle{max-width:none}
   .principles{margin-bottom:56px}
@@ -263,7 +222,6 @@ a{text-decoration:none;color:inherit}
   .bg-arrows .bg-3{width:220px;height:220px;top:70%;left:-70px}
 }
 @media (max-width:480px){
-  .arrows-top{display:none}
   .document{padding-top:100px}
 
   .bg-arrows .bg-1{width:160px;height:160px;left:-50px}
@@ -295,25 +253,6 @@ a{text-decoration:none;color:inherit}
 </a>
 
 <main class="document">
-
-  <!-- ============ ДЕКОР: СТРЕЛКИ СВЕРХУ СПРАВА ============ -->
-  <div class="arrows arrows-top" aria-hidden="true">
-    <span class="arrow arrow-1">
-      <svg viewBox="0 0 60 100" fill="currentColor">
-        <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
-      </svg>
-    </span>
-    <span class="arrow arrow-2">
-      <svg viewBox="0 0 60 100" fill="currentColor">
-        <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
-      </svg>
-    </span>
-    <span class="arrow arrow-3">
-      <svg viewBox="0 0 60 100" fill="currentColor">
-        <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
-      </svg>
-    </span>
-  </div>
 
   <!-- ============ ТИТУЛ ============ -->
   <header class="title-block">
@@ -449,25 +388,6 @@ a{text-decoration:none;color:inherit}
       Забота о настроении и потребностях активистов, избегание чрезмерной токсичности. Мы стремимся создать здоровую атмосферу, где учитываются настроения и потребности активистов, а токсичность и конфликты сведены к минимуму. Это не означает избегания критики — она должна быть конструктивной и направленной на решение проблем, а не на разжигание ненависти. Мы ценим открытый диалог, взаимное уважение и поддержку.
     </p>
   </section>
-
-  <!-- ============ ФИНАЛЬНЫЕ СТРЕЛКИ ============ -->
-  <div class="arrows-end" aria-hidden="true">
-    <span class="arrow arrow-1">
-      <svg viewBox="0 0 60 100" fill="currentColor">
-        <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
-      </svg>
-    </span>
-    <span class="arrow arrow-2">
-      <svg viewBox="0 0 60 100" fill="currentColor">
-        <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
-      </svg>
-    </span>
-    <span class="arrow arrow-3">
-      <svg viewBox="0 0 60 100" fill="currentColor">
-        <path d="M30 0 L60 40 L42 40 L42 100 L18 100 L18 40 L0 40 Z"/>
-      </svg>
-    </span>
-  </div>
 
   <!-- ============ КНОПКИ ============ -->
   <div class="actions">
