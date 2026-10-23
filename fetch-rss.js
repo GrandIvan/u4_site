@@ -6,8 +6,6 @@ const INIT_CHANNEL = 'uchastie_official';
 
 async function fetchTelegram(channel, limit) {
   const url = `https://t.me/s/${channel}`;
-  console.log(`Скачиваем: ${url}`);
-
   const res = await fetch(url, {
     headers: {
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
@@ -24,17 +22,17 @@ async function fetchTelegram(channel, limit) {
     const textEl = $(el).find('.tgme_widget_message_text');
     textEl.find('br').replaceWith('\n');
 
-    // --- НОВОЕ: Вытаскиваем фирменные эмодзи ---
+    // ВЫТАСКИВАЕМ ФИРМЕННЫЕ ЭМОДЗИ
     textEl.find('i.emoji').each((_, emojiEl) => {
       const style = $(emojiEl).attr('style') || '';
-      const match = style.match(/background-image:url\(['"]?(https?:\/\/[^'"]+)['"]?\)/);
+      const match = style.match(/background-image:\s*url\(['"]?(https?:\/\/[^'"]+)['"]?\)/);
       if (match) {
-        // Заменяем тег эмодзи на картинку
-        $(emojiEl).replaceWith(`<img src="${match[1]}" class="tg-emoji" style="width:1.2em;height:1.2em;vertical-align:-0.2em;display:inline-block;margin:0 2px;">`);
+        const imgTag = `<img src="${match[1]}" class="tg-emoji" alt="emoji">`;
+        $(emojiEl).replaceWith(imgTag);
       }
     });
 
-    // Очищаем от всех тегов, кроме <img> и <br>
+    // Очищаем текст от лишних тегов, но оставляем <img> и <br>
     let cleanHtml = textEl.html() || '';
     cleanHtml = cleanHtml.replace(/<(?!\/?(br|img)\b)[^>]+>/gi, '');
     const text = cleanHtml.trim();
@@ -51,7 +49,7 @@ async function fetchTelegram(channel, limit) {
       if (match) image = match[1];
     }
 
-    // Разбиваем текст на заголовок и описание
+    // Заголовок и описание
     let title = '';
     let description = '';
 
@@ -62,7 +60,6 @@ async function fetchTelegram(channel, limit) {
         description = lines.slice(1).join(' ');
       } else {
         title = text;
-        description = '';
       }
     }
 
@@ -84,22 +81,16 @@ async function fetchTelegram(channel, limit) {
 
 async function start() {
   try {
-    console.log(`--- Новости ---`);
     const news = await fetchTelegram(NEWS_CHANNEL, 9);
     fs.writeFileSync('news.json', JSON.stringify(news, null, 2));
     console.log(`✓ news.json (${news.length} шт)`);
-  } catch (e) {
-    console.error(`✗ ${e.message}`);
-  }
+  } catch (e) { console.error(`✗ Новости: ${e.message}`); }
 
   try {
-    console.log(`--- Инициативы ---`);
     const inits = await fetchTelegram(INIT_CHANNEL, 6);
     fs.writeFileSync('initiatives.json', JSON.stringify(inits, null, 2));
     console.log(`✓ initiatives.json (${inits.length} шт)`);
-  } catch (e) {
-    console.error(`✗ ${e.message}`);
-  }
+  } catch (e) { console.error(`✗ Инициативы: ${e.message}`); }
 }
 
 start();
