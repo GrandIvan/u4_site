@@ -638,8 +638,7 @@ h2.title{
 
       const card = document.createElement('article');
       card.className = 'news-card reveal';
-      // Дорогая stagger-анимация: карточки появляются одна за другой
-      card.style.transitionDelay = (i * 80) + 'ms'; 
+      card.style.transitionDelay = (i * 80) + 'ms';
 
       card.innerHTML =
         '<div class="news-thumb">' +
@@ -666,7 +665,6 @@ h2.title{
 
     if (loading) loading.remove();
 
-    // Активация плавной анимации появления CSS
     setTimeout(function () {
       grid.querySelectorAll('.reveal').forEach(function (el) {
         el.classList.add('in');
@@ -679,38 +677,35 @@ h2.title{
     const loading = document.getElementById(loadingId);
     
     try {
-      // Прямой запрос к локальному сгенерированному файлу вместо прокси-серверов
-      const res = await fetch('./' + jsonPath, { cache: 'no-cache' });
-      if (!res.ok) throw new Error('Ошибка загрузки JSON');
+      // Добавляем метку времени, чтобы Vercel и браузер не отдавали старый кэш
+      const res = await fetch('./' + jsonPath + '?t=' + Date.now());
+      if (!res.ok) throw new Error('Файл не найден (404)');
       const items = await res.json();
       renderCards(grid, loading, items, cfg);
     } catch (err) {
       console.error('[Load Error] ' + jsonPath, err);
       if (loading) {
-        loading.textContent = 'Не удалось загрузить данные. Обновите страницу.';
+        loading.textContent = 'Не удалось загрузить данные.';
         loading.style.color = '#DC2626';
       }
     }
   }
 
-  // Запуск загрузки обоих блоков параллельно
-  document.addEventListener('DOMContentLoaded', function() {
-    // Новости
-    loadBlock('news.json', 'newsGrid', 'newsLoading', {
-      count: 9,
-      favicon: 'android-chrome-512x512.png',
-      label: 'Новость',
-      linkText: 'Читать в Telegram'
-    });
-
-    // Инициативы
-    loadBlock('initiatives.json', 'initiativesGrid', 'initiativesLoading', {
-      count: 6,
-      favicon: 'android-chrome-512x512.png',
-      label: 'Инициатива',
-      linkText: 'Подробнее'
-    });
+  // Запуск загрузки
+  loadBlock('news.json', 'newsGrid', 'newsLoading', {
+    count: 9,
+    favicon: 'android-chrome-512x512.png',
+    label: 'Новость',
+    linkText: 'Читать в Telegram'
   });
+
+  loadBlock('initiatives.json', 'initiativesGrid', 'initiativesLoading', {
+    count: 6,
+    favicon: 'android-chrome-512x512.png',
+    label: 'Инициатива',
+    linkText: 'Подробнее'
+  });
+
 })();
 </script>
 
