@@ -600,11 +600,6 @@ h2.title{
 (function () {
   'use strict';
 
-  // ============================================================
-  //  ОБЩИЕ УТИЛИТЫ
-  // ============================================================
-  function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
-
   function formatDate(dateStr) {
     if (!dateStr) return '';
     const months = ['января','февраля','марта','апреля','мая','июня',
@@ -626,145 +621,25 @@ h2.title{
     return text.slice(0, max).replace(/\s+\S*$/, '') + '…';
   }
 
-  function parseXML(xmlText) {
-    try {
-      const doc = new DOMParser().parseFromString(xmlText, 'text/xml');
-      const nodes = Array.from(doc.querySelectorAll('item, entry'));
-      return nodes.map(function (node) {
-        const txt = function (tag) {
-          const el = node.getElementsByTagName(tag)[0];
-          return el ? el.textContent : '';
-        };
-        const linkEl = node.querySelector('link');
-        const link = linkEl ? (linkEl.getAttribute('href') || linkEl.textContent) : '';
-        return {
-          title: txt('title'),
-          description: txt('description') || txt('summary') ||
-                       txt('content') || txt('content:encoded'),
-          pubDate: txt('pubDate') || txt('published') || txt('updated'),
-          link: link
-        };
-      });
-    } catch (e) { return []; }
-  }
-
-  // ============================================================
-  //  ЗАГРУЗЧИК: перебирает прокси по очереди с паузами
-  // ============================================================
-  const PROXIES = [
-    // 1. allorigins raw — самый быстрый, когда работает
-    function(u){ return 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u); },
-    // 2. codetabs — иногда отдаёт CORS, но в целом ок
-    function(u){ return 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u); },
-    // 3. allorigins get — обёртка в JSON
-    function(u){ return 'https://api.allorigins.win/get?url=' + encodeURIComponent(u); },
-    // 4. cors.eu.org — простой прокси
-    function(u){ return 'https://cors.eu.org/' + u; },
-    // 5. cors.lol
-    function(u){ return 'https://api.cors.lol/?url=' + encodeURIComponent(u); },
-    // 6. rss2json без count — бесплатный
-    function(u){ return 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(u); }
-  ];
-
-  async function loadFeed(rssUrl) {
-    const cacheKey = 'feed:v2:' + rssUrl;
-
-    // 1) Смотрим свежий кэш (1 час)
-    try {
-      const raw = localStorage.getItem(cacheKey);
-      if (raw) {
-        const cached = JSON.parse(raw);
-        if (cached && cached.items && cached.items.length &&
-            Date.now() - cached.time < 60 * 60 * 1000) {
-          console.log('[feed] из кэша:', rssUrl);
-          return cached.items;
-        }
-      }
-    } catch (e) {}
-
-    // 2) Перебираем прокси в 3 раунда
-    for (let round = 0; round < 3; round++) {
-      for (let i = 0; i < PROXIES.length; i++) {
-        try {
-          const url = PROXIES[i](rssUrl);
-          console.log('[feed] раунд ' + (round + 1) + ', прокси ' + (i + 1) + ':', url);
-
-          const res = await fetch(url, { cache: 'no-store' });
-          if (!res.ok) throw new Error('HTTP ' + res.status);
-
-          const text = await res.text();
-          let items = null;
-
-          // Пробуем как JSON
-          if (text.trim().charAt(0) === '{' || text.trim().charAt(0) === '[') {
-            try {
-              const data = JSON.parse(text);
-              if (data.items && Array.isArray(data.items) && data.items.length) {
-                items = data.items;
-              } else if (data.contents) {
-                items = parseXML(data.contents);
-              }
-            } catch (e) {}
-          }
-
-          // Пробуем как XML
-          if (!items || !items.length) {
-            if (text.indexOf('<item') !== -1 || text.indexOf('<entry') !== -1) {
-              items = parseXML(text);
-            }
-          }
-
-          if (items && items.length) {
-            console.log('[feed] ✓ успех через прокси ' + (i + 1) +
-                        ', элементов: ' + items.length);
-            try {
-              localStorage.setItem(cacheKey, JSON.stringify({
-                time: Date.now(),
-                items: items
-              }));
-            } catch (e) {}
-            return items;
-          }
-        } catch (e) {
-          console.warn('[feed] прокси ' + (i + 1) + ' ошибка:', e.message);
-        }
-        await sleep(500); // пауза между прокси
-      }
-      console.log('[feed] раунд ' + (round + 1) + ' завершён, пауза 3 сек...');
-      await sleep(3000);
-    }
-
-    // 3) Последний шанс — старый кэш, даже просроченный
-    try {
-      const raw = localStorage.getItem(cacheKey);
-      if (raw) {
-        const cached = JSON.parse(raw);
-        if (cached && cached.items && cached.items.length) {
-          console.log('[feed] отдаём старый кэш:', rssUrl);
-          return cached.items;
-        }
-      }
-    } catch (e) {}
-
-    throw new Error('Все способы не сработали');
-  }
-
-  // ============================================================
-  //  ОТРИСОВКА КАРТОЧЕК
-  // ============================================================
   function renderCards(grid, loading, items, cfg) {
     if (!grid) return;
     grid.innerHTML = '';
+
+    if (!items || !items.length) {
+      if (loading) loading.textContent = 'Нет доступных данных.';
+      return;
+    }
 
     items.slice(0, cfg.count).forEach(function (item, i) {
       const title = truncate(cleanText(item.title), 100) || 'Без названия';
       const desc  = truncate(cleanText(item.description), 160);
       const date  = formatDate(item.pubDate);
-      const link  = item.link || item.guid || '#';
+      const link  = item.link || '#';
 
       const card = document.createElement('article');
       card.className = 'news-card reveal';
-      card.style.transitionDelay = Math.min(i * 60, 400) + 'ms';
+      // Дорогая stagger-анимация: карточки появляются одна за другой
+      card.style.transitionDelay = (i * 80) + 'ms'; 
 
       card.innerHTML =
         '<div class="news-thumb">' +
@@ -791,70 +666,53 @@ h2.title{
 
     if (loading) loading.remove();
 
-    requestAnimationFrame(function () {
+    // Активация плавной анимации появления CSS
+    setTimeout(function () {
       grid.querySelectorAll('.reveal').forEach(function (el) {
         el.classList.add('in');
       });
-    });
+    }, 50);
   }
 
-  // ============================================================
-  //  НОВОСТИ
-  // ============================================================
-  (async function loadNews() {
-    const grid = document.getElementById('newsGrid');
-    const loading = document.getElementById('newsLoading');
-    const RSS_URL = 'https://rss.app/feeds/MqFQDVEmEcczbBix.xml';
-    const cfg = {
+  async function loadBlock(jsonPath, gridId, loadingId, cfg) {
+    const grid = document.getElementById(gridId);
+    const loading = document.getElementById(loadingId);
+    
+    try {
+      // Прямой запрос к локальному сгенерированному файлу вместо прокси-серверов
+      const res = await fetch('./' + jsonPath, { cache: 'no-cache' });
+      if (!res.ok) throw new Error('Ошибка загрузки JSON');
+      const items = await res.json();
+      renderCards(grid, loading, items, cfg);
+    } catch (err) {
+      console.error('[Load Error] ' + jsonPath, err);
+      if (loading) {
+        loading.textContent = 'Не удалось загрузить данные. Обновите страницу.';
+        loading.style.color = '#DC2626';
+      }
+    }
+  }
+
+  // Запуск загрузки обоих блоков параллельно
+  document.addEventListener('DOMContentLoaded', function() {
+    // Новости
+    loadBlock('news.json', 'newsGrid', 'newsLoading', {
       count: 9,
       favicon: 'android-chrome-512x512.png',
       label: 'Новость',
       linkText: 'Читать в Telegram'
-    };
+    });
 
-    if (loading) loading.textContent = 'Загружаем новости…';
-
-    try {
-      const items = await loadFeed(RSS_URL);
-      renderCards(grid, loading, items, cfg);
-    } catch (err) {
-      console.error('[news] не загрузилось:', err);
-      if (loading) {
-        loading.textContent = 'Не удалось загрузить новости. Обновите страницу.';
-        loading.style.color = '#DC2626';
-      }
-    }
-  })();
-
-  // ============================================================
-  //  ИНИЦИАТИВЫ (стартуют с задержкой, чтобы не бить по прокси)
-  // ============================================================
-  setTimeout(function loadInitiatives() {
-    const grid = document.getElementById('initiativesGrid');
-    const loading = document.getElementById('initiativesLoading');
-    const RSS_URL = 'https://rss.app/feeds/cPU2ZPrtiDXSpzFx.xml';
-    const cfg = {
+    // Инициативы
+    loadBlock('initiatives.json', 'initiativesGrid', 'initiativesLoading', {
       count: 6,
-      favicon: 'nolog_logo.png',
+      favicon: 'android-chrome-512x512.png',
       label: 'Инициатива',
       linkText: 'Подробнее'
-    };
-
-    if (loading) loading.textContent = 'Загружаем инициативы…';
-
-    loadFeed(RSS_URL)
-      .then(function (items) {
-        renderCards(grid, loading, items, cfg);
-      })
-      .catch(function (err) {
-        console.error('[initiatives] не загрузилось:', err);
-        if (loading) {
-          loading.textContent = 'Не удалось загрузить инициативы. Обновите страницу.';
-          loading.style.color = '#DC2626';
-        }
-      });
-  }, 1200);
+    });
+  });
 })();
 </script>
+
 </body>
 </html>
