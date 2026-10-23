@@ -100,31 +100,6 @@ a{text-decoration:none;color:inherit}
   z-index:1;
 }
 
-/* ---------- Декоративные стрелки у заголовка ---------- */
-.arrows{
-  position:absolute;
-  display:flex;
-  flex-direction:column;
-  pointer-events:none;
-  z-index:1;
-}
-.arrows-top{
-  top:120px;
-  right:60px;
-  align-items:flex-end;
-  gap:0;
-}
-.arrow{
-  display:block;
-  width:46px;
-  height:46px;
-  color:var(--purple);
-  transform:rotate(45deg);
-}
-.arrow svg{width:100%;height:100%;display:block}
-.arrow-1{opacity:.95}
-.arrow-2{opacity:.75;transform:rotate(45deg) translate(-14px,-14px)}
-.arrow-3{opacity:.55;transform:rotate(45deg) translate(-28px,-28px)}
 
 /* ---------- Титул ---------- */
 .title-block{
@@ -222,18 +197,6 @@ a{text-decoration:none;color:inherit}
   flex:none;
 }
 
-/* ---------- Финальные стрелки ---------- */
-.arrows-end{
-  display:flex;
-  justify-content:flex-start;
-  gap:6px;
-  margin:60px 0 0;
-}
-.arrows-end .arrow{
-  width:38px;height:38px;
-}
-.arrows-end .arrow-2{transform:rotate(45deg) translate(-12px,-12px)}
-.arrows-end .arrow-3{transform:rotate(45deg) translate(-24px,-24px)}
 
 /* ---------- Кнопки ---------- */
 .actions{
