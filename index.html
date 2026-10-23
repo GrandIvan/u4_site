@@ -229,8 +229,9 @@ h2.title{
 }
 .news-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-md)}
 
+/* Высота картинки — 260px */
 .news-thumb{
-  height:340px;
+  height:260px;
   position:relative;overflow:hidden;
   background:linear-gradient(140deg,var(--purple-700),var(--purple-500) 60%,var(--purple-400));
 }
@@ -238,32 +239,31 @@ h2.title{
   content:"";position:absolute;inset:0;
   background-image:radial-gradient(circle at 22% 28%,rgba(255,255,255,.35),transparent 42%),
                    radial-gradient(circle at 78% 72%,rgba(255,255,255,.22),transparent 46%);
-  z-index: 0;
+  z-index:0;
 }
-/* Стили для реальных картинок из Telegram */
-.news-thumb img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 1;
+/* Реальное фото из Telegram — на всю плашку */
+.news-thumb img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:1;
 }
-
-/* Логотип на всю ширину карточки */
-.news-thumb img.is-full {
-  inset: 0;
-  top: 0;
-  left: 0;
-  transform: none;
-  width: 100%;
-  height: 100%;
-  border-radius: 0;
-  border: none;
-  padding: 0;
-  background: transparent;
-  box-shadow: none;
-  object-fit: contain; /* Вписывает картинку целиком. Если хотите, чтобы обрезалось по краям — поменяйте на cover */
+/* Логотип-заглушка — тоже на всю плашку, но с вписыванием */
+.news-thumb img.is-full{
+  inset:0;
+  top:0;
+  left:0;
+  transform:none;
+  width:100%;
+  height:100%;
+  border-radius:0;
+  border:none;
+  padding:20px;
+  background:transparent;
+  box-shadow:none;
+  object-fit:contain;
 }
 .news-body{padding:26px 26px 30px;display:flex;flex-direction:column;flex:1}
 .news-meta{
@@ -273,8 +273,11 @@ h2.title{
 }
 .news-meta .dot{width:4px;height:4px;border-radius:50%;background:var(--purple-300)}
 .news-meta .date{color:var(--muted);font-weight:600;letter-spacing:.02em;text-transform:none;font-size:.84rem}
-.news-card h3{font-size:1.1rem;font-weight:800;letter-spacing:-.02em;line-height:1.35;margin-bottom:12px}
-.news-card p{color:var(--muted);font-size:.92rem;flex:1}
+.news-card h3{
+  font-size:1.12rem;font-weight:800;letter-spacing:-.02em;
+  line-height:1.35;margin-bottom:12px;
+}
+.news-card p{color:var(--muted);font-size:.94rem;flex:1;line-height:1.6}
 .news-link{
   margin-top:20px;display:inline-flex;align-items:center;gap:8px;
   font-weight:700;font-size:.9rem;color:var(--purple-600);
@@ -355,6 +358,7 @@ h2.title{
 @media (max-width:640px){
   .container{width:calc(100% - 32px)}
   .news-grid{grid-template-columns:1fr}
+  .news-thumb{height:220px}
   .hero-actions .btn{width:100%}
   .footer-top{grid-template-columns:1fr}
   .value-item{padding:22px 18px;gap:18px}
@@ -481,9 +485,7 @@ h2.title{
       <p class="lead">Последние публикации из нашего Telegram-канала.</p>
     </div>
 
-    <div class="news-grid" id="newsGrid">
-      <!-- Карточки подгрузятся автоматически -->
-    </div>
+    <div class="news-grid" id="newsGrid"></div>
 
     <p id="newsLoading" style="color:var(--muted); text-align:center; padding:20px 0;">
       Загружаем новости…
@@ -500,9 +502,7 @@ h2.title{
       <p class="lead">Кампании, проекты и предложения, которые мы продвигаем прямо сейчас.</p>
     </div>
 
-    <div class="news-grid" id="initiativesGrid">
-      <!-- Карточки подгрузятся автоматически -->
-    </div>
+    <div class="news-grid" id="initiativesGrid"></div>
 
     <p id="initiativesLoading" style="color:var(--muted); text-align:center; padding:20px 0;">
       Загружаем инициативы…
@@ -646,14 +646,25 @@ h2.title{
     }
 
     items.slice(0, cfg.count).forEach(function (item, i) {
-      const title = truncate(cleanText(item.title), 100) || 'Без названия';
-      const desc  = truncate(cleanText(item.description), 160);
+      // Заголовок и описание
+      const rawTitle = cleanText(item.title);
+      let title = truncate(rawTitle, 140) || 'Без названия';
+
+      const rawDesc = cleanText(item.description);
+      let desc = truncate(rawDesc, 180);
+
+      // Если описание дублирует заголовок — убираем дубль
+      if (desc && title && desc.indexOf(title.slice(0, 30)) === 0) {
+        desc = truncate(rawDesc.slice(title.length).trim(), 180);
+      }
+      if (!desc) desc = 'Подробнее по ссылке.';
+
       const date  = formatDate(item.pubDate);
       const link  = item.link || '#';
-      
-      // Проверяем наличие картинки из Telegram
+
+      // Картинка: фото из Telegram или заглушка на всю плашку
       const imgSrc = item.image ? item.image : cfg.favicon;
-      const imgClass = item.image ? '' : 'is-logo';
+      const imgClass = item.image ? '' : 'is-full';
 
       const card = document.createElement('article');
       card.className = 'news-card reveal';
@@ -661,8 +672,8 @@ h2.title{
 
       card.innerHTML =
         '<div class="news-thumb">' +
-          // Если картинка битая, заменяем её логотипом
-          '<img src="' + imgSrc + '" class="' + imgClass + '" alt="" loading="lazy" onerror="this.onerror=null;this.src=\'' + cfg.favicon + '\';this.className=\'is-logo\';">' +
+          '<img src="' + imgSrc + '" class="' + imgClass + '" alt="" loading="lazy" ' +
+          'onerror="this.onerror=null;this.src=\'' + cfg.favicon + '\';this.className=\'is-full\';">' +
         '</div>' +
         '<div class="news-body">' +
           '<div class="news-meta">' +
@@ -695,9 +706,9 @@ h2.title{
   async function loadBlock(jsonPath, gridId, loadingId, cfg) {
     const grid = document.getElementById(gridId);
     const loading = document.getElementById(loadingId);
-    
+
     try {
-      // Обход кэша, чтобы всегда подтягивались свежие данные
+      // Обход кэша
       const res = await fetch('./' + jsonPath + '?t=' + Date.now());
       if (!res.ok) throw new Error('Файл не найден (404)');
       const items = await res.json();
@@ -711,7 +722,7 @@ h2.title{
     }
   }
 
-  // Запуск загрузки
+  // Новости
   loadBlock('news.json', 'newsGrid', 'newsLoading', {
     count: 9,
     favicon: 'android-chrome-512x512.png',
@@ -719,6 +730,7 @@ h2.title{
     linkText: 'Читать в Telegram'
   });
 
+  // Инициативы (своя заглушка)
   loadBlock('initiatives.json', 'initiativesGrid', 'initiativesLoading', {
     count: 6,
     favicon: 'nolog_logo.png',
