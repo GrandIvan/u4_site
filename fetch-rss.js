@@ -6,7 +6,7 @@ const INIT_CHANNEL = 'uchastie_official';
 
 async function fetchTelegram(channel, limit) {
   const url = `https://t.me/s/${channel}`;
-  console.log(`Скачиваем HTML: ${url}`);
+  console.log(`Скачиваем: ${url}`);
   
   const res = await fetch(url, {
     headers: {
@@ -26,23 +26,23 @@ async function fetchTelegram(channel, limit) {
     const link = $(el).find('.tgme_widget_message_date').attr('href') || '';
     const date = $(el).find('time').attr('datetime') || '';
     
-    // Ищем картинку
+    // Улучшенный поиск картинки
     let image = '';
     const photoWrap = $(el).find('.tgme_widget_message_photo_wrap');
     if (photoWrap.length) {
       const style = photoWrap.attr('style') || '';
-      const match = style.match(/background-image:url\('([^']+)'\)/);
+      // Регулярка теперь ищет и одинарные, и двойные кавычки, и пробелы
+      const match = style.match(/background-image:\s*url\(['"]?([^'")]+)['"]?\)/);
       if (match) image = match[1];
     }
 
-    // Если есть текст ИЛИ картинка — добавляем пост
     if (text.length > 5 || image) {
       items.push({
         title: text ? text.split('\n')[0].substring(0, 80) + (text.length > 80 ? '...' : '') : 'Фото',
         description: text || 'Пост с изображением',
         pubDate: date,
         link: link.startsWith('http') ? link : 'https://t.me/' + link.replace(/^\//, ''),
-        image: image // <--- Сохраняем ссылку на картинку
+        image: image
       });
     }
   });
@@ -55,20 +55,18 @@ async function start() {
     console.log(`--- Скачиваем новости ---`);
     const news = await fetchTelegram(NEWS_CHANNEL, 9);
     fs.writeFileSync('news.json', JSON.stringify(news, null, 2));
-    console.log(`✓ news.json сохранен (${news.length} шт)`);
+    console.log(`✓ news.json (${news.length} шт)`);
   } catch (e) {
     console.error(`✗ Ошибка с новостями:`, e.message);
-    if (!fs.existsSync('news.json')) fs.writeFileSync('news.json', '[]');
   }
 
   try {
     console.log(`--- Скачиваем инициативы ---`);
     const inits = await fetchTelegram(INIT_CHANNEL, 6);
     fs.writeFileSync('initiatives.json', JSON.stringify(inits, null, 2));
-    console.log(`✓ initiatives.json сохранен (${inits.length} шт)`);
+    console.log(`✓ initiatives.json (${inits.length} шт)`);
   } catch (e) {
     console.error(`✗ Ошибка с инициативами:`, e.message);
-    if (!fs.existsSync('initiatives.json')) fs.writeFileSync('initiatives.json', '[]');
   }
 }
 
