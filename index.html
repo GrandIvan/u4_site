@@ -247,6 +247,7 @@ h2.title{
                    radial-gradient(circle at 78% 72%,rgba(255,255,255,.22),transparent 46%);
   z-index:0;
 }
+/* Реальное фото из Telegram — на всю плашку */
 .news-thumb img{
   position:absolute;
   inset:0;
@@ -255,6 +256,7 @@ h2.title{
   object-fit:cover;
   z-index:1;
 }
+/* Логотип-заглушка — тоже на всю плашку */
 .news-thumb img.is-full {
   inset: 0;
   top: 0;
@@ -284,7 +286,7 @@ h2.title{
 .news-meta .dot{width:4px;height:4px;border-radius:50%;background:var(--purple-300)}
 .news-meta .date{color:var(--muted);font-weight:600;letter-spacing:.02em;text-transform:none;font-size:.84rem}
 
-/* Заголовок с ограничением строк */
+/* Оптимальный размер заголовка и текста */
 .news-card h3{
   font-size: 1.1rem;
   font-weight: 800;
@@ -292,34 +294,13 @@ h2.title{
   line-height: 1.35;
   margin-bottom: 12px;
   color: var(--ink);
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
-
-/* Описание с ограничением строк */
 .news-card p{
   color: var(--muted);
   font-size: .94rem;
   flex: 1;
   line-height: 1.65;
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
-
-/* СТРОГИЕ СТИЛИ ДЛЯ ЭМОДЗИ */
-.tg-emoji {
-  width: 1.2em !important;
-  height: 1.2em !important;
-  display: inline-block !important;
-  vertical-align: -0.15em;
-  margin: 0 2px;
-  max-width: none !important;
-}
-
 .news-link{
   margin-top:20px;display:inline-flex;align-items:center;gap:8px;
   font-weight:700;font-size:.9rem;color:var(--purple-600);
@@ -669,10 +650,16 @@ h2.title{
     return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
   }
 
-  // Надежная очистка: удаляет все теги, КРОМЕ <br> и <img>
   function cleanText(html) {
-    if (!html) return '';
-    return html.replace(/<(?!\/?(br|img)\b)[^>]+>/gi, '').trim();
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html || '';
+    return (tmp.textContent || tmp.innerText || '').trim();
+  }
+
+  function truncate(text, max) {
+    text = (text || '').trim();
+    if (text.length <= max) return text;
+    return text.slice(0, max).replace(/\s+\S*$/, '') + '…';
   }
 
   function renderCards(grid, loading, items, cfg) {
@@ -685,9 +672,17 @@ h2.title{
     }
 
     items.slice(0, cfg.count).forEach(function (item, i) {
-      // Теперь мы НЕ обрезаем текст в JS, это делает CSS (-webkit-line-clamp)
-      const title = cleanText(item.title) || 'Без названия';
-      const desc = cleanText(item.description) || 'Подробнее по ссылке.';
+      const rawTitle = cleanText(item.title);
+      let title = truncate(rawTitle, 140) || 'Без названия';
+
+      const rawDesc = cleanText(item.description);
+      let desc = truncate(rawDesc, 180);
+
+      if (desc && title && desc.indexOf(title.slice(0, 30)) === 0) {
+        desc = truncate(rawDesc.slice(title.length).trim(), 180);
+      }
+      if (!desc) desc = 'Подробнее по ссылке.';
+
       const date  = formatDate(item.pubDate);
       const link  = item.link || '#';
 
