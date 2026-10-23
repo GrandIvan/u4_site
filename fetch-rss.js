@@ -1,62 +1,68 @@
 const fs = require('fs');
-const Parser = require('rss-parser');
+const cheerio = require('cheerio');
 
-const parser = new Parser({
-  headers: {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-  }
-});
 
-const FEEDS = {
-  news: 'https://rss.app/feeds/MqFQDVEmEcczbBix.xml',
-  initiatives: 'https://rss.app/feeds/cPU2ZPrtiDXSpzFx.xml'
-};
+const NEWS_CHANNEL = 'uchastie_official';
+const INIT_CHANNEL = 'luxury_tax_2026'; 
 
-// Способы скачивания: напрямую и через прокси
-const GET_METHODS = [
-  (url) => url, // 1. Напрямую
-  (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`, // 2. Через allorigins
-  (url) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}` // 3. Через codetabs
-];
-
-async function fetchWithFallback(url) {
-  for (let i = 0; i < GET_METHODS.length; i++) {
-    const fetchUrl = GET_METHODS[i](url);
-    try {
-      console.log(`Пробуем способ ${i + 1}...`);
-      const feed = await parser.parseURL(fetchUrl);
-      if (feed && feed.items && feed.items.length > 0) {
-        return feed; // Если данные есть — возвращаем
-      }
-    } catch (e) {
-      console.log(`Способ ${i + 1} не сработал: ${e.message}`);
+async function fetchTelegram(channel, limit) {
+  const url = `https://t.me/s/${channel}`;
+  console.log(`Скачиваем HTML: ${url}`);
+  
+  const res = await fetch(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     }
-  }
-  throw new Error('Все способы скачивания не удались');
+  });
+  
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const html = await res.text();
+  const $ = cheerio.load(html);
+  
+  const items = [];
+  
+  $('.tgme_widget_message_wrap').each((i, el) => {
+    const textEl = $(el).find('.tgme_widget_message_text');
+    const text = textEl.text().trim();
+    const link = $(el).find('.tgme_widget_message_date').attr('href') || '';
+    const date = $(el).find('time').attr('datetime') || '';
+    
+    // Пропускаем пустые посты (только фото без текста)
+    if (text && text.length > 5) {
+      items.push({
+        title: text.split('\n')[0].substring(0, 80) + (text.length > 80 ? '...' : ''),
+        description: text,
+        pubDate: date,
+        link: link.startsWith('http') ? link : 'https://t.me/' + link.replace(/^\//, '')
+      });
+    }
+  });
+
+  // Переворачиваем массив, чтобы свежие посты были первыми
+  return items.reverse().slice(0, limit);
 }
 
 async function start() {
-  for (const [key, url] of Object.entries(FEEDS)) {
-    try {
-      console.log(`--- Скачиваем: ${key} ---`);
-      const feed = await fetchWithFallback(url);
-      
-      const items = feed.items.map(item => ({
-        title: item.title || '',
-        description: item.contentSnippet || item.content || '',
-        pubDate: item.pubDate || item.isoDate || '',
-        link: item.link || '#'
-      }));
+  try {
+    // Новости (9 штук)
+    console.log(`--- Скачиваем новости из @${NEWS_CHANNEL} ---`);
+    const news = await fetchTelegram(NEWS_CHANNEL, 9);
+    fs.writeFileSync('news.json', JSON.stringify(news, null, 2));
+    console.log(`✓ news.json сохранен (${news.length} шт)`);
+  } catch (e) {
+    console.error(`✗ Ошибка с новостями:`, e.message);
+    if (!fs.existsSync('news.json')) fs.writeFileSync('news.json', '[]');
+  }
 
-      fs.writeFileSync(`${key}.json`, JSON.stringify(items, null, 2));
-      console.log(`✓ Успех! ${key}.json сохранен (${items.length} новостей)`);
-    } catch (e) {
-      console.error(`✗ Ошибка при скачивании ${key}:`, e.message);
-      // Если файлов нет вообще, создаем пустые, чтобы сайт не падал
-      if (!fs.existsSync(`${key}.json`)) {
-        fs.writeFileSync(`${key}.json`, JSON.stringify([]));
-      }
-    }
+  try {
+    // Инициативы (6 штук)
+    console.log(`--- Скачиваем инициативы из @${INIT_CHANNEL} ---`);
+    const inits = await fetchTelegram(INIT_CHANNEL, 6);
+    fs.writeFileSync('initiatives.json', JSON.stringify(inits, null, 2));
+    console.log(`✓ initiatives.json сохранен (${inits.length} шт)`);
+  } catch (e) {
+    console.error(`✗ Ошибка с инициативами:`, e.message);
+    if (!fs.existsSync('initiatives.json')) fs.writeFileSync('initiatives.json', '[]');
   }
 }
 
