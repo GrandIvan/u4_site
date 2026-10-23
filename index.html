@@ -220,7 +220,13 @@ h2.title{
 .value-item p{color:var(--muted);font-size:.94rem}
 
 /* ---------- NEWS / INITIATIVES (общие карточки) ---------- */
-.news-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.news-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:24px;
+  max-width: 1200px; 
+  margin-inline: auto;
+}
 .news-card{
   border-radius:var(--radius);overflow:hidden;background:#fff;
   border:1px solid var(--line);
@@ -260,14 +266,15 @@ h2.title{
   height: 100%;
   border-radius: 0;
   border: none;
-  padding: 0;              /* Убрали отступы */
+  padding: 0;              
   background: transparent;
   box-shadow: none;
-  object-fit: cover;       /* Теперь картинка заполняет всё (может обрезаться по краям) */
+  object-fit: cover;       
 }
-}
+
+/* Исправленный блок текста */
 .news-body{
-  padding: 26px 32px 32px;  /* Увеличили отступы по бокам */
+  padding: 28px 32px 32px;  
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -279,18 +286,21 @@ h2.title{
 }
 .news-meta .dot{width:4px;height:4px;border-radius:50%;background:var(--purple-300)}
 .news-meta .date{color:var(--muted);font-weight:600;letter-spacing:.02em;text-transform:none;font-size:.84rem}
+
+/* Оптимальный размер заголовка и текста */
 .news-card h3{
-  font-size:1.05rem;           /* Чуть уменьшили заголовок */
-  font-weight:800;
-  letter-spacing:-.02em;
-  line-height:1.35;
-  margin-bottom:12px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  line-height: 1.35;
+  margin-bottom: 12px;
+  color: var(--ink);
 }
 .news-card p{
-  color:var(--muted);
-  font-size:.92rem;            /* Чуть уменьшили основной текст */
-  flex:1;
-  line-height:1.6;
+  color: var(--muted);
+  font-size: .94rem;
+  flex: 1;
+  line-height: 1.65;
 }
 .news-link{
   margin-top:20px;display:inline-flex;align-items:center;gap:8px;
@@ -348,13 +358,10 @@ h2.title{
 
 /* ---------- RESPONSIVE ---------- */
 @media (max-width:1024px){
+  /* Исправлено: теперь на планшетах 2 колонки, а не 3 */
   .news-grid{
-  display: grid;
-  grid-template-columns: repeat(3,1fr);
-  gap: 24px;
-  max-width: 1100px; /* Карточки станут чуть компактнее */
-  margin-inline: auto;
-}
+    grid-template-columns: repeat(2, 1fr);
+  }
   .values-grid{grid-template-columns:1fr;gap:36px}
   .values-left{position:static}
   .footer-top{grid-template-columns:1fr 1fr;gap:36px}
@@ -383,6 +390,7 @@ h2.title{
   .footer-top{grid-template-columns:1fr}
   .value-item{padding:22px 18px;gap:18px}
   .value-num{min-width:40px;font-size:1.25rem}
+  .news-body{padding: 22px 24px 28px;}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation:none !important;transition:none !important}
@@ -666,14 +674,12 @@ h2.title{
     }
 
     items.slice(0, cfg.count).forEach(function (item, i) {
-      // Заголовок и описание
       const rawTitle = cleanText(item.title);
       let title = truncate(rawTitle, 140) || 'Без названия';
 
       const rawDesc = cleanText(item.description);
       let desc = truncate(rawDesc, 180);
 
-      // Если описание дублирует заголовок — убираем дубль
       if (desc && title && desc.indexOf(title.slice(0, 30)) === 0) {
         desc = truncate(rawDesc.slice(title.length).trim(), 180);
       }
@@ -682,7 +688,6 @@ h2.title{
       const date  = formatDate(item.pubDate);
       const link  = item.link || '#';
 
-      // Картинка: фото из Telegram или заглушка на всю плашку
       const imgSrc = item.image ? item.image : cfg.favicon;
       const imgClass = item.image ? '' : 'is-full';
 
@@ -728,7 +733,6 @@ h2.title{
     const loading = document.getElementById(loadingId);
 
     try {
-      // Обход кэша
       const res = await fetch('./' + jsonPath + '?t=' + Date.now());
       if (!res.ok) throw new Error('Файл не найден (404)');
       const items = await res.json();
@@ -742,7 +746,6 @@ h2.title{
     }
   }
 
-  // Новости
   loadBlock('news.json', 'newsGrid', 'newsLoading', {
     count: 9,
     favicon: 'android-chrome-512x512.png',
@@ -750,7 +753,6 @@ h2.title{
     linkText: 'Читать в Telegram'
   });
 
-  // Инициативы (своя заглушка)
   loadBlock('initiatives.json', 'initiativesGrid', 'initiativesLoading', {
     count: 6,
     favicon: 'nolog_logo.png',
