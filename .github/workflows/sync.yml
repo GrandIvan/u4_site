@@ -2,11 +2,11 @@ name: Sync RSS Data
 
 on:
   schedule:
-    - cron: '0 * * * *' # Каждый час
-  workflow_dispatch: # Кнопка ручного запуска
+    - cron: '0 * * * *'
+  workflow_dispatch:
 
 permissions:
-  contents: write # ← КРИТИЧЕСКИ ВАЖНО! Без этого git push упадет с ошибкой
+  contents: write
 
 jobs:
   build:
@@ -21,7 +21,7 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm install rss-parser
+        run: npm install cheerio
 
       - name: Run parser script
         run: node fetch-rss.js
@@ -31,4 +31,4 @@ jobs:
           git config --global user.name 'U4astie Bot'
           git config --global user.email 'bot@u4site.ru'
           git add news.json initiatives.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Автообновление данных RSS" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Автообновление из Telegram" && git push)
