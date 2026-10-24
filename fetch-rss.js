@@ -3,8 +3,7 @@ const cheerio = require('cheerio');
 
 const NEWS_CHANNEL = 'uchastie_official';
 const INIT_CHANNEL = 'luxury_tax_2026';
-
-
+const AVTOR_CHANNEL = 'uchastie_lite'; // ← ВПИШИТЕ ИМЯ КАНАЛА БЕЗ @
 
 async function fetchTelegram(channel, limit) {
   const url = `https://t.me/s/${channel}`;
@@ -23,14 +22,11 @@ async function fetchTelegram(channel, limit) {
   const items = [];
 
   $('.tgme_widget_message_wrap').each((i, el) => {
-    // --- НОВАЯ ПРОВЕРКА: Пропускаем репосты ---
+    // Пропускаем репосты
     const isForwarded = $(el).find('.tgme_widget_message_forwarded_from').length > 0;
-    if (isForwarded) {
-      return; // Пропускаем этот пост, идем к следующему
-    }
+    if (isForwarded) return;
 
     const textEl = $(el).find('.tgme_widget_message_text');
-    // Сохраняем переносы строк
     textEl.find('br').replaceWith('\n');
     const text = textEl.text().trim();
 
@@ -100,6 +96,16 @@ async function start() {
     const inits = await fetchTelegram(INIT_CHANNEL, 6);
     fs.writeFileSync('initiatives.json', JSON.stringify(inits, null, 2));
     console.log(`✓ initiatives.json (${inits.length} шт)`);
+  } catch (e) {
+    console.error(`✗ ${e.message}`);
+  }
+
+  // НОВЫЙ БЛОК: Авторские материалы
+  try {
+    console.log(`--- Авторские материалы ---`);
+    const avtory = await fetchTelegram(AVTOR_CHANNEL, 6);
+    fs.writeFileSync('avtory.json', JSON.stringify(avtory, null, 2));
+    console.log(`✓ avtory.json (${avtory.length} шт)`);
   } catch (e) {
     console.error(`✗ ${e.message}`);
   }
