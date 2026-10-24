@@ -21,6 +21,12 @@ async function fetchTelegram(channel, limit) {
   const items = [];
 
   $('.tgme_widget_message_wrap').each((i, el) => {
+    // --- НОВАЯ ПРОВЕРКА: Пропускаем репосты ---
+    const isForwarded = $(el).find('.tgme_widget_message_forwarded_from').length > 0;
+    if (isForwarded) {
+      return; // Пропускаем этот пост, идем к следующему
+    }
+
     const textEl = $(el).find('.tgme_widget_message_text');
     // Сохраняем переносы строк
     textEl.find('br').replaceWith('\n');
