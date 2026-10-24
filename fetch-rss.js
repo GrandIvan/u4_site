@@ -4,9 +4,11 @@ const cheerio = require('cheerio');
 const NEWS_CHANNEL = 'uchastie_official';
 const INIT_CHANNEL = 'luxury_tax_2026';
 
-async function fetchPage(channel, before = null) {
-  let url = `https://t.me/s/${channel}`;
-  if (before) url += `?before=${before}`;
+
+
+async function fetchTelegram(channel, limit) {
+  const url = `https://t.me/s/${channel}`;
+  console.log(`Скачиваем: ${url}`);
 
   const res = await fetch(url, {
     headers: {
@@ -16,23 +18,26 @@ async function fetchPage(channel, before = null) {
 
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const html = await res.text();
-  return cheerio.load(html);
-}
+  const $ = cheerio.load(html);
 
-function parsePage($) {
   const items = [];
 
   $('.tgme_widget_message_wrap').each((i, el) => {
-    // Пропускаем репосты
-    if ($(el).find('.tgme_widget_message_forwarded_from').length > 0) return;
+    // --- НОВАЯ ПРОВЕРКА: Пропускаем репосты ---
+    const isForwarded = $(el).find('.tgme_widget_message_forwarded_from').length > 0;
+    if (isForwarded) {
+      return; // Пропускаем этот пост, идем к следующему
+    }
 
     const textEl = $(el).find('.tgme_widget_message_text');
+    // Сохраняем переносы строк
     textEl.find('br').replaceWith('\n');
     const text = textEl.text().trim();
 
     const link = $(el).find('.tgme_widget_message_date').attr('href') || '';
     const date = $(el).find('time').attr('datetime') || '';
 
+    // Картинка поста
     let image = '';
     const photoWrap = $(el).find('.tgme_widget_message_photo_wrap');
     if (photoWrap.length) {
@@ -41,6 +46,7 @@ function parsePage($) {
       if (match) image = match[1];
     }
 
+    // Разбиваем текст на заголовок и описание
     let title = '';
     let description = '';
 
@@ -65,49 +71,18 @@ function parsePage($) {
     if (!title && image) title = 'Новый пост';
     if (!description) description = '';
 
-    // Получаем ID поста (нужен для листания)
-    const dataPost = $(el).find('.tgme_widget_message').attr('data-post') || '';
-    const postId = dataPost.split('/').pop();
-
     if (text.length > 3 || image) {
       items.push({
         title: title,
         description: description,
         pubDate: date,
         link: link.startsWith('http') ? link : 'https://t.me/' + link.replace(/^\//, ''),
-        image: image,
-        _id: postId
+        image: image
       });
     }
   });
 
-  return items;
-}
-
-async function fetchTelegram(channel, limit) {
-  console.log(`Скачиваем: ${channel}`);
-  let allItems = [];
-  let before = null;
-
-  // Делаем до 5 запросов (всего до 100 постов), пока не наберем нужное количество
-  for (let page = 0; page < 5; page++) {
-    const $ = await fetchPage(channel, before);
-    const items = parsePage($);
-
-    if (items.length === 0) break;
-
-    allItems = items.concat(allItems); // новые посты добавляем в начало
-
-    if (allItems.length >= limit) break;
-
-    // Берем ID самого старого поста на странице для следующего запроса
-    const oldestId = items[0]._id;
-    if (!oldestId) break;
-    before = oldestId;
-  }
-
-  // Убираем служебное поле _id и обрезаем до нужного количества
-  return allItems.slice(-limit).map(({ _id, ...rest }) => rest);
+  return items.reverse().slice(0, limit);
 }
 
 async function start() {
