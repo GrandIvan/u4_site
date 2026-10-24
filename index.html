@@ -219,7 +219,7 @@ h2.title{
 .value-item h4{font-size:1.1rem;font-weight:800;letter-spacing:-.02em;margin-bottom:7px}
 .value-item p{color:var(--muted);font-size:.94rem}
 
-/* ---------- NEWS / INITIATIVES (общие карточки) ---------- */
+/* ---------- NEWS / INITIATIVES / AUTHORS (общие карточки) ---------- */
 .news-grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -322,6 +322,20 @@ h2.title{
   background:linear-gradient(140deg,var(--purple-800),var(--purple-600) 60%,var(--purple-500));
 }
 
+/* ---------- AUTHORS (фон и акценты) ---------- */
+.authors{background:#fff;position:relative;overflow:hidden}
+.authors::before{
+  content:"";position:absolute;width:520px;height:520px;border-radius:50%;
+  background:radial-gradient(circle,rgba(188,61,208,.14),transparent 68%);
+  top:-240px;left:-180px;
+  pointer-events:none;
+}
+.authors .container{position:relative;z-index:1}
+.authors .news-card{border-color:var(--purple-200)}
+.authors .news-thumb{
+  background:linear-gradient(140deg,var(--purple-900),var(--purple-700) 60%,var(--purple-500));
+}
+
 /* ---------- FOOTER ---------- */
 .footer{background:var(--purple-950);color:rgba(255,255,255,.62);padding:70px 0 34px;font-size:.9rem}
 .footer-top{
@@ -383,7 +397,7 @@ h2.title{
 @media (max-width:640px){
   .container{width:calc(100% - 32px)}
   .news-grid{grid-template-columns:1fr}
-  .news-thumb{height:350px}
+  .news-thumb{height:220px}
   .hero-actions .btn{width:100%}
   .footer-top{grid-template-columns:1fr}
   .value-item{padding:22px 18px;gap:18px}
@@ -412,6 +426,7 @@ h2.title{
       <a href="concept.html">Концептуальная основа</a>
       <a href="#news">Новости</a>
       <a href="#initiatives">Инициативы</a>
+      <a href="#authors">Авторские</a>
       <a href="https://t.me/Uchastie_join_bot" class="nav-cta">Присоединиться</a>
     </nav>
 
@@ -536,6 +551,23 @@ h2.title{
   </div>
 </section>
 
+<!-- ================= AUTHORS ================= -->
+<section class="section authors" id="authors">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Авторские материалы</span>
+      <h2 class="title">Мнения и аналитика</h2>
+      <p class="lead">Статьи, разборы и рассуждения от участников движения.</p>
+    </div>
+
+    <div class="news-grid" id="authorsGrid"></div>
+
+    <p id="authorsLoading" style="color:var(--muted); text-align:center; padding:20px 0;">
+      Загружаем материалы…
+    </p>
+  </div>
+</section>
+
 </main>
 
 <!-- ================= FOOTER ================= -->
@@ -572,6 +604,7 @@ h2.title{
           <li><a href="https://t.me/Uchastie_join_bot">Вступить в организацию</a></li>
           <li><a href="#news">Новости</a></li>
           <li><a href="#initiatives">Инициативы</a></li>
+          <li><a href="#authors">Авторские</a></li>
         </ul>
       </div>
     </div>
@@ -608,152 +641,4 @@ h2.title{
 
   nav.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
-  window.addEventListener('resize', () => { if (window.innerWidth > 860) closeMenu(); });
-
-  /* ---------- Scroll reveal ---------- */
-  const revealEls = document.querySelectorAll('.reveal');
-  if ('IntersectionObserver' in window) {
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((entry, i) => {
-        if (entry.isIntersecting) {
-          const el = entry.target;
-          const delay = Math.min(i * 70, 280);
-          setTimeout(() => el.classList.add('in'), delay);
-          io.unobserve(el);
-        }
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
-    revealEls.forEach(el => io.observe(el));
-  } else {
-    revealEls.forEach(el => el.classList.add('in'));
-  }
-})();
-</script>
-
-<!-- ================ ЗАГРУЗКА НОВОСТЕЙ И ИНИЦИАТИВ ================ -->
-<script>
-(function () {
-  'use strict';
-
-  function formatDate(dateStr) {
-    if (!dateStr) return '';
-    const months = ['января','февраля','марта','апреля','мая','июня',
-                    'июля','августа','сентября','октября','ноября','декабря'];
-    const d = new Date(dateStr);
-    if (isNaN(d)) return '';
-    return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
-  }
-
-  function cleanText(html) {
-    const tmp = document.createElement('div');
-    tmp.innerHTML = html || '';
-    return (tmp.textContent || tmp.innerText || '').trim();
-  }
-
-  function truncate(text, max) {
-    text = (text || '').trim();
-    if (text.length <= max) return text;
-    return text.slice(0, max).replace(/\s+\S*$/, '') + '…';
-  }
-
-  function renderCards(grid, loading, items, cfg) {
-    if (!grid) return;
-    grid.innerHTML = '';
-
-    if (!items || !items.length) {
-      if (loading) loading.textContent = 'Нет доступных данных.';
-      return;
-    }
-
-    items.slice(0, cfg.count).forEach(function (item, i) {
-      const rawTitle = cleanText(item.title);
-      let title = truncate(rawTitle, 140) || 'Без названия';
-
-      const rawDesc = cleanText(item.description);
-      let desc = truncate(rawDesc, 180);
-
-      if (desc && title && desc.indexOf(title.slice(0, 30)) === 0) {
-        desc = truncate(rawDesc.slice(title.length).trim(), 180);
-      }
-      if (!desc) desc = 'Подробнее по ссылке.';
-
-      const date  = formatDate(item.pubDate);
-      const link  = item.link || '#';
-
-      const imgSrc = item.image ? item.image : cfg.favicon;
-      const imgClass = item.image ? '' : 'is-full';
-
-      const card = document.createElement('article');
-      card.className = 'news-card reveal';
-      card.style.transitionDelay = (i * 80) + 'ms';
-
-      card.innerHTML =
-        '<div class="news-thumb">' +
-          '<img src="' + imgSrc + '" class="' + imgClass + '" alt="" loading="lazy" ' +
-          'onerror="this.onerror=null;this.src=\'' + cfg.favicon + '\';this.className=\'is-full\';">' +
-        '</div>' +
-        '<div class="news-body">' +
-          '<div class="news-meta">' +
-            '<span>' + cfg.label + '</span>' +
-            '<span class="dot"></span>' +
-            '<span class="date">' + date + '</span>' +
-          '</div>' +
-          '<h3>' + title + '</h3>' +
-          '<p>' + desc + '</p>' +
-          '<a class="news-link" href="' + link + '" target="_blank" rel="noopener">' +
-            cfg.linkText +
-            '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" ' +
-            'stroke="currentColor" stroke-width="2.4" stroke-linecap="round" ' +
-            'stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>' +
-          '</a>' +
-        '</div>';
-
-      grid.appendChild(card);
-    });
-
-    if (loading) loading.remove();
-
-    setTimeout(function () {
-      grid.querySelectorAll('.reveal').forEach(function (el) {
-        el.classList.add('in');
-      });
-    }, 50);
-  }
-
-  async function loadBlock(jsonPath, gridId, loadingId, cfg) {
-    const grid = document.getElementById(gridId);
-    const loading = document.getElementById(loadingId);
-
-    try {
-      const res = await fetch('./' + jsonPath + '?t=' + Date.now());
-      if (!res.ok) throw new Error('Файл не найден (404)');
-      const items = await res.json();
-      renderCards(grid, loading, items, cfg);
-    } catch (err) {
-      console.error('[Load Error] ' + jsonPath, err);
-      if (loading) {
-        loading.textContent = 'Не удалось загрузить данные.';
-        loading.style.color = '#DC2626';
-      }
-    }
-  }
-
-  loadBlock('news.json', 'newsGrid', 'newsLoading', {
-    count: 6,
-    favicon: 'android-chrome-512x512.png',
-    label: 'Новость',
-    linkText: 'Читать в Telegram'
-  });
-
-  loadBlock('initiatives.json', 'initiativesGrid', 'initiativesLoading', {
-    count: 3,
-    favicon: 'nolog_logo.png',
-    label: 'Инициатива',
-    linkText: 'Читать в Telegram'
-  });
-
-})();
-</script>
-
-</body>
-</html>
+  window.addEventListener('resize', () => { if (window.innerWidth >
