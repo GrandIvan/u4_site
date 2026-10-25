@@ -3,7 +3,7 @@ const cheerio = require('cheerio');
 
 const NEWS_CHANNEL = 'uchastie_official';
 const INIT_CHANNEL = 'luxury_tax_2026';
-const AVTOR_CHANNEL = 'ВАШ_КАНАЛ_АВТОРОВ'; // ← ВПИШИТЕ ИМЯ КАНАЛА
+const AVTOR_CHANNEL = 'uchastie_lite'; // ← ВПИШИТЕ ИМЯ КАНАЛА
 
 async function fetchTelegram(channel, limit) {
   const url = `https://t.me/s/${channel}`;
