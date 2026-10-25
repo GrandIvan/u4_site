@@ -207,7 +207,7 @@ h2.title{
   flex-direction: column;
   position: relative;
   padding-left: 32px;
-  max-width: 900px; /* Чтобы строки не были слишком длинными */
+  max-width: 900px;
 }
 
 /* Вертикальная линия */
@@ -224,24 +224,9 @@ h2.title{
 
 .value-item{
   position: relative;
-  padding: 28px 0 28px 24px;
+  padding: 28px 0 28px 16px;
   transition: background .3s ease, transform .3s ease;
   border-radius: 0 12px 12px 0;
-}
-
-/* Точка на линии */
-.value-item::before{
-  content: "";
-  position: absolute;
-  left: -37px; /* Центрируем точку на линии */
-  top: 36px;
-  width: 12px;
-  height: 12px;
-  background: #fff;
-  border: 3px solid var(--purple-300);
-  border-radius: 50%;
-  transition: border-color .3s ease, transform .3s ease;
-  z-index: 1;
 }
 
 /* Заголовок */
@@ -275,17 +260,13 @@ h2.title{
   color: var(--muted);
   font-size: 1rem;
   line-height: 1.7;
-  max-width: 75ch; /* Удобная ширина для чтения */
+  max-width: 75ch;
 }
 
 /* Эффект при наведении */
 .value-item:hover{
   background: linear-gradient(90deg, var(--purple-50), transparent);
   transform: translateX(8px);
-}
-.value-item:hover::before{
-  border-color: var(--purple-600);
-  transform: scale(1.25);
 }
 .value-item:hover .value-num{
   color: var(--purple-600);
@@ -300,13 +281,7 @@ h2.title{
     padding-left: 24px;
   }
   .value-item{
-    padding: 22px 0 22px 16px;
-  }
-  .value-item::before{
-    left: -29px;
-    top: 28px;
-    width: 10px;
-    height: 10px;
+    padding: 22px 0 22px 12px;
   }
   .value-header{
     flex-direction: column;
