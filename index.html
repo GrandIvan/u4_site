@@ -380,6 +380,13 @@ h2.title{
   flex: 1;
   line-height: 1.65;
 }
+.tg-emoji {
+  width: 1.2em;
+  height: 1.2em;
+  display: inline-block;
+  vertical-align: -0.2em;
+  margin: 0 2px;
+}
 .news-link{
   margin-top:20px;display:inline-flex;align-items:center;gap:8px;
   font-weight:700;font-size:.9rem;color:var(--purple-600);
@@ -763,11 +770,12 @@ h2.title{
     if (isNaN(d)) return '';
     return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
   }
-
+  
   function cleanText(html) {
-    const tmp = document.createElement('div');
-    tmp.innerHTML = html || '';
-    return (tmp.textContent || tmp.innerText || '').trim();
+    if (!html) return '';
+    // Оставляем только теги <br> и <img>
+    return html.replace(/<(?!\/?(br|img)\b)[^>]+>/gi, '').trim();
+  }
   }
 
   function truncate(text, max) {
