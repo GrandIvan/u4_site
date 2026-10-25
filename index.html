@@ -194,13 +194,7 @@ h2.title{
   background:radial-gradient(circle,rgba(188,61,208,.22),transparent 68%);
   top:-260px;left:-200px;
 }
-.values-grid{
-  display:grid;grid-template-columns:.85fr 1.15fr;
-  gap:clamp(40px,6vw,90px);align-items:start;
-  position:relative;z-index:1;
-}
-.values-left{position:sticky;top:120px}
-.value-list{display:flex;flex-direction:column;gap:8px}
+
 /* ---------- ПРИНЦИПЫ (Таймлайн на всю ширину) ---------- */
 .value-list{
   display: flex;
@@ -208,6 +202,7 @@ h2.title{
   position: relative;
   padding-left: 32px;
   max-width: 900px;
+  margin-top: 40px;
 }
 
 /* Вертикальная линия */
@@ -275,29 +270,6 @@ h2.title{
   color: var(--purple-600);
 }
 
-/* Мобильная версия */
-@media (max-width: 768px){
-  .value-list{
-    padding-left: 24px;
-  }
-  .value-item{
-    padding: 22px 0 22px 12px;
-  }
-  .value-header{
-    flex-direction: column;
-    gap: 4px;
-    margin-bottom: 8px;
-  }
-  .value-num{
-    font-size: 1rem;
-  }
-  .value-header h4{
-    font-size: 1.15rem;
-  }
-  .value-desc{
-    font-size: .93rem;
-  }
-}
 /* ---------- NEWS / INITIATIVES / AUTHORS (общие карточки) ---------- */
 .news-grid{
   display:grid;
@@ -380,13 +352,6 @@ h2.title{
   flex: 1;
   line-height: 1.65;
 }
-.tg-emoji {
-  width: 1.2em;
-  height: 1.2em;
-  display: inline-block;
-  vertical-align: -0.2em;
-  margin: 0 2px;
-}
 .news-link{
   margin-top:20px;display:inline-flex;align-items:center;gap:8px;
   font-weight:700;font-size:.9rem;color:var(--purple-600);
@@ -460,8 +425,6 @@ h2.title{
   .news-grid{
     grid-template-columns: repeat(2, 1fr);
   }
-  .values-grid{grid-template-columns:1fr;gap:36px}
-  .values-left{position:static}
   .footer-top{grid-template-columns:1fr 1fr;gap:36px}
 }
 @media (max-width:860px){
@@ -480,14 +443,34 @@ h2.title{
   .burger{display:block;position:relative;z-index:10}
   .site-header.menu-open{--hdr:var(--ink);background:#fff}
 }
+@media (max-width:768px){
+  .value-list{
+    padding-left: 24px;
+  }
+  .value-item{
+    padding: 22px 0 22px 12px;
+  }
+  .value-header{
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+  .value-num{
+    font-size: 1rem;
+  }
+  .value-header h4{
+    font-size: 1.15rem;
+  }
+  .value-desc{
+    font-size: .93rem;
+  }
+}
 @media (max-width:640px){
   .container{width:calc(100% - 32px)}
   .news-grid{grid-template-columns:1fr}
   .news-thumb{height:350px}
   .hero-actions .btn{width:100%}
   .footer-top{grid-template-columns:1fr}
-  .value-item{padding:22px 18px;gap:18px}
-  .value-num{min-width:40px;font-size:1.25rem}
   .news-body{padding: 22px 24px 28px;}
 }
 @media (prefers-reduced-motion:reduce){
@@ -770,12 +753,12 @@ h2.title{
     if (isNaN(d)) return '';
     return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
   }
-  
+
+  // Безопасная очистка: удаляем все теги, оставляем чистый текст
   function cleanText(html) {
-    if (!html) return '';
-    // Оставляем только теги <br> и <img>
-    return html.replace(/<(?!\/?(br|img)\b)[^>]+>/gi, '').trim();
-  }
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html || '';
+    return (tmp.textContent || tmp.innerText || '').trim();
   }
 
   function truncate(text, max) {
@@ -820,7 +803,6 @@ h2.title{
           '<img src="' + imgSrc + '" class="' + imgClass + '" alt="" loading="lazy" referrerpolicy="no-referrer" ' +
           'onerror="this.onerror=null;this.src=\'' + cfg.favicon + '\';this.className=\'is-full\';">' +
         '</div>' +
-        // ... остальной код карточки
         '<div class="news-body">' +
           '<div class="news-meta">' +
             '<span>' + cfg.label + '</span>' +
