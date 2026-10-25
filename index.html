@@ -201,24 +201,98 @@ h2.title{
 }
 .values-left{position:sticky;top:120px}
 .value-list{display:flex;flex-direction:column;gap:8px}
-.value-item{
-  display:flex;gap:26px;padding:30px 28px;border-radius:var(--radius);
-  background:transparent;border:1px solid transparent;
-  transition:background .35s var(--ease),border-color .35s,transform .35s var(--ease),box-shadow .35s;
-}
-.value-item:hover{
-  background:#fff;border-color:var(--purple-200);
-  transform:translateX(6px);box-shadow:var(--shadow-sm);
-}
-.value-num{
-  font-size:1.5rem;font-weight:800;color:var(--purple-400);
-  line-height:1;min-width:52px;letter-spacing:-.04em;
-  transition:color .35s;
-}
-.value-item:hover .value-num{color:var(--purple-600)}
-.value-item h4{font-size:1.1rem;font-weight:800;letter-spacing:-.02em;margin-bottom:7px}
-.value-item p{color:var(--muted);font-size:.94rem}
+/* ---------- АККОРДЕОН ПРИНЦИПОВ ---------- */
+.value-list{display:flex;flex-direction:column;gap:0}
 
+.value-item{
+  border-bottom:1px solid var(--line);
+  padding:24px 0;
+  transition:background .3s ease;
+  position:relative;
+}
+
+/* Заголовок (номер + название) */
+.value-header{
+  display:flex;
+  align-items:baseline;
+  gap:16px;
+}
+
+.value-num{
+  font-size:1.2rem;
+  font-weight:800;
+  color:var(--purple-400);
+  min-width:32px;
+  line-height:1;
+  transition:color .3s ease;
+}
+
+.value-header h4{
+  font-size:1.4rem;
+  font-weight:800;
+  letter-spacing:-.02em;
+  color:var(--ink);
+  transition:color .3s ease;
+  margin:0;
+}
+
+/* Текст, который выпадает */
+.value-desc{
+  max-height:0;
+  overflow:hidden;
+  opacity:0;
+  transition:max-height .5s ease, opacity .5s ease, margin .5s ease;
+  padding-left:48px;
+  color:var(--muted);
+  font-size:1rem;
+  line-height:1.7;
+}
+
+/* Эффект при наведении на компьютере */
+@media (hover: hover) and (min-width: 769px) {
+  .value-item:hover{
+    background:#fff;
+    border-radius:12px;
+    padding-left:16px;
+    padding-right:16px;
+    margin-left:-16px;
+    margin-right:-16px;
+    border-bottom-color:transparent;
+    box-shadow:var(--shadow-sm);
+  }
+  .value-item:hover .value-num{color:var(--purple-600)}
+  .value-item:hover .value-header h4{color:var(--purple-600)}
+  .value-item:hover .value-desc{
+    max-height:250px;
+    opacity:1;
+    margin-top:10px;
+    margin-bottom:8px;
+  }
+}
+
+/* Мобильная версия (как было) */
+@media (max-width: 768px){
+  .value-item{padding:22px 0}
+  .value-header{display:block}
+  .value-num{
+    font-size:1rem;
+    margin-right:6px;
+    display:inline;
+  }
+  .value-header h4{
+    display:inline;
+    font-size:1.05rem;
+    color:var(--purple-600);
+  }
+  .value-desc{
+    max-height:none;
+    opacity:1;
+    padding-left:0;
+    margin-top:8px;
+    display:block;
+    font-size:.94rem;
+  }
+}
 /* ---------- NEWS / INITIATIVES / AUTHORS (общие карточки) ---------- */
 .news-grid{
   display:grid;
@@ -472,44 +546,54 @@ h2.title{
         <h2 class="title">Общие принципы</h2>
       </div>
 
-      <div class="value-list">
+            <div class="value-list">
         <div class="value-item reveal">
-          <div class="value-num">01</div>
-          <div>
+          <div class="value-header">
+            <div class="value-num">01</div>
             <h4>Рациональность</h4>
-            <p>Это наш главный метод. Мы выбираем концепцию политики, ориентированную на результат. Организация основывает свои действия и анализ на объективных условиях и фактах и исходя из них пытается выбрать наиболее эффективные решения. Мы пытаемся найти практические способы реализации наших целей и левых демократических идей, опираясь на трезвый расчёт. Подходить к политике нужно стратегически, а не эмоционально.</p>
+          </div>
+          <div class="value-desc">
+            Это наш главный метод. Мы выбираем концепцию политики, ориентированную на результат. Организация основывает свои действия и анализ на объективных условиях и фактах и исходя из них пытается выбрать наиболее эффективные решения. Мы пытаемся найти практические способы реализации наших целей и левых демократических идей, опираясь на трезвый расчёт. Подходить к политике нужно стратегически, а не эмоционально.
           </div>
         </div>
 
         <div class="value-item reveal">
-          <div class="value-num">02</div>
-          <div>
+          <div class="value-header">
+            <div class="value-num">02</div>
             <h4>Политическая борьба</h4>
-            <p>Мы существуем, чтобы добиться изменений, чтобы воплощать левые демократические принципы и построить справедливое общество.</p>
+          </div>
+          <div class="value-desc">
+            Мы существуем, чтобы добиться изменений, чтобы воплощать левые демократические принципы и построить справедливое общество.
           </div>
         </div>
 
         <div class="value-item reveal">
-          <div class="value-num">03</div>
-          <div>
+          <div class="value-header">
+            <div class="value-num">03</div>
             <h4>Мы — протопартия</h4>
-            <p>Мы надеемся стать значимой силой, способной влиять не только на локальную, но и на глобальную российскую политику. Наша цель — не создание закрытой секты, клуба или избы-читальни для самоутверждения в узком кругу, а построение широкого, открытого и эффективного движения, способного бороться за интересы людей.</p>
+          </div>
+          <div class="value-desc">
+            Мы надеемся стать значимой силой, способной влиять не только на локальную, но и на глобальную российскую политику. Наша цель — не создание закрытой секты, клуба или избы-читальни для самоутверждения в узком кругу, а построение широкого, открытого и эффективного движения, способного бороться за интересы людей.
           </div>
         </div>
 
         <div class="value-item reveal">
-          <div class="value-num">04</div>
-          <div>
+          <div class="value-header">
+            <div class="value-num">04</div>
             <h4>Активное участие в самых разных инициативах</h4>
-            <p>Ошибиться и сделать что-то лучше, чем отказаться от действий. Политическая борьба требует смелости, гибкости и готовности пробовать новые пути, даже если они кажутся неидеальными.</p>
+          </div>
+          <div class="value-desc">
+            Ошибиться и сделать что-то лучше, чем отказаться от действий. Политическая борьба требует смелости, гибкости и готовности пробовать новые пути, даже если они кажутся неидеальными.
           </div>
         </div>
 
         <div class="value-item reveal">
-          <div class="value-num">05</div>
-          <div>
+          <div class="value-header">
+            <div class="value-num">05</div>
             <h4>Солидарность</h4>
-            <p>Мы стремимся к сотрудничеству с другими демократическими организациями, в первую очередь левыми, а также с независимыми общественными деятелями: прогрессивными кандидатами на выборах, блогерами и другими.</p>
+          </div>
+          <div class="value-desc">
+            Мы стремимся к сотрудничеству с другими демократическими организациями, в первую очередь левыми, а также с независимыми общественными деятелями: прогрессивными кандидатами на выборах, блогерами и другими.
           </div>
         </div>
       </div>
