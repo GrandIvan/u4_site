@@ -27,8 +27,23 @@ async function fetchTelegram(channel, limit) {
     if (isForwarded) return;
 
     const textEl = $(el).find('.tgme_widget_message_text');
+
+    // --- Заменяем премиум-эмодзи на картинки ---
+    textEl.find('i.emoji').each((_, emojiEl) => {
+      const style = $(emojiEl).attr('style') || '';
+      const match = style.match(/background-image:\s*url\(['"]?(https?:\/\/[^'"]+)['"]?\)/);
+      if (match) {
+        $(emojiEl).replaceWith(`<img src="${match[1]}" class="tg-emoji" alt="emoji">`);
+      }
+    });
+
+    // Сохраняем переносы строк
     textEl.find('br').replaceWith('\n');
-    const text = textEl.text().trim();
+
+    // Очищаем от всех тегов, КРОМЕ <br> и <img>
+    let cleanHtml = textEl.html() || '';
+    cleanHtml = cleanHtml.replace(/<(?!\/?(br|img)\b)[^>]+>/gi, '');
+    const text = cleanHtml.trim();
 
     const link = $(el).find('.tgme_widget_message_date').attr('href') || '';
     const date = $(el).find('time').attr('datetime') || '';
@@ -84,7 +99,7 @@ async function fetchTelegram(channel, limit) {
 async function start() {
   try {
     console.log(`--- Новости ---`);
-    const news = await fetchTelegram(NEWS_CHANNEL, 9);
+    const news = await fetchTelegram(NEWS_CHANNEL, 6);
     fs.writeFileSync('news.json', JSON.stringify(news, null, 2));
     console.log(`✓ news.json (${news.length} шт)`);
   } catch (e) {
@@ -93,14 +108,13 @@ async function start() {
 
   try {
     console.log(`--- Инициативы ---`);
-    const inits = await fetchTelegram(INIT_CHANNEL, 6);
+    const inits = await fetchTelegram(INIT_CHANNEL, 3);
     fs.writeFileSync('initiatives.json', JSON.stringify(inits, null, 2));
     console.log(`✓ initiatives.json (${inits.length} шт)`);
   } catch (e) {
     console.error(`✗ ${e.message}`);
   }
 
-  // НОВЫЙ БЛОК: Авторские материалы
   try {
     console.log(`--- Авторские материалы ---`);
     const avtory = await fetchTelegram(AVTOR_CHANNEL, 6);
