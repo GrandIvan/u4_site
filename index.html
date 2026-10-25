@@ -722,9 +722,10 @@ h2.title{
 
       card.innerHTML =
         '<div class="news-thumb">' +
-          '<img src="' + imgSrc + '" class="' + imgClass + '" alt="" loading="lazy" ' +
+          '<img src="' + imgSrc + '" class="' + imgClass + '" alt="" loading="lazy" referrerpolicy="no-referrer" ' +
           'onerror="this.onerror=null;this.src=\'' + cfg.favicon + '\';this.className=\'is-full\';">' +
         '</div>' +
+        // ... остальной код карточки
         '<div class="news-body">' +
           '<div class="news-meta">' +
             '<span>' + cfg.label + '</span>' +
