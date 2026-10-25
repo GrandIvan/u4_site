@@ -753,6 +753,72 @@ h2.title{
     if (isNaN(d)) return '';
     return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
   }
+    // Словарь замен: символ → путь к картинке в папке emoji/
+  const EMOJI_MAP = {
+    '📍': 'emoji/location.webp',
+    '🌐': 'emoji/globe.webp',
+    '🗣': 'emoji/speech.webp',
+    '⚙️': 'emoji/gear.webp',
+    '👥': 'emoji/crowd.webp',
+    '🪶': 'emoji/feather.webp',
+    '🏛': 'emoji/building.webp',
+    '🎤': 'emoji/microphone.webp',
+    '📰': 'emoji/news.webp',
+    '🧠': 'emoji/brain.webp',
+    '📅': 'emoji/calendar.webp',
+    '🔥': 'emoji/fire.webp',
+    '🔄': 'emoji/repost.webp',
+    '❗': 'emoji/alert.webp',
+    '⌨️': 'emoji/typewriter.webp',
+    '🖋': 'emoji/pen.webp',
+    '🤝': 'emoji/handshake.webp',
+    '❓': 'emoji/question.webp',
+    '📋': 'emoji/list.webp',
+    '🕊': 'emoji/dove.webp',
+    '🍃': 'emoji/leaves.webp',
+    '✅': 'emoji/checkbox.webp',
+    '💬': 'emoji/chat.webp',
+    '⛓️': 'emoji/chain.webp',
+    '💭': 'emoji/dots.webp',
+    '⚖️': 'emoji/scales.webp',
+    '♀️': 'emoji/feminist.webp',
+    '🔴': 'emoji/dot.webp',
+    '💡': 'emoji/idea.webp',
+    '💯': 'emoji/hundred.webp',
+    '📉': 'emoji/down.webp',
+    '🚌': 'emoji/bus.webp',
+    '🕊️': 'emoji/peace.webp',
+    '💎': 'emoji/diamond.webp',
+    '⏫': 'emoji/arrows.webp',
+    '🚀': 'emoji/rocket.webp',
+    '✍️': 'emoji/hand-pen.webp',
+    '🔍': 'emoji/search.webp',
+    '🔃': 'emoji/arrows-circle.webp',
+    '💰': 'emoji/money.webp',
+    '🔗': 'emoji/link.webp',
+    '🕒': 'emoji/clock.webp',
+    '🚩': 'emoji/flag.webp',
+    '📶': 'emoji/wifi.webp',
+    '🏠': 'emoji/home.webp',
+    '📎': 'emoji/clip.webp',    // ← Заменили скрипку на скрепку
+    '📢': 'emoji/megaphone.webp',
+    '🔁': 'emoji/sync.webp',
+    '🔧': 'emoji/wrench.webp',  // ← НОВОЕ: гаечный ключ
+    '✊': 'emoji/fist.webp',    // ← НОВОЕ: кулак
+    '📖': 'emoji/book.webp'     // ← НОВОЕ: книга
+  };
+
+  // Функция замены
+  function replaceEmojis(text) {
+    if (!text) return '';
+    let result = text;
+    for (const [emoji, path] of Object.entries(EMOJI_MAP)) {
+      result = result.split(emoji).join(
+        '<img src="' + path + '" class="tg-emoji" alt="">'
+      );
+    }
+    return result;
+  }
 
   // Безопасная очистка: удаляем все теги, оставляем чистый текст
   function cleanText(html) {
@@ -777,11 +843,13 @@ h2.title{
     }
 
     items.slice(0, cfg.count).forEach(function (item, i) {
-      const rawTitle = cleanText(item.title);
-      let title = truncate(rawTitle, 140) || 'Без названия';
+      // 1. Берём заголовок, заменяем в нём эмодзи на картинки
+      const rawTitle = replaceEmojis(cleanText(item.title)) || 'Без названия';
+      const title = rawTitle; // CSS сам обрежет, если будет слишком длинно
 
-      const rawDesc = cleanText(item.description);
-      let desc = truncate(rawDesc, 180);
+      // 2. Берём описание, заменяем в нём эмодзи на картинки
+      const rawDesc = replaceEmojis(cleanText(item.description));
+      const desc = rawDesc || 'Подробнее по ссылке.';
 
       if (desc && title && desc.indexOf(title.slice(0, 30)) === 0) {
         desc = truncate(rawDesc.slice(title.length).trim(), 180);
