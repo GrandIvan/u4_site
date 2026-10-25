@@ -201,96 +201,97 @@ h2.title{
 }
 .values-left{position:sticky;top:120px}
 .value-list{display:flex;flex-direction:column;gap:8px}
-/* ---------- АККОРДЕОН ПРИНЦИПОВ ---------- */
-.value-list{display:flex;flex-direction:column;gap:0}
-
-.value-item{
-  border-bottom:1px solid var(--line);
-  padding:24px 0;
-  transition:background .3s ease;
-  position:relative;
+/* ---------- ПРИНЦИПЫ (Сетка карточек) ---------- */
+.value-list{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
 }
 
-/* Заголовок (номер + название) */
+.value-item{
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  transition: transform .35s var(--ease), box-shadow .35s var(--ease), border-color .35s;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Фиолетовая полоса слева */
+.value-item::before{
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 28px;
+  bottom: 28px;
+  width: 4px;
+  background: var(--purple-500);
+  border-radius: 0 4px 4px 0;
+  transform: scaleY(0);
+  transform-origin: center;
+  transition: transform .35s var(--ease);
+}
+
+.value-item:hover{
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--purple-200);
+}
+.value-item:hover::before{
+  transform: scaleY(1);
+}
+
+/* Заголовок с номером */
 .value-header{
-  display:flex;
-  align-items:baseline;
-  gap:16px;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
 }
 
 .value-num{
-  font-size:1.2rem;
-  font-weight:800;
-  color:var(--purple-400);
-  min-width:32px;
-  line-height:1;
-  transition:color .3s ease;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--purple-400);
+  line-height: 1;
+  transition: color .35s;
+}
+.value-item:hover .value-num{
+  color: var(--purple-600);
 }
 
 .value-header h4{
-  font-size:1.4rem;
-  font-weight:800;
-  letter-spacing:-.02em;
-  color:var(--ink);
-  transition:color .3s ease;
-  margin:0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--ink);
+  line-height: 1.3;
+  margin: 0;
 }
 
-/* Текст, который выпадает */
+/* Текст описания */
 .value-desc{
-  max-height:0;
-  overflow:hidden;
-  opacity:0;
-  transition:max-height .5s ease, opacity .5s ease, margin .5s ease;
-  padding-left:48px;
-  color:var(--muted);
-  font-size:1rem;
-  line-height:1.7;
+  color: var(--muted);
+  font-size: .95rem;
+  line-height: 1.65;
 }
 
-/* Эффект при наведении на компьютере */
-@media (hover: hover) and (min-width: 769px) {
-  .value-item:hover{
-    background:#fff;
-    border-radius:12px;
-    padding-left:16px;
-    padding-right:16px;
-    margin-left:-16px;
-    margin-right:-16px;
-    border-bottom-color:transparent;
-    box-shadow:var(--shadow-sm);
-  }
-  .value-item:hover .value-num{color:var(--purple-600)}
-  .value-item:hover .value-header h4{color:var(--purple-600)}
-  .value-item:hover .value-desc{
-    max-height:250px;
-    opacity:1;
-    margin-top:10px;
-    margin-bottom:8px;
-  }
-}
-
-/* Мобильная версия (как было) */
+/* Мобильная версия — 1 колонка */
 @media (max-width: 768px){
-  .value-item{padding:22px 0}
-  .value-header{display:block}
-  .value-num{
-    font-size:1rem;
-    margin-right:6px;
-    display:inline;
+  .value-list{
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .value-item{
+    padding: 24px 20px;
   }
   .value-header h4{
-    display:inline;
-    font-size:1.05rem;
-    color:var(--purple-600);
+    font-size: 1.05rem;
   }
   .value-desc{
-    max-height:none;
-    opacity:1;
-    padding-left:0;
-    margin-top:8px;
-    display:block;
-    font-size:.94rem;
+    font-size: .92rem;
   }
 }
 /* ---------- NEWS / INITIATIVES / AUTHORS (общие карточки) ---------- */
