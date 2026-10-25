@@ -3,7 +3,7 @@ const cheerio = require('cheerio');
 
 const NEWS_CHANNEL = 'uchastie_official';
 const INIT_CHANNEL = 'luxury_tax_2026';
-const AVTOR_CHANNEL = 'uchastie_lite'; 
+const AVTOR_CHANNEL = 'ВАШ_КАНАЛ_АВТОРОВ'; // ← ВПИШИТЕ ИМЯ КАНАЛА
 
 async function fetchTelegram(channel, limit) {
   const url = `https://t.me/s/${channel}`;
@@ -22,33 +22,16 @@ async function fetchTelegram(channel, limit) {
   const items = [];
 
   $('.tgme_widget_message_wrap').each((i, el) => {
-    // Пропускаем репосты
     const isForwarded = $(el).find('.tgme_widget_message_forwarded_from').length > 0;
     if (isForwarded) return;
 
     const textEl = $(el).find('.tgme_widget_message_text');
-
-    // --- Заменяем премиум-эмодзи на картинки ---
-    textEl.find('i.emoji').each((_, emojiEl) => {
-      const style = $(emojiEl).attr('style') || '';
-      const match = style.match(/background-image:\s*url\(['"]?(https?:\/\/[^'"]+)['"]?\)/);
-      if (match) {
-        $(emojiEl).replaceWith(`<img src="${match[1]}" class="tg-emoji" alt="emoji">`);
-      }
-    });
-
-    // Сохраняем переносы строк
     textEl.find('br').replaceWith('\n');
-
-    // Очищаем от всех тегов, КРОМЕ <br> и <img>
-    let cleanHtml = textEl.html() || '';
-    cleanHtml = cleanHtml.replace(/<(?!\/?(br|img)\b)[^>]+>/gi, '');
-    const text = cleanHtml.trim();
+    const text = textEl.text().trim();
 
     const link = $(el).find('.tgme_widget_message_date').attr('href') || '';
     const date = $(el).find('time').attr('datetime') || '';
 
-    // Картинка поста
     let image = '';
     const photoWrap = $(el).find('.tgme_widget_message_photo_wrap');
     if (photoWrap.length) {
@@ -57,7 +40,6 @@ async function fetchTelegram(channel, limit) {
       if (match) image = match[1];
     }
 
-    // Разбиваем текст на заголовок и описание
     let title = '';
     let description = '';
 
