@@ -840,9 +840,7 @@ h2.title{
       const link  = item.link || '#';
 
       // Прогоняем ссылку из Телеграма через кэш, чтобы не было блокировки
-const imgSrc = item.image 
-  ? 'https://wsrv.nl/?url=' + encodeURIComponent(item.image) 
-  : cfg.favicon;
+      const imgSrc = item.image ? item.image : cfg.favicon;
       const imgClass = item.image ? '' : 'is-full';
 
       const card = document.createElement('article');
