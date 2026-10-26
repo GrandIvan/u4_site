@@ -742,59 +742,135 @@ h2.title{
 
   // Словарь эмодзи (символ → путь к картинке)
   const EMOJI_MAP = {
-    '📍': 'emoji/location.webp',
-    '🌐': 'emoji/globe.webp',
-    '🗣': 'emoji/speech.webp',
-    '⚙️': 'emoji/gear.webp',
-    '👥': 'emoji/crowd.webp',
-    '🪶': 'emoji/feather.webp',
-    '🏛': 'emoji/building.webp',
-    '🎤': 'emoji/microphone.webp',
-    '📰': 'emoji/news.webp',
-    '🧠': 'emoji/brain.webp',
-    '📅': 'emoji/calendar.webp',
-    '🔥': 'emoji/fire.webp',
-    '🔄': 'emoji/repost.webp',
-    '❗': 'emoji/alert.webp',
-    '⌨️': 'emoji/typewriter.webp',
-    '🖋': 'emoji/pen.webp',
-    '🤝': 'emoji/handshake.webp',
-    '❓': 'emoji/question.webp',
-    '📋': 'emoji/list.webp',
-    '🕊': 'emoji/dove.webp',
-    '🍃': 'emoji/leaves.webp',
-    '✅': 'emoji/checkbox.webp',
-    '💬': 'emoji/chat.webp',
-    '⛓️': 'emoji/chain.webp',
-    '💭': 'emoji/dots.webp',
-    '⚖️': 'emoji/scales.webp',
-    '♀️': 'emoji/feminist.webp',
-    '🔴': 'emoji/dot.webp',
-    '💡': 'emoji/idea.webp',
-    '💯': 'emoji/hundred.webp',
-    '📉': 'emoji/down.webp',
-    '🚌': 'emoji/bus.webp',
-    '🕊️': 'emoji/peace.webp',
-    '💎': 'emoji/diamond.webp',
-    '⏫': 'emoji/arrows.webp',
-    '🚀': 'emoji/rocket.webp',
-    '✍️': 'emoji/hand-pen.webp',
-    '🔍': 'emoji/search.webp',
-    '🔃': 'emoji/arrows-circle.webp',
-    '💰': 'emoji/money.webp',
-    '🔗': 'emoji/link.webp',
-    '🕒': 'emoji/clock.webp',
-    '🚩': 'emoji/flag.webp',
-    '📶': 'emoji/wifi.webp',
-    '🏠': 'emoji/home.webp',
-    '📎': 'emoji/clip.webp',
-    '📢': 'emoji/megaphone.webp',
-    '🔁': 'emoji/sync.webp',
-    '🔧': 'emoji/wrench.webp',
-    '✊': 'emoji/fist.webp',
-    '📖': 'emoji/book.webp'
-  };
+  // 1. Три стрелки (репост/обновление) -> 🔄 / ⏩
+  '⏩': 'emoji/arrows-circle.webp',
+  '🔄': 'emoji/arrows-circle.webp',
 
+  // 2. Трезубец / Посейдон (в нижнем меню его нет, но есть вилка-крюк 🪝, мапим на него)
+  '🪝': 'emoji/trident.webp',
+
+  // 3. Женский символ -> ♀️
+  '♀️': 'emoji/feminist.webp',
+
+  // 4. Список -> 📋
+  '📋': 'emoji/list.webp',
+
+  // 5. Скрепка -> 📎
+  '📎': 'emoji/clip.webp',
+
+  // 6. Wi-Fi -> 📶
+  '📶': 'emoji/wifi.webp',
+
+  // 7. Галочка в квадрате -> ☑️ / ✅ (берем с галочкой)
+  '☑️': 'emoji/checkbox.webp',
+  '✅': 'emoji/checkbox.webp',
+
+  // 8. Гаечный ключ -> 🔧
+  '🔧': 'emoji/wrench.webp',
+
+  // 9. Дом -> 🏠 / 🏢
+  '🏠': 'emoji/home.webp',
+  '🏢': 'emoji/home.webp',
+
+  // 10. Перо -> 🪶 / 🖌️ / ✏️
+  '🪶': 'emoji/feather.webp',
+  '🖌️': 'emoji/feather.webp',
+  '✏️': 'emoji/feather.webp',
+
+  // 11. Ключ -> 🔑 (у вас на скрине есть мешок, но в нижнем ключ 🔑)
+  '🔑': 'emoji/key.webp',
+
+  // 12. Деньги -> 💰
+  '💰': 'emoji/money.webp',
+
+  // 13. Лампочка -> 💡
+  '💡': 'emoji/idea.webp',
+
+  // 14. Печатная машинка -> 📓 (или калькулятор)
+  '📓': 'emoji/typewriter.webp',
+
+  // 15. Мозг -> 🧠
+  '🧠': 'emoji/brain.webp',
+
+  // 16. Восклицательный знак -> ❗
+  '❗': 'emoji/alert.webp',
+
+  // 17. Рупор -> 📢
+  '📢': 'emoji/megaphone.webp',
+
+  // 18. Вопрос -> ❓
+  '❓': 'emoji/question.webp',
+
+  // 19. Цепь -> ⛓️ / 🪢
+  '⛓️': 'emoji/chain.webp',
+  '🪢': 'emoji/chain.webp',
+
+  // 20. Огонь -> 🔥
+  '🔥': 'emoji/fire.webp',
+
+  // 21. Кулак -> ✊
+  '✊': 'emoji/fist.webp',
+
+  // 22. Облачко чата -> 💬
+  '💬': 'emoji/chat.webp',
+
+  // 23. Ручка -> ✍️
+  '✍️': 'emoji/hand-pen.webp',
+
+  // 24. Голубь с ветвью -> 🕊️
+  '🕊️': 'emoji/dove.webp',
+  '🕊': 'emoji/dove.webp',
+
+  // 25. Микрофон -> 🎤
+  '🎤': 'emoji/microphone.webp',
+
+  // 26. Книга -> 📖
+  '📖': 'emoji/book.webp',
+
+  // 27. Листья -> 🌱 / 🍃
+  '🌱': 'emoji/leaves.webp',
+  '🍃': 'emoji/leaves.webp',
+
+  // 28. Ракета -> 🚀
+  '🚀': 'emoji/rocket.webp',
+
+  // 29. Глобус -> 🌐
+  '🌐': 'emoji/globe.webp',
+
+  // 30. Лупа -> 🔍 / 👁️
+  '🔍': 'emoji/search.webp',
+  '👁️': 'emoji/search.webp',
+
+  // 31. Автобус -> 🚌
+  '🚌': 'emoji/bus.webp',
+
+  // 32. Шестеренка -> ⚙️
+  '⚙️': 'emoji/gear.webp',
+
+  // 33. Геометка -> 📍
+  '📍': 'emoji/location.webp',
+
+  // 34. Календарь -> 📅
+  '📅': 'emoji/calendar.webp',
+
+  // 35. Часы -> 🕒
+  '🕒': 'emoji/clock.webp',
+
+  // 36. Здание с колоннами -> 🏛️
+  '🏛️': 'emoji/building.webp',
+
+  // 37. Кружочки (точка) -> 🟢 / ⚪ / 🔵 / ⭕
+  '🟢': 'emoji/dot.webp',
+  '⚪': 'emoji/dot.webp',
+  '🔵': 'emoji/dot.webp',
+  '⭕': 'emoji/dot.webp',
+
+  // 38. Стрелки вверх -> ⬆️ / ↗️ / ⤴️ / ⏫
+  '⬆️': 'emoji/arrows.webp',
+  '↗️': 'emoji/arrows.webp',
+  '⤴️': 'emoji/arrows.webp',
+  '⏫': 'emoji/arrows.webp'
+};
   function replaceEmojis(text) {
     if (!text) return '';
     let result = text;
