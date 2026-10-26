@@ -1,3 +1,8 @@
+Понял. Возвращаю градиент шапки к тому виду, который вам понравился на телефоне (светлее и плавнее).
+
+Вот полный и целый файл `index.html`. Скопируйте его целиком:
+
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -29,7 +34,7 @@
   --muted:#7E5C86;
   --line:#F0E0F3;
   --white:#ffffff;
-  --radius:24px; /* Увеличенное скругление */
+  --radius:18px;
   --shadow-sm:0 2px 8px rgba(42,7,49,.06);
   --shadow-md:0 12px 32px rgba(42,7,49,.10);
   --shadow-lg:0 28px 60px rgba(42,7,49,.18);
@@ -51,7 +56,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:none;background:transpar
 .container{width:min(1180px,100% - 40px);margin-inline:auto}
 
 /* ---------- UTILITIES ---------- */
-.section{padding:clamp(80px,10vw,150px) 0; /* Больше воздуха */}
+.section{padding:clamp(72px,9vw,130px) 0;}
 .eyebrow{
   display:inline-flex;align-items:center;gap:9px;
   font-size:.78rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
@@ -133,7 +138,7 @@ h2.title{
   opacity:1;
   padding:11px 24px;
   border:none;
-  box-shadow:0 4px 12px rgba(135,23,157,.25); /* Упрощенная кнопка */
+  box-shadow:0 4px 12px rgba(135,23,157,.25);
 }
 .nav .nav-cta:hover{
   background:var(--purple-700);
@@ -159,7 +164,7 @@ h2.title{
 /* ---------- HERO ---------- */
 .hero{
   position:relative;overflow:hidden;
-  background:linear-gradient(155deg, #2A0731 0%, #4F0F5D 100%); /* Строгий градиент */
+  background: linear-gradient(155deg, #2A0731 0%, #4F0F5D 35%, #87179D 100%); /* Светлее, как на телефоне */
   color:#fff;
   padding:clamp(140px,17vw,210px) 0 clamp(90px,11vw,140px);
 }
@@ -172,13 +177,13 @@ h2.title{
   -webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 30%,#000 20%,transparent 78%);
 }
 .orb{position:absolute;border-radius:50%;filter:blur(70px);pointer-events:none}
-.orb-1{width:520px;height:520px;background:rgba(188,61,208,.35);top:-160px;right:-120px}
-.orb-2{width:420px;height:420px;background:rgba(135,23,157,.45);bottom:-180px;left:-140px}
-.orb-3{width:300px;height:300px;background:rgba(212,125,224,.25);top:42%;left:52%}
+.orb-1{width:520px;height:520px;background:rgba(188,61,208,.45);top:-160px;right:-120px}
+.orb-2{width:420px;height:420px;background:rgba(135,23,157,.55);bottom:-180px;left:-140px}
+.orb-3{width:300px;height:300px;background:rgba(212,125,224,.35);top:42%;left:52%}
 .hero-inner{position:relative;z-index:2;max-width:920px}
 .hero h1{
-  font-size:clamp(2rem,5.5vw,3.8rem); /* Чуть компактнее */
-  line-height:1.1;letter-spacing:-.03em;font-weight:800;
+  font-size:clamp(2.3rem,6.4vw,4.4rem);
+  line-height:1.05;letter-spacing:-.035em;font-weight:800;
   margin-bottom:26px;
   max-width: 20ch;
 }
@@ -225,7 +230,7 @@ h2.title{
   padding: 28px 0 28px 16px;
   transition: background .3s ease;
   border-radius: 0 12px 12px 0;
-  border-bottom: 1px solid rgba(135,23,157,.08); /* Тонкий разделитель */
+  border-bottom: 1px solid rgba(135,23,157,.08);
 }
 
 .value-header{
@@ -262,7 +267,7 @@ h2.title{
 }
 
 .value-item:hover{
-  background: rgba(135,23,157,.03); /* Мягкая подсветка */
+  background: rgba(135,23,157,.03);
 }
 
 /* ---------- NEWS / INITIATIVES / AUTHORS ---------- */
@@ -279,14 +284,13 @@ h2.title{
   transition:box-shadow .35s var(--ease), border-color .35s var(--ease);
   display:flex;flex-direction:column;
 }
-/* Без прыжков, только тень */
 .news-card:hover{
   box-shadow: 0 12px 24px rgba(42,7,49,.12); 
   border-color: var(--purple-300);
 }
 
 .news-thumb{
-  height:350px; /* Вернули прежнюю высоту */
+  height:350px;
   position:relative;overflow:hidden;
   background:linear-gradient(140deg,var(--purple-700),var(--purple-500) 60%,var(--purple-400));
 }
@@ -357,7 +361,6 @@ h2.title{
   overflow: hidden;
 }
 
-/* Эмодзи 1.6em */
 .tg-emoji {
   width: 1.6em;
   height: 1.6em;
@@ -467,7 +470,7 @@ h2.title{
 @media (max-width:640px){
   .container{width:calc(100% - 32px)}
   .news-grid{grid-template-columns:1fr}
-  .news-thumb{height:350px} /* Вернули прежнюю высоту для мобилки */
+  .news-thumb{height:350px}
   .hero-actions .btn{width:100%}
   .footer-top{grid-template-columns:1fr}
   .news-body{padding: 22px 24px 28px;}
@@ -745,7 +748,6 @@ h2.title{
   'use strict';
 
   const EMOJI_MAP = {
-    
     '💢': 'emoji/fist.webp',
     '🏦': 'emoji/building.webp',
     '📉': 'emoji/down.webp',
@@ -953,3 +955,4 @@ h2.title{
 
 </body>
 </html>
+```
