@@ -22,17 +22,22 @@ async function fetchTelegram(channel, limit) {
   const items = [];
 
   $('.tgme_widget_message_wrap').each((i, el) => {
+    // Пропускаем репосты из других каналов
     const isForwarded = $(el).find('.tgme_widget_message_forwarded_from').length > 0;
     if (isForwarded) return;
 
     const textEl = $(el).find('.tgme_widget_message_text');
+    // Сохраняем переносы строк
     textEl.find('br').replaceWith('\n');
     const text = textEl.text().trim();
 
     const link = $(el).find('.tgme_widget_message_date').attr('href') || '';
     const date = $(el).find('time').attr('datetime') || '';
 
+    // --- УЛУЧШЕННЫЙ ПОИСК КАРТИНКИ ---
     let image = '';
+
+    // 1. Обычное фото
     const photoWrap = $(el).find('.tgme_widget_message_photo_wrap');
     if (photoWrap.length) {
       const style = photoWrap.attr('style') || '';
@@ -40,6 +45,32 @@ async function fetchTelegram(channel, limit) {
       if (match) image = match[1];
     }
 
+    // 2. Обложка видео
+    if (!image) {
+      const videoThumb = $(el).find('.tgme_widget_message_video_thumb');
+      if (videoThumb.length) {
+        const style = videoThumb.attr('style') || '';
+        const match = style.match(/background-image:\s*url\(['"]?([^'")]+)['"]?\)/);
+        if (match) image = match[1];
+      }
+    }
+
+    // 3. Превью ссылки (если это пост со ссылкой на статью)
+    if (!image) {
+      const linkThumb = $(el).find('.tgme_widget_message_link_preview_thumb, .tgme_widget_message_link_preview_image');
+      if (linkThumb.length) {
+        const style = linkThumb.attr('style') || '';
+        const styleMatch = style.match(/background-image:\s*url\(['"]?([^'")]+)['"]?\)/);
+        if (styleMatch) {
+          image = styleMatch[1];
+        } else if (linkThumb.is('img')) {
+          image = linkThumb.attr('src') || '';
+        }
+      }
+    }
+    // ---------------------------------
+
+    // Разбиваем текст на заголовок и описание
     let title = '';
     let description = '';
 
