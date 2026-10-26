@@ -29,7 +29,7 @@
   --muted:#7E5C86;
   --line:#F0E0F3;
   --white:#ffffff;
-  --radius:18px;
+  --radius:24px; /* Увеличили скругление для современности */
   --shadow-sm:0 2px 8px rgba(42,7,49,.06);
   --shadow-md:0 12px 32px rgba(42,7,49,.10);
   --shadow-lg:0 28px 60px rgba(42,7,49,.18);
@@ -51,7 +51,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:none;background:transpar
 .container{width:min(1180px,100% - 40px);margin-inline:auto}
 
 /* ---------- UTILITIES ---------- */
-.section{padding:clamp(72px,9vw,130px) 0}
+.section{padding:clamp(80px,10vw,150px) 0; /* Больше воздуха */}
 .eyebrow{
   display:inline-flex;align-items:center;gap:9px;
   font-size:.78rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
@@ -132,10 +132,14 @@ h2.title{
   color:#fff !important;
   opacity:1;
   padding:11px 24px;
-  border:2px solid #fff;
-  box-shadow:0 0 0 2px var(--purple-300), 0 8px 22px rgba(135,23,157,.32);
+  border:none;
+  box-shadow:0 4px 12px rgba(135,23,157,.25); /* Упростили кнопку */
 }
-.nav .nav-cta:hover{background:var(--purple-700);transform:translateY(-1px)}
+.nav .nav-cta:hover{
+  background:var(--purple-700);
+  box-shadow:0 6px 16px rgba(135,23,157,.35);
+  transform:translateY(-1px);
+}
 
 .burger{
   display:none;width:44px;height:44px;
@@ -155,7 +159,7 @@ h2.title{
 /* ---------- HERO ---------- */
 .hero{
   position:relative;overflow:hidden;
-  background:linear-gradient(155deg,var(--purple-950) 0%,var(--purple-800) 42%,var(--purple-600) 100%);
+  background:linear-gradient(155deg, #2A0731 0%, #4F0F5D 100%); /* Более строгий градиент */
   color:#fff;
   padding:clamp(140px,17vw,210px) 0 clamp(90px,11vw,140px);
 }
@@ -168,14 +172,15 @@ h2.title{
   -webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 30%,#000 20%,transparent 78%);
 }
 .orb{position:absolute;border-radius:50%;filter:blur(70px);pointer-events:none}
-.orb-1{width:520px;height:520px;background:rgba(188,61,208,.45);top:-160px;right:-120px}
-.orb-2{width:420px;height:420px;background:rgba(135,23,157,.55);bottom:-180px;left:-140px}
-.orb-3{width:300px;height:300px;background:rgba(212,125,224,.35);top:42%;left:52%}
+.orb-1{width:520px;height:520px;background:rgba(188,61,208,.35);top:-160px;right:-120px}
+.orb-2{width:420px;height:420px;background:rgba(135,23,157,.45);bottom:-180px;left:-140px}
+.orb-3{width:300px;height:300px;background:rgba(212,125,224,.25);top:42%;left:52%}
 .hero-inner{position:relative;z-index:2;max-width:920px}
 .hero h1{
-  font-size:clamp(2.3rem,6.4vw,4.4rem);
-  line-height:1.05;letter-spacing:-.035em;font-weight:800;
+  font-size:clamp(2rem,5.5vw,3.8rem); /* Уменьшили размер */
+  line-height:1.1;letter-spacing:-.03em;font-weight:800;
   margin-bottom:26px;
+  max-width: 20ch;
 }
 .hero h1 .accent{
   background:linear-gradient(100deg,var(--purple-300),#fff 60%);
@@ -218,23 +223,26 @@ h2.title{
 .value-item{
   position: relative;
   padding: 28px 0 28px 16px;
-  transition: background .3s ease, transform .3s ease;
+  transition: background .3s ease;
   border-radius: 0 12px 12px 0;
+  border-bottom: 1px solid rgba(135,23,157,.08); /* Тонкий разделитель */
 }
 
 .value-header{
   display: flex;
   align-items: baseline;
   gap: 14px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .value-num{
-  font-size: 1.2rem;
+  background: var(--purple-100);
+  color: var(--purple-700);
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.95rem;
   font-weight: 800;
-  color: var(--purple-400);
   line-height: 1;
-  transition: color .3s ease;
 }
 
 .value-header h4{
@@ -244,7 +252,6 @@ h2.title{
   color: var(--ink);
   line-height: 1.25;
   margin: 0;
-  transition: color .3s ease;
 }
 
 .value-desc{
@@ -255,14 +262,7 @@ h2.title{
 }
 
 .value-item:hover{
-  background: linear-gradient(90deg, var(--purple-50), transparent);
-  transform: translateX(8px);
-}
-.value-item:hover .value-num{
-  color: var(--purple-600);
-}
-.value-item:hover .value-header h4{
-  color: var(--purple-600);
+  background: rgba(135,23,157,.03); /* Легкая подсветка вместо сдвига */
 }
 
 /* ---------- NEWS / INITIATIVES / AUTHORS ---------- */
@@ -276,13 +276,17 @@ h2.title{
 .news-card{
   border-radius:var(--radius);overflow:hidden;background:#fff;
   border:1px solid var(--line);
-  transition:transform .35s var(--ease),box-shadow .35s var(--ease);
+  transition:box-shadow .35s var(--ease), border-color .35s var(--ease);
   display:flex;flex-direction:column;
 }
-.news-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-md)}
+/* Убрали прыжок, оставили мягкую тень */
+.news-card:hover{
+  box-shadow: 0 12px 24px rgba(42,7,49,.12); 
+  border-color: var(--purple-300);
+}
 
 .news-thumb{
-  height:350px;
+  height:260px; /* Уменьшили высоту */
   position:relative;overflow:hidden;
   background:linear-gradient(140deg,var(--purple-700),var(--purple-500) 60%,var(--purple-400));
 }
@@ -330,36 +334,36 @@ h2.title{
 .news-meta .date{color:var(--muted);font-weight:600;letter-spacing:.02em;text-transform:none;font-size:.84rem}
 
 .news-card h3{
-  font-size: 1.1rem;
+  font-size: 1.15rem; /* Чуть крупнее */
   font-weight: 800;
   letter-spacing: -.02em;
   line-height: 1.35;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   color: var(--ink);
   display: -webkit-box;
-  -webkit-line-clamp: 3; /* Жесткое ограничение в 3 строки */
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
 .news-card p{
-  color: var(--muted);
+  color: #5A4664; /* Чуть темнее для контраста */
   font-size: .94rem;
   flex: 1;
   line-height: 1.65;
   display: -webkit-box;
-  -webkit-line-clamp: 4; /* Жесткое ограничение в 4 строки */
+  -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-/* Стиль для встроенных эмодзи-картинок */
+/* Эмодзи 1.6em */
 .tg-emoji {
-  width: 1.8em;
-  height: 1.8em;
-  display: inline-block; /* Стоит в строке, а не блоком */
-  vertical-align: -0.4em; /* Выравнивание по базовой линии */
-  margin: 0 4px;
+  width: 1.6em;
+  height: 1.6em;
+  display: inline-block;
+  vertical-align: -0.3em; /* Выровняли под 1.6em */
+  margin: 0 3px;
   max-width: none;
 }
 
@@ -455,15 +459,15 @@ h2.title{
 @media (max-width:768px){
   .value-list{ padding-left: 24px; }
   .value-item{ padding: 22px 0 22px 12px; }
-  .value-header{ flex-direction: column; gap: 4px; margin-bottom: 8px; }
-  .value-num{ font-size: 1rem; }
+  .value-header{ flex-direction: column; gap: 6px; margin-bottom: 8px; align-items: flex-start; }
+  .value-num{ font-size: 0.85rem; }
   .value-header h4{ font-size: 1.15rem; }
   .value-desc{ font-size: .93rem; }
 }
 @media (max-width:640px){
   .container{width:calc(100% - 32px)}
   .news-grid{grid-template-columns:1fr}
-  .news-thumb{height:350px}
+  .news-thumb{height:220px} /* На мобилке еще меньше */
   .hero-actions .btn{width:100%}
   .footer-top{grid-template-columns:1fr}
   .news-body{padding: 22px 24px 28px;}
@@ -740,93 +744,86 @@ h2.title{
 (function () {
   'use strict';
 
-  // Словарь замен: берем стандартные эмодзи из нижней панели скрина и мапим на ваши файлы
+  const EMOJI_MAP = {
+    '🏳️': 'emoji/flag.webp',
+    '💢': 'emoji/fist.webp',
+    '🏦': 'emoji/building.webp',
+    '📉': 'emoji/down.webp',
+    '🔈': 'emoji/megaphone.webp',
+    '🔁': 'emoji/link.webp',
+    '⏩': 'emoji/arrows-circle.webp',
+    '⭐': 'emoji/idea.webp', 
+    '🌈': 'emoji/leaves.webp', 
+    '📋': 'emoji/list.webp',
+    '📎': 'emoji/clip.webp',
+    '📶': 'emoji/wifi.webp',
+    '✉️': 'emoji/chat.webp', 
+    '📨': 'emoji/chat.webp',
+    '🔧': 'emoji/wrench.webp',
+    '🏠': 'emoji/home.webp',
+    '🏢': 'emoji/building.webp',
+    '💰': 'emoji/money.webp',
+    '👥': 'emoji/crowd.webp',
+    '☀️': 'emoji/idea.webp',
+    '🔤': 'emoji/typewriter.webp',
+    '🧠': 'emoji/brain.webp',
+    '❗': 'emoji/alert.webp',
+    '📢': 'emoji/megaphone.webp',
+    '❓': 'emoji/question.webp',
+    '🔄': 'emoji/arrows-circle.webp',
+    '❌': 'emoji/crowd.webp',
+    '💯': 'emoji/hundred.webp',
+    '✨': 'emoji/idea.webp',
+    '✅': 'emoji/checkbox.webp',
+    '💬': 'emoji/chat.webp',
+    '🤝': 'emoji/handshake.webp',
+    '📓': 'emoji/typewriter.webp',
+    '💿': 'emoji/dot.webp',
+    '🏴‍☠️': 'emoji/flag.webp',
+    '🔴': 'emoji/dot.webp',
+    '✍️': 'emoji/hand-pen.webp',
+    '❤️': 'emoji/fire.webp', 
+    '🧱': 'emoji/building.webp',
+    '🪜': 'emoji/list.webp',
+    '🌱': 'emoji/leaves.webp',
+    '👉': 'emoji/arrows.webp',
+    '🖌️': 'emoji/feather.webp',
+    '✏️': 'emoji/feather.webp',
+    '⭕': 'emoji/dot.webp',
+    '👁️': 'emoji/search.webp',
+    '🚌': 'emoji/bus.webp',
+    '🚩': 'emoji/flag.webp',
+    '🕒': 'emoji/clock.webp',
+    '🪧': 'emoji/list.webp',
+    '🚫': 'emoji/alert.webp',
+    '⚪': 'emoji/dot.webp',
+    '⬆️': 'emoji/arrows.webp',
+    '↗️': 'emoji/arrows.webp',
+    '↩️': 'emoji/arrows.webp',
+    '🪝': 'emoji/trident.webp',
+    '♀️': 'emoji/feminist.webp',
+    '☑️': 'emoji/checkbox.webp',
+    '🪶': 'emoji/feather.webp',
+    '🔑': 'emoji/key.webp',
+    '💡': 'emoji/idea.webp',
+    '⛓️': 'emoji/chain.webp',
+    '🪢': 'emoji/chain.webp',
+    '🔥': 'emoji/fire.webp',
+    '✊': 'emoji/fist.webp',
+    '🕊️': 'emoji/dove.webp',
+    '🕊': 'emoji/dove.webp',
+    '🎤': 'emoji/microphone.webp',
+    '📖': 'emoji/book.webp',
+    '🍃': 'emoji/leaves.webp',
+    '🚀': 'emoji/rocket.webp',
+    '🌐': 'emoji/globe.webp',
+    '🔍': 'emoji/search.webp',
+    '⚙️': 'emoji/gear.webp',
+    '📍': 'emoji/location.webp',
+    '📅': 'emoji/calendar.webp',
+    '🏛️': 'emoji/building.webp'
+  };
 
-const EMOJI_MAP = {
-  // --- НОВЫЕ (те, что вы скопировали) ---
-  '🏳️': 'emoji/flag.webp',           // Белый флаг
-  '💢': 'emoji/fist.webp',          // Символ гнева / взрыв
-  '🏦': 'emoji/building.webp',       // Банк / Здание
-  '📉': 'emoji/down.webp',           // График вниз
-  '🔈': 'emoji/megaphone.webp',      // Динамик / Рупор
-  '🔁': 'emoji/link.webp',           // Кнопка повтора
-
-  // --- ОСНОВНЫЕ (из вашего скрина) ---
-  '⏩': 'emoji/arrows-circle.webp',
-  '⭐': 'emoji/idea.webp', 
-  '🌈': 'emoji/leaves.webp', 
-  '📋': 'emoji/list.webp',
-  '📎': 'emoji/clip.webp',
-  '📶': 'emoji/wifi.webp',
-  '✉️': 'emoji/chat.webp', 
-  '📨': 'emoji/chat.webp',
-  '🔧': 'emoji/wrench.webp',
-  '🏠': 'emoji/home.webp',
-  '🏢': 'emoji/building.webp',
-  '💰': 'emoji/money.webp',
-  '👥': 'emoji/crowd.webp',
-  '☀️': 'emoji/idea.webp',
-  '🔤': 'emoji/typewriter.webp',
-  '🧠': 'emoji/brain.webp',
-  '❗': 'emoji/alert.webp',
-  '📢': 'emoji/megaphone.webp',
-  '❓': 'emoji/question.webp',
-  '🔄': 'emoji/arrows-circle.webp',
-  '❌': 'emoji/crowd.webp',
-  '💯': 'emoji/hundred.webp',
-  '✨': 'emoji/idea.webp',
-  '✅': 'emoji/checkbox.webp',
-  '💬': 'emoji/chat.webp',
-  '🤝': 'emoji/handshake.webp',
-  '📓': 'emoji/typewriter.webp',
-  '💿': 'emoji/dot.webp',
-  '🏴‍☠️': 'emoji/flag.webp',
-  '🔴': 'emoji/dot.webp',
-  '✍️': 'emoji/hand-pen.webp',
-  '❤️': 'emoji/fire.webp', 
-  '🧱': 'emoji/building.webp',
-  '🪜': 'emoji/list.webp',
-  '🌱': 'emoji/leaves.webp',
-  '👉': 'emoji/arrows.webp',
-  '🖌️': 'emoji/feather.webp',
-  '✏️': 'emoji/feather.webp',
-  '⭕': 'emoji/dot.webp',
-  '👁️': 'emoji/search.webp',
-  '🚌': 'emoji/bus.webp',
-  '🚩': 'emoji/flag.webp',
-  '🕒': 'emoji/clock.webp',
-  '🪧': 'emoji/list.webp',
-  '🚫': 'emoji/alert.webp',
-  '⚪': 'emoji/dot.webp',
-  '⬆️': 'emoji/arrows.webp',
-  '↗️': 'emoji/arrows.webp',
-  '↩️': 'emoji/arrows.webp',
-  
-  // --- ФИОЛЕТОВЫЕ (верхняя панель) ---
-  '🪝': 'emoji/trident.webp',
-  '♀️': 'emoji/feminist.webp',
-  '☑️': 'emoji/checkbox.webp',
-  '🪶': 'emoji/feather.webp',
-  '🔑': 'emoji/key.webp',
-  '💡': 'emoji/idea.webp',
-  '⛓️': 'emoji/chain.webp',
-  '🪢': 'emoji/chain.webp',
-  '🔥': 'emoji/fire.webp',
-  '✊': 'emoji/fist.webp',
-  '🕊️': 'emoji/dove.webp',
-  '🕊': 'emoji/dove.webp',
-  '🎤': 'emoji/microphone.webp',
-  '📖': 'emoji/book.webp',
-  '🍃': 'emoji/leaves.webp',
-  '🚀': 'emoji/rocket.webp',
-  '🌐': 'emoji/globe.webp',
-  '🔍': 'emoji/search.webp',
-  '⚙️': 'emoji/gear.webp',
-  '📍': 'emoji/location.webp',
-  '📅': 'emoji/calendar.webp',
-  '🏛️': 'emoji/building.webp'
-};
-  // Замена с учетом невидимых символов (вариационных селекторов)
   function replaceEmojis(text) {
     if (!text) return '';
     let result = text;
@@ -847,12 +844,10 @@ const EMOJI_MAP = {
     return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
   }
 
-  // ВАЖНО: Теперь мы используем innerHTML, чтобы не удалять картинки, если они уже есть в JSON
   function cleanText(html) {
     if (!html) return '';
     const tmp = document.createElement('div');
     tmp.innerHTML = html;
-    // Удаляем только опасные теги (скрипты), оставляя текст и картинки
     tmp.querySelectorAll('script, style, iframe').forEach(el => el.remove());
     return tmp.innerHTML.trim();
   }
@@ -867,7 +862,6 @@ const EMOJI_MAP = {
     }
 
     items.slice(0, cfg.count).forEach(function (item, i) {
-      // Заменяем эмодзи на картинки
       const rawTitle = replaceEmojis(cleanText(item.title)) || 'Без названия';
       const rawDesc = replaceEmojis(cleanText(item.description));
       const desc = rawDesc || 'Подробнее по ссылке.';
@@ -893,7 +887,6 @@ const EMOJI_MAP = {
             '<span class="dot"></span>' +
             '<span class="date">' + date + '</span>' +
           '</div>' +
-          // Вставляем текст с HTML-тегами картинок. CSS обрежет лишнее.
           '<h3>' + rawTitle + '</h3>' +
           '<p>' + desc + '</p>' +
           '<a class="news-link" href="' + link + '" target="_blank" rel="noopener">' +
