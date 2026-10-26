@@ -15,7 +15,7 @@
   --muted:#7E5C86;
   --line:#F0E0F3;
   --white:#ffffff;
-  --radius:24px;
+  --radius:18px; /* Вернул прежнее значение */
   --shadow-sm:0 2px 8px rgba(42,7,49,.06);
   --shadow-md:0 12px 32px rgba(42,7,49,.10);
   --shadow-lg:0 28px 60px rgba(42,7,49,.18);
