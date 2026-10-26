@@ -122,6 +122,7 @@
     '🌐': 'emoji/globe.webp',
     '🔍': 'emoji/search.webp',
     '⚙️': 'emoji/gear.webp',
+    '🗯️': 'emoji/dots.webp',
     '📍': 'emoji/location.webp',
     '📅': 'emoji/calendar.webp',
     '🏛️': 'emoji/building.webp'
