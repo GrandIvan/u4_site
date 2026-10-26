@@ -28,6 +28,7 @@ body{
   color:var(--ink);
   background:var(--white);
   line-height:1.65;
+  font-weight: 400; /* <--- ДОБАВИТЬ ЭТУ СТРОКУ */
   -webkit-font-smoothing:antialiased;
   overflow-x:hidden;
 }
