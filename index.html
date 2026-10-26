@@ -839,7 +839,10 @@ h2.title{
       const date  = formatDate(item.pubDate);
       const link  = item.link || '#';
 
-      const imgSrc = item.image ? item.image : cfg.favicon;
+      // Прогоняем ссылку из Телеграма через кэш, чтобы не было блокировки
+const imgSrc = item.image 
+  ? 'https://wsrv.nl/?url=' + encodeURIComponent(item.image) 
+  : cfg.favicon;
       const imgClass = item.image ? '' : 'is-full';
 
       const card = document.createElement('article');
