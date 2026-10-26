@@ -1,7 +1,53 @@
 (function () {
   'use strict';
 
-  // 1. Словарь замен эмодзи на картинки
+  /* ---------- Sticky header ---------- */
+  const header = document.getElementById('header');
+  const onScroll = () => header.classList.toggle('scrolled', window.scrollY > 30);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  /* ---------- Mobile menu ---------- */
+  const burger = document.getElementById('burger');
+  const nav = document.getElementById('nav');
+
+  function closeMenu() {
+    nav.classList.remove('open');
+    burger.classList.remove('open');
+    header.classList.remove('menu-open');
+    burger.setAttribute('aria-expanded', 'false');
+  }
+
+  burger.addEventListener('click', () => {
+    const open = nav.classList.toggle('open');
+    burger.classList.toggle('open', open);
+    header.classList.toggle('menu-open', open);
+    burger.setAttribute('aria-expanded', String(open));
+  });
+
+  nav.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+  window.addEventListener('resize', () => { if (window.innerWidth > 860) closeMenu(); });
+
+  /* ---------- Scroll reveal ---------- */
+  const revealEls = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const delay = Math.min(i * 70, 280);
+          setTimeout(() => el.classList.add('in'), delay);
+          io.unobserve(el);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+    revealEls.forEach(el => io.observe(el));
+  } else {
+    revealEls.forEach(el => el.classList.add('in'));
+  }
+
+  /* ---------- ЭМОДЗИ И ЗАГРУЗКА ---------- */
   const EMOJI_MAP = {
     '💢': 'emoji/fist.webp',
     '🏦': 'emoji/building.webp',
@@ -81,7 +127,6 @@
     '🏛️': 'emoji/building.webp'
   };
 
-  // 2. Функция замены эмодзи (учитывает невидимые символы)
   function replaceEmojis(text) {
     if (!text) return '';
     let result = text;
@@ -93,7 +138,6 @@
     return result;
   }
 
-  // 3. Форматирование даты
   function formatDate(dateStr) {
     if (!dateStr) return '';
     const months = ['января','февраля','марта','апреля','мая','июня',
@@ -103,7 +147,6 @@
     return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
   }
 
-  // 4. Очистка текста от опасных тегов (оставляет картинки, если они есть)
   function cleanText(html) {
     if (!html) return '';
     const tmp = document.createElement('div');
@@ -112,7 +155,6 @@
     return tmp.innerHTML.trim();
   }
 
-  // 5. Отрисовка карточек
   function renderCards(grid, loading, items, cfg) {
     if (!grid) return;
     grid.innerHTML = '';
@@ -170,7 +212,6 @@
     }, 50);
   }
 
-  // 6. Загрузка данных из JSON
   async function loadBlock(jsonPath, gridId, loadingId, cfg) {
     const grid = document.getElementById(gridId);
     const loading = document.getElementById(loadingId);
@@ -189,7 +230,6 @@
     }
   }
 
-  // 7. Запуск загрузки для всех блоков
   loadBlock('news.json', 'newsGrid', 'newsLoading', {
     count: 6,
     favicon: 'android-chrome-512x512.png',
@@ -210,23 +250,5 @@
     label: 'Авторское',
     linkText: 'Читать в Telegram'
   });
-
-  // 8. Анимация появления блоков при скролле
-  const revealEls = document.querySelectorAll('.reveal');
-  if ('IntersectionObserver' in window) {
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((entry, i) => {
-        if (entry.isIntersecting) {
-          const el = entry.target;
-          const delay = Math.min(i * 70, 280);
-          setTimeout(() => el.classList.add('in'), delay);
-          io.unobserve(el);
-        }
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
-    revealEls.forEach(el => io.observe(el));
-  } else {
-    revealEls.forEach(el => el.classList.add('in'));
-  }
 
 })();
