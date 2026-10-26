@@ -872,14 +872,17 @@ h2.title{
   '⏫': 'emoji/arrows.webp'
 };
   function replaceEmojis(text) {
-    if (!text) return '';
-    let result = text;
-    for (const [emoji, path] of Object.entries(EMOJI_MAP)) {
-      result = result.split(emoji).join(
-        '<img src="' + path + '" class="tg-emoji" alt="">'
-      );
-    }
-    return result;
+  if (!text) return '';
+  let result = text;
+  for (const [emoji, path] of Object.entries(EMOJI_MAP)) {
+    // Убираем невидимый селектор из ключа словаря
+    const cleanEmoji = emoji.replace(/\uFE0F/g, '');
+    const imgTag = '<img src="' + path + '" class="tg-emoji" alt="">';
+    
+    // Заменяем и обычный вариант, и вариант с невидимым символом
+    result = result.split(emoji).join(imgTag).split(cleanEmoji).join(imgTag);
+  }
+  return result;
   }
 
   function formatDate(dateStr) {
