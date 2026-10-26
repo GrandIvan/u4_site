@@ -589,4 +589,364 @@ h2.title{
   </div>
 </section>
 
-<!-- =============
+<!-- ================= NEWS ================= -->
+<section class="section" id="news">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Новости</span>
+      <h2 class="title">Что происходит в движении</h2>
+      <p class="lead">Последние публикации из нашего Telegram-канала.</p>
+    </div>
+
+    <div class="news-grid" id="newsGrid"></div>
+
+    <p id="newsLoading" style="color:var(--muted); text-align:center; padding:20px 0;">
+      Загружаем новости…
+    </p>
+  </div>
+</section>
+
+<!-- ================= INITIATIVES ================= -->
+<section class="section initiatives" id="initiatives">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Инициативы</span>
+      <h2 class="title">Наши инициативы</h2>
+      <p class="lead">Кампании, проекты и предложения, которые мы продвигаем прямо сейчас.</p>
+    </div>
+
+    <div class="news-grid" id="initiativesGrid"></div>
+
+    <p id="initiativesLoading" style="color:var(--muted); text-align:center; padding:20px 0;">
+      Загружаем инициативы…
+    </p>
+  </div>
+</section>
+
+<!-- ================= AUTHORS ================= -->
+<section class="section authors" id="authors">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Авторские материалы</span>
+      <h2 class="title">Мнения и аналитика</h2>
+      <p class="lead">Статьи, разборы и рассуждения от участников движения.</p>
+    </div>
+
+    <div class="news-grid" id="authorsGrid"></div>
+
+    <p id="authorsLoading" style="color:var(--muted); text-align:center; padding:20px 0;">
+      Загружаем материалы…
+    </p>
+  </div>
+</section>
+
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-top">
+      <div>
+        <a href="#top" class="logo">
+          <img src="logo_inv.jpg" alt="Логотип «Участие»" class="logo-img">
+          <span class="logo-text">Участие<span>Левое демократическое движение</span></span>
+        </a>
+        <p class="footer-about">Организация, работающая на основе открытости, ответственности и уважения к каждому гражданину.</p>
+        <div class="socials">
+          <a href="https://t.me/uchastie_official" aria-label="Telegram">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.9 4.3 19 19.1c-.2 1-.8 1.2-1.6.8l-4.5-3.3-2.2 2.1c-.2.2-.4.4-.9.4l.3-4.6 8.4-7.6c.4-.3-.1-.5-.6-.2L7.5 13.3 3 11.9c-1-.3-1-1 .2-1.5L20.4 3.4c.8-.3 1.6.2 1.5.9Z"/></svg>
+          </a>
+          <a href="https://youtube.com/channel/UCxE_W3-qn47tEtIrJo8GdoA?si=vG24kawbLqkXSO-W" aria-label="YouTube">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22.5 7.2a2.8 2.8 0 0 0-2-2C18.8 4.8 12 4.8 12 4.8s-6.8 0-8.5.4a2.8 2.8 0 0 0-2 2A29 29 0 0 0 1 12a29 29 0 0 0 .5 4.8 2.8 2.8 0 0 0 2 2c1.7.4 8.5.4 8.5.4s6.8 0 8.5-.4a2.8 2.8 0 0 0 2-2A29 29 0 0 0 23 12a29 29 0 0 0-.5-4.8ZM9.9 15.2V8.8L15.4 12l-5.5 3.2Z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div>
+        <h5>Движение</h5>
+        <ul>
+          <li><a href="printsipy.html">Принципы</a></li>
+          <li><a href="concept.html">Концептуальная основа</a></li>
+          </ul>
+      </div>
+
+      <div>
+        <h5>Участие</h5>
+        <ul>
+          <li><a href="https://t.me/Uchastie_join_bot">Вступить в организацию</a></li>
+          <li><a href="#news">Новости</a></li>
+          <li><a href="#initiatives">Инициативы</a></li>
+          <li><a href="#authors">Авторские материалы</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- Sticky header ---------- */
+  const header = document.getElementById('header');
+  const onScroll = () => header.classList.toggle('scrolled', window.scrollY > 30);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  /* ---------- Mobile menu ---------- */
+  const burger = document.getElementById('burger');
+  const nav = document.getElementById('nav');
+
+  function closeMenu() {
+    nav.classList.remove('open');
+    burger.classList.remove('open');
+    header.classList.remove('menu-open');
+    burger.setAttribute('aria-expanded', 'false');
+  }
+
+  burger.addEventListener('click', () => {
+    const open = nav.classList.toggle('open');
+    burger.classList.toggle('open', open);
+    header.classList.toggle('menu-open', open);
+    burger.setAttribute('aria-expanded', String(open));
+  });
+
+  nav.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+  window.addEventListener('resize', () => { if (window.innerWidth > 860) closeMenu(); });
+
+  /* ---------- Scroll reveal ---------- */
+  const revealEls = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const delay = Math.min(i * 70, 280);
+          setTimeout(() => el.classList.add('in'), delay);
+          io.unobserve(el);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+    revealEls.forEach(el => io.observe(el));
+  } else {
+    revealEls.forEach(el => el.classList.add('in'));
+  }
+})();
+</script>
+
+<!-- ================ ЗАГРУЗКА И ЗАМЕНА ЭМОДЗИ ================ -->
+<script>
+(function () {
+  'use strict';
+
+  // Словарь замен: берем стандартные эмодзи из нижней панели скрина и мапим на ваши файлы
+  const EMOJI_MAP = {
+    '⏩': 'emoji/arrows-circle.webp',
+    '⭐': 'emoji/idea.webp', // Нет звезды, используем лампочку
+    '🌈': 'emoji/leaves.webp', // Нет радуги, используем листья
+    '📋': 'emoji/list.webp',
+    '📎': 'emoji/clip.webp',
+    '📶': 'emoji/wifi.webp',
+    '✉️': 'emoji/chat.webp', // Нет конверта, используем чат
+    '📨': 'emoji/chat.webp',
+    '🔧': 'emoji/wrench.webp',
+    '🏠': 'emoji/home.webp',
+    '🏢': 'emoji/building.webp',
+    '💰': 'emoji/money.webp',
+    '👥': 'emoji/crowd.webp',
+    '☀️': 'emoji/idea.webp',
+    '🔤': 'emoji/typewriter.webp',
+    '🧠': 'emoji/brain.webp',
+    '❗': 'emoji/alert.webp',
+    '📢': 'emoji/megaphone.webp',
+    '❓': 'emoji/question.webp',
+    '🔄': 'emoji/arrows-circle.webp',
+    '❌': 'emoji/alert.webp',
+    '💯': 'emoji/hundred.webp',
+    '✨': 'emoji/idea.webp',
+    '✅': 'emoji/checkbox.webp',
+    '💬': 'emoji/chat.webp',
+    '🤝': 'emoji/handshake.webp',
+    '📓': 'emoji/typewriter.webp',
+    '💿': 'emoji/dot.webp',
+    '🏴‍☠️': 'emoji/flag.webp',
+    '🔴': 'emoji/dot.webp',
+    '✍️': 'emoji/hand-pen.webp',
+    '❤️': 'emoji/fire.webp', // Нет сердца, используем огонь
+    '🧱': 'emoji/building.webp',
+    '🪜': 'emoji/list.webp',
+    '🌱': 'emoji/leaves.webp',
+    '👉': 'emoji/arrows.webp',
+    '🖌️': 'emoji/feather.webp',
+    '✏️': 'emoji/feather.webp',
+    '⭕': 'emoji/dot.webp',
+    '👁️': 'emoji/search.webp',
+    '🚌': 'emoji/bus.webp',
+    '🚩': 'emoji/flag.webp',
+    '🕒': 'emoji/clock.webp',
+    '🪧': 'emoji/list.webp',
+    '🚫': 'emoji/alert.webp',
+    '⚪': 'emoji/dot.webp',
+    '⬆️': 'emoji/arrows.webp',
+    '↗️': 'emoji/arrows.webp',
+    '↩️': 'emoji/arrows.webp',
+    // Добавляем остальные ваши фиолетовые иконки, которые есть на скрине сверху
+    '🪝': 'emoji/trident.webp',
+    '♀️': 'emoji/feminist.webp',
+    '☑️': 'emoji/checkbox.webp',
+    '🪶': 'emoji/feather.webp',
+    '🔑': 'emoji/key.webp',
+    '💡': 'emoji/idea.webp',
+    '⛓️': 'emoji/chain.webp',
+    '🪢': 'emoji/chain.webp',
+    '🔥': 'emoji/fire.webp',
+    '✊': 'emoji/fist.webp',
+    '🕊️': 'emoji/dove.webp',
+    '🕊': 'emoji/dove.webp',
+    '🎤': 'emoji/microphone.webp',
+    '📖': 'emoji/book.webp',
+    '🍃': 'emoji/leaves.webp',
+    '🚀': 'emoji/rocket.webp',
+    '🌐': 'emoji/globe.webp',
+    '🔍': 'emoji/search.webp',
+    '⚙️': 'emoji/gear.webp',
+    '📍': 'emoji/location.webp',
+    '📅': 'emoji/calendar.webp',
+    '🏛️': 'emoji/building.webp'
+  };
+
+  // Замена с учетом невидимых символов (вариационных селекторов)
+  function replaceEmojis(text) {
+    if (!text) return '';
+    let result = text;
+    for (const [emoji, path] of Object.entries(EMOJI_MAP)) {
+      const cleanEmoji = emoji.replace(/\uFE0F/g, '');
+      const imgTag = '<img src="' + path + '" class="tg-emoji" alt="">';
+      result = result.split(emoji).join(imgTag).split(cleanEmoji).join(imgTag);
+    }
+    return result;
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const months = ['января','февраля','марта','апреля','мая','июня',
+                    'июля','августа','сентября','октября','ноября','декабря'];
+    const d = new Date(dateStr);
+    if (isNaN(d)) return '';
+    return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  // ВАЖНО: Теперь мы используем innerHTML, чтобы не удалять картинки, если они уже есть в JSON
+  function cleanText(html) {
+    if (!html) return '';
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    // Удаляем только опасные теги (скрипты), оставляя текст и картинки
+    tmp.querySelectorAll('script, style, iframe').forEach(el => el.remove());
+    return tmp.innerHTML.trim();
+  }
+
+  function renderCards(grid, loading, items, cfg) {
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    if (!items || !items.length) {
+      if (loading) loading.textContent = 'Нет доступных данных.';
+      return;
+    }
+
+    items.slice(0, cfg.count).forEach(function (item, i) {
+      // Заменяем эмодзи на картинки
+      const rawTitle = replaceEmojis(cleanText(item.title)) || 'Без названия';
+      const rawDesc = replaceEmojis(cleanText(item.description));
+      const desc = rawDesc || 'Подробнее по ссылке.';
+
+      const date  = formatDate(item.pubDate);
+      const link  = item.link || '#';
+
+      const imgSrc = item.image ? item.image : cfg.favicon;
+      const imgClass = item.image ? '' : 'is-full';
+
+      const card = document.createElement('article');
+      card.className = 'news-card reveal';
+      card.style.transitionDelay = (i * 80) + 'ms';
+
+      card.innerHTML =
+        '<div class="news-thumb">' +
+          '<img src="' + imgSrc + '" class="' + imgClass + '" alt="" loading="lazy" referrerpolicy="no-referrer" ' +
+          'onerror="this.onerror=null;this.src=\'' + cfg.favicon + '\';this.className=\'is-full\';">' +
+        '</div>' +
+        '<div class="news-body">' +
+          '<div class="news-meta">' +
+            '<span>' + cfg.label + '</span>' +
+            '<span class="dot"></span>' +
+            '<span class="date">' + date + '</span>' +
+          '</div>' +
+          // Вставляем текст с HTML-тегами картинок. CSS обрежет лишнее.
+          '<h3>' + rawTitle + '</h3>' +
+          '<p>' + desc + '</p>' +
+          '<a class="news-link" href="' + link + '" target="_blank" rel="noopener">' +
+            cfg.linkText +
+            '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" ' +
+            'stroke="currentColor" stroke-width="2.4" stroke-linecap="round" ' +
+            'stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>' +
+          '</a>' +
+        '</div>';
+
+      grid.appendChild(card);
+    });
+
+    if (loading) loading.remove();
+
+    setTimeout(function () {
+      grid.querySelectorAll('.reveal').forEach(function (el) {
+        el.classList.add('in');
+      });
+    }, 50);
+  }
+
+  async function loadBlock(jsonPath, gridId, loadingId, cfg) {
+    const grid = document.getElementById(gridId);
+    const loading = document.getElementById(loadingId);
+
+    try {
+      const res = await fetch('./' + jsonPath + '?t=' + Date.now());
+      if (!res.ok) throw new Error('Файл не найден (404)');
+      const items = await res.json();
+      renderCards(grid, loading, items, cfg);
+    } catch (err) {
+      console.error('[Load Error] ' + jsonPath, err);
+      if (loading) {
+        loading.textContent = 'Не удалось загрузить данные.';
+        loading.style.color = '#DC2626';
+      }
+    }
+  }
+
+  loadBlock('news.json', 'newsGrid', 'newsLoading', {
+    count: 6,
+    favicon: 'android-chrome-512x512.png',
+    label: 'Новость',
+    linkText: 'Читать в Telegram'
+  });
+
+  loadBlock('initiatives.json', 'initiativesGrid', 'initiativesLoading', {
+    count: 3,
+    favicon: 'nolog_logo.png',
+    label: 'Инициатива',
+    linkText: 'Читать в Telegram'
+  });
+
+  loadBlock('avtory.json', 'authorsGrid', 'authorsLoading', {
+    count: 6,
+    favicon: 'nolog_logo.png',
+    label: 'Авторское',
+    linkText: 'Читать в Telegram'
+  });
+
+})();
+</script>
+
+</body>
+</html>
