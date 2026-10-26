@@ -187,7 +187,7 @@ h2.title{
 }
 .hero-actions{display:flex;flex-wrap:wrap;gap:14px}
 
-/* ---------- VALUES (Таймлайн) ---------- */
+/* ---------- VALUES ---------- */
 .values{background:var(--purple-50);position:relative;overflow:hidden}
 .values::before{
   content:"";position:absolute;width:600px;height:600px;border-radius:50%;
@@ -204,7 +204,6 @@ h2.title{
   margin-top: 40px;
 }
 
-/* Вертикальная линия */
 .value-list::before{
   content: "";
   position: absolute;
@@ -266,7 +265,7 @@ h2.title{
   color: var(--purple-600);
 }
 
-/* ---------- NEWS / INITIATIVES / AUTHORS (общие карточки) ---------- */
+/* ---------- NEWS / INITIATIVES / AUTHORS ---------- */
 .news-grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -337,13 +336,33 @@ h2.title{
   line-height: 1.35;
   margin-bottom: 12px;
   color: var(--ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Жесткое ограничение в 3 строки */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
+
 .news-card p{
   color: var(--muted);
   font-size: .94rem;
   flex: 1;
   line-height: 1.65;
+  display: -webkit-box;
+  -webkit-line-clamp: 4; /* Жесткое ограничение в 4 строки */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
+
+/* Стиль для встроенных эмодзи-картинок */
+.tg-emoji {
+  width: 1.2em;
+  height: 1.2em;
+  display: inline-block; /* Стоит в строке, а не блоком */
+  vertical-align: -0.2em; /* Выравнивание по базовой линии */
+  margin: 0 2px;
+  max-width: none;
+}
+
 .news-link{
   margin-top:20px;display:inline-flex;align-items:center;gap:8px;
   font-weight:700;font-size:.9rem;color:var(--purple-600);
@@ -351,7 +370,7 @@ h2.title{
 }
 .news-card:hover .news-link{gap:14px}
 
-/* ---------- INITIATIVES (фон и акценты) ---------- */
+/* ---------- INITIATIVES ---------- */
 .initiatives{background:var(--purple-25);position:relative;overflow:hidden}
 .initiatives::before{
   content:"";position:absolute;width:520px;height:520px;border-radius:50%;
@@ -365,7 +384,7 @@ h2.title{
   background:linear-gradient(140deg,var(--purple-800),var(--purple-600) 60%,var(--purple-500));
 }
 
-/* ---------- AUTHORS (фон и акценты) ---------- */
+/* ---------- AUTHORS ---------- */
 .authors{background:#fff;position:relative;overflow:hidden}
 .authors::before{
   content:"";position:absolute;width:520px;height:520px;border-radius:50%;
@@ -414,9 +433,7 @@ h2.title{
 
 /* ---------- RESPONSIVE ---------- */
 @media (max-width:1024px){
-  .news-grid{
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .news-grid{ grid-template-columns: repeat(2, 1fr); }
   .footer-top{grid-template-columns:1fr 1fr;gap:36px}
 }
 @media (max-width:860px){
@@ -436,26 +453,12 @@ h2.title{
   .site-header.menu-open{--hdr:var(--ink);background:#fff}
 }
 @media (max-width:768px){
-  .value-list{
-    padding-left: 24px;
-  }
-  .value-item{
-    padding: 22px 0 22px 12px;
-  }
-  .value-header{
-    flex-direction: column;
-    gap: 4px;
-    margin-bottom: 8px;
-  }
-  .value-num{
-    font-size: 1rem;
-  }
-  .value-header h4{
-    font-size: 1.15rem;
-  }
-  .value-desc{
-    font-size: .93rem;
-  }
+  .value-list{ padding-left: 24px; }
+  .value-item{ padding: 22px 0 22px 12px; }
+  .value-header{ flex-direction: column; gap: 4px; margin-bottom: 8px; }
+  .value-num{ font-size: 1rem; }
+  .value-header h4{ font-size: 1.15rem; }
+  .value-desc{ font-size: .93rem; }
 }
 @media (max-width:640px){
   .container{width:calc(100% - 32px)}
@@ -732,10 +735,76 @@ h2.title{
 })();
 </script>
 
-<!-- ================ ЗАГРУЗКА НОВОСТЕЙ, ИНИЦИАТИВ И АВТОРСКИХ ================ -->
+<!-- ================ ЗАГРУЗКА И ЗАМЕНА ЭМОДЗИ ================ -->
 <script>
 (function () {
   'use strict';
+
+  // Словарь эмодзи (символ → путь к картинке)
+  const EMOJI_MAP = {
+    '📍': 'emoji/location.webp',
+    '🌐': 'emoji/globe.webp',
+    '🗣': 'emoji/speech.webp',
+    '⚙️': 'emoji/gear.webp',
+    '👥': 'emoji/crowd.webp',
+    '🪶': 'emoji/feather.webp',
+    '🏛': 'emoji/building.webp',
+    '🎤': 'emoji/microphone.webp',
+    '📰': 'emoji/news.webp',
+    '🧠': 'emoji/brain.webp',
+    '📅': 'emoji/calendar.webp',
+    '🔥': 'emoji/fire.webp',
+    '🔄': 'emoji/repost.webp',
+    '❗': 'emoji/alert.webp',
+    '⌨️': 'emoji/typewriter.webp',
+    '🖋': 'emoji/pen.webp',
+    '🤝': 'emoji/handshake.webp',
+    '❓': 'emoji/question.webp',
+    '📋': 'emoji/list.webp',
+    '🕊': 'emoji/dove.webp',
+    '🍃': 'emoji/leaves.webp',
+    '✅': 'emoji/checkbox.webp',
+    '💬': 'emoji/chat.webp',
+    '⛓️': 'emoji/chain.webp',
+    '💭': 'emoji/dots.webp',
+    '⚖️': 'emoji/scales.webp',
+    '♀️': 'emoji/feminist.webp',
+    '🔴': 'emoji/dot.webp',
+    '💡': 'emoji/idea.webp',
+    '💯': 'emoji/hundred.webp',
+    '📉': 'emoji/down.webp',
+    '🚌': 'emoji/bus.webp',
+    '🕊️': 'emoji/peace.webp',
+    '💎': 'emoji/diamond.webp',
+    '⏫': 'emoji/arrows.webp',
+    '🚀': 'emoji/rocket.webp',
+    '✍️': 'emoji/hand-pen.webp',
+    '🔍': 'emoji/search.webp',
+    '🔃': 'emoji/arrows-circle.webp',
+    '💰': 'emoji/money.webp',
+    '🔗': 'emoji/link.webp',
+    '🕒': 'emoji/clock.webp',
+    '🚩': 'emoji/flag.webp',
+    '📶': 'emoji/wifi.webp',
+    '🏠': 'emoji/home.webp',
+    '📎': 'emoji/clip.webp',
+    '📢': 'emoji/megaphone.webp',
+    '🔁': 'emoji/sync.webp',
+    '🔧': 'emoji/wrench.webp',
+    '✊': 'emoji/fist.webp',
+    '📖': 'emoji/book.webp'
+  };
+
+  function replaceEmojis(text) {
+    if (!text) return '';
+    let result = text;
+    for (const [emoji, path] of Object.entries(EMOJI_MAP)) {
+      result = result.split(emoji).join(
+        '<img src="' + path + '" class="tg-emoji" alt="">'
+      );
+    }
+    return result;
+  }
 
   function formatDate(dateStr) {
     if (!dateStr) return '';
@@ -746,17 +815,10 @@ h2.title{
     return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
   }
 
-  // Безопасная очистка: удаляем все теги, оставляем чистый текст
   function cleanText(html) {
     const tmp = document.createElement('div');
     tmp.innerHTML = html || '';
     return (tmp.textContent || tmp.innerText || '').trim();
-  }
-
-  function truncate(text, max) {
-    text = (text || '').trim();
-    if (text.length <= max) return text;
-    return text.slice(0, max).replace(/\s+\S*$/, '') + '…';
   }
 
   function renderCards(grid, loading, items, cfg) {
@@ -769,16 +831,10 @@ h2.title{
     }
 
     items.slice(0, cfg.count).forEach(function (item, i) {
-      const rawTitle = cleanText(item.title);
-      let title = truncate(rawTitle, 140) || 'Без названия';
-
-      const rawDesc = cleanText(item.description);
-      let desc = truncate(rawDesc, 180);
-
-      if (desc && title && desc.indexOf(title.slice(0, 30)) === 0) {
-        desc = truncate(rawDesc.slice(title.length).trim(), 180);
-      }
-      if (!desc) desc = 'Подробнее по ссылке.';
+      // Заменяем эмодзи на картинки
+      const rawTitle = replaceEmojis(cleanText(item.title)) || 'Без названия';
+      const rawDesc = replaceEmojis(cleanText(item.description));
+      const desc = rawDesc || 'Подробнее по ссылке.';
 
       const date  = formatDate(item.pubDate);
       const link  = item.link || '#';
@@ -801,7 +857,8 @@ h2.title{
             '<span class="dot"></span>' +
             '<span class="date">' + date + '</span>' +
           '</div>' +
-          '<h3>' + title + '</h3>' +
+          // Вставляем текст с HTML-тегами картинок. CSS обрежет лишнее.
+          '<h3>' + rawTitle + '</h3>' +
           '<p>' + desc + '</p>' +
           '<a class="news-link" href="' + link + '" target="_blank" rel="noopener">' +
             cfg.linkText +
