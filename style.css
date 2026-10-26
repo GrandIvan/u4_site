@@ -145,7 +145,7 @@ h2.title{
 /* ---------- HERO ---------- */
 .hero{
   position:relative;overflow:hidden;
-  background:linear-gradient(155deg, #2A0731 0%, #4F0F5D 100%);
+  background:linear-gradient(155deg, #2A0731 0%, #4F0F5D 42%, #87179D 100%); /* Вернул светлый низ */
   color:#fff;
   padding:clamp(140px,17vw,210px) 0 clamp(90px,11vw,140px);
 }
