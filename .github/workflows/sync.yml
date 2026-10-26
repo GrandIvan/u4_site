@@ -30,5 +30,5 @@ jobs:
         run: |
           git config --global user.name 'U4astie Bot'
           git config --global user.email 'bot@u4site.ru'
-          git add news.json initiatives.json avtory.json
+          git add news.json initiatives.json avtory.json images/
           git diff --quiet && git diff --staged --quiet || (git commit -m "Автообновление из Telegram" && git push)
