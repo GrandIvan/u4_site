@@ -247,7 +247,7 @@
 
   loadBlock('avtory.json', 'authorsGrid', 'authorsLoading', {
     count: 6,
-    favicon: 'nolog_logo.png',
+    favicon: 'logo.png',
     label: 'Авторское',
     linkText: 'Читать в Telegram'
   });
