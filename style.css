@@ -355,7 +355,7 @@ h2.title{
 .news-card:hover .news-link{gap:14px}
 
 /* ---------- INITIATIVES ---------- */
-.initiatives{background:var(--purple-50);position:relative;overflow:hidden}
+.initiatives{background: #fff;position:relative;overflow:hidden}
 .initiatives::before{
   content:"";position:absolute;width:520px;height:520px;border-radius:50%;
   background:radial-gradient(circle,rgba(188,61,208,.18),transparent 68%);
@@ -369,7 +369,7 @@ h2.title{
 }
 
 /* ---------- AUTHORS ---------- */
-.authors{background:#fff;position:relative;overflow:hidden}
+.authors{background: var(--purple-50);position:relative;overflow:hidden}
 .authors::before{
   content:"";position:absolute;width:520px;height:520px;border-radius:50%;
   background:radial-gradient(circle,rgba(188,61,208,.14),transparent 68%);
