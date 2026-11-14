@@ -374,7 +374,7 @@ h2.title{
 }
 
 /* ---------- AUTHORS (Светло-фиолетовый) ---------- */
-.authors{background: var(--purple-25);position:relative;overflow:hidden}
+.authors{background: var(--purple-100);position:relative;overflow:hidden}
 .authors::before{
   content:"";position:absolute;width:520px;height:520px;border-radius:50%;
   background:radial-gradient(circle,rgba(188,61,208,.14),transparent 68%);
