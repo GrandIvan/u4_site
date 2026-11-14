@@ -275,7 +275,6 @@ h2.title{
   position: relative;
   overflow: hidden;
   background: linear-gradient(140deg,var(--purple-700),var(--purple-500) 60%,var(--purple-400));
-  min-height: 240px; /* Минимальная высота, чтобы карточка не была слишком маленькой */
   display: flex;
   flex-direction: column;
 }
@@ -334,7 +333,7 @@ h2.title{
   flex: 1;
   line-height: 1.65;
   display: -webkit-box;
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 8;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
