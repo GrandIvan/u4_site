@@ -272,9 +272,12 @@ h2.title{
 }
 
 .news-thumb{
-  height:350px;
-  position:relative;overflow:hidden;
-  background:linear-gradient(140deg,var(--purple-700),var(--purple-500) 60%,var(--purple-400));
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(140deg,var(--purple-700),var(--purple-500) 60%,var(--purple-400));
+  min-height: 240px; /* Минимальная высота, чтобы карточка не была слишком маленькой */
+  display: flex;
+  flex-direction: column;
 }
 .news-thumb::before{
   content:"";position:absolute;inset:0;
@@ -283,26 +286,19 @@ h2.title{
   z-index:0;
 }
 .news-thumb img{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  z-index:1;
+  width: 100%;
+  height: auto;
+  display: block;
+  position: relative;
+  z-index: 1;
 }
 .news-thumb img.is-full {
+  position: absolute;
   inset: 0;
-  top: 0;
-  left: 0;
-  transform: none;
   width: 100%;
   height: 100%;
-  border-radius: 0;
-  border: none;
-  padding: 0;              
-  background: transparent;
-  box-shadow: none;
-  object-fit: cover;       
+  object-fit: cover;
+  z-index: 1;
 }
 
 .news-body{
