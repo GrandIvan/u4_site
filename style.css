@@ -447,7 +447,7 @@ h2.title{
 @media (max-width:640px){
   .container{width:calc(100% - 32px)}
   .news-grid{grid-template-columns:1fr}
-  .news-thumb{height:350px}
+  .news-thumb{height: auto;}
   .hero-actions .btn{width:100%}
   .footer-top{grid-template-columns:1fr}
   .news-body{padding: 22px 24px 28px;}
