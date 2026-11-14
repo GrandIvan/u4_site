@@ -28,7 +28,7 @@ body{
   color:var(--ink);
   background:var(--white);
   line-height:1.65;
-  font-weight: 400; /* <--- ДОБАВИТЬ ЭТУ СТРОКУ */
+  font-weight: 400;
   -webkit-font-smoothing:antialiased;
   overflow-x:hidden;
 }
@@ -146,7 +146,7 @@ h2.title{
 /* ---------- HERO ---------- */
 .hero{
   position:relative;overflow:hidden;
-  background:linear-gradient(155deg,var(--purple-950) 0%,var(--purple-800) 42%,var(--purple-600) 100%); /* ВЕРНУЛ КАК В ЭТАЛОНЕ */
+  background:linear-gradient(155deg,var(--purple-950) 0%,var(--purple-800) 42%,var(--purple-600) 100%);
   color:#fff;
   padding:clamp(140px,17vw,210px) 0 clamp(90px,11vw,140px);
 }
@@ -179,8 +179,8 @@ h2.title{
 }
 .hero-actions{display:flex;flex-wrap:wrap;gap:14px}
 
-/* ---------- VALUES ---------- */
-.values{background:var(--purple-50);position:relative;overflow:hidden}
+/* ---------- VALUES (Белый) ---------- */
+.values{background:#fff;position:relative;overflow:hidden}
 .values::before{
   content:"";position:absolute;width:600px;height:600px;border-radius:50%;
   background:radial-gradient(circle,rgba(188,61,208,.22),transparent 68%);
@@ -252,7 +252,7 @@ h2.title{
   background: rgba(135,23,157,.03);
 }
 
-/* ---------- NEWS / INITIATIVES / AUTHORS ---------- */
+/* ---------- NEWS / INITIATIVES / AUTHORS (общие карточки) ---------- */
 .news-grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -354,8 +354,8 @@ h2.title{
 }
 .news-card:hover .news-link{gap:14px}
 
-/* ---------- INITIATIVES ---------- */
-.initiatives{background: #fff;position:relative;overflow:hidden}
+/* ---------- INITIATIVES (Светло-фиолетовый) ---------- */
+.initiatives{background:var(--purple-25);position:relative;overflow:hidden}
 .initiatives::before{
   content:"";position:absolute;width:520px;height:520px;border-radius:50%;
   background:radial-gradient(circle,rgba(188,61,208,.18),transparent 68%);
@@ -368,8 +368,13 @@ h2.title{
   background:linear-gradient(140deg,var(--purple-800),var(--purple-600) 60%,var(--purple-500));
 }
 
-/* ---------- AUTHORS ---------- */
-.authors{background: var(--purple-50);position:relative;overflow:hidden}
+/* ---------- NEWS (Белый) ---------- */
+#news {
+  background: #fff;
+}
+
+/* ---------- AUTHORS (Светло-фиолетовый) ---------- */
+.authors{background: var(--purple-25);position:relative;overflow:hidden}
 .authors::before{
   content:"";position:absolute;width:520px;height:520px;border-radius:50%;
   background:radial-gradient(circle,rgba(188,61,208,.14),transparent 68%);
