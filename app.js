@@ -30,22 +30,22 @@
   window.addEventListener('resize', () => { if (window.innerWidth > 860) closeMenu(); });
 
   /* ---------- Scroll reveal ---------- */
-  const revealEls = document.querySelectorAll('.reveal');
-  if ('IntersectionObserver' in window) {
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((entry, i) => {
-        if (entry.isIntersecting) {
-          const el = entry.target;
-          const delay = Math.min(i * 70, 280);
-          setTimeout(() => el.classList.add('in'), delay);
-          io.unobserve(el);
-        }
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
-    revealEls.forEach(el => io.observe(el));
-  } else {
-    revealEls.forEach(el => el.classList.add('in'));
-  }
+  /* ---------- Scroll reveal (для целых секций) ---------- */
+const revealEls = document.querySelectorAll('.reveal');
+if ('IntersectionObserver' in window) {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        // Без задержек, появляется весь блок сразу
+        entry.target.classList.add('in');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.05, rootMargin: '0px 0px -50px 0px' }); // Чуть ниже, чтобы срабатывало плавнее
+  revealEls.forEach(el => io.observe(el));
+} else {
+  revealEls.forEach(el => el.classList.add('in'));
+}
 
   /* ---------- ЭМОДЗИ И ЗАГРУЗКА ---------- */
   const EMOJI_MAP = {
@@ -177,8 +177,7 @@
       const imgClass = item.image ? '' : 'is-full';
 
       const card = document.createElement('article');
-      card.className = 'news-card reveal';
-      card.style.transitionDelay = (i * 80) + 'ms';
+card.className = 'news-card'; // Убрали reveal и задержку
 
       card.innerHTML =
         '<div class="news-thumb">' +
@@ -206,11 +205,7 @@
 
     if (loading) loading.remove();
 
-    setTimeout(function () {
-      grid.querySelectorAll('.reveal').forEach(function (el) {
-        el.classList.add('in');
-      });
-    }, 50);
+    
   }
 
   async function loadBlock(jsonPath, gridId, loadingId, cfg) {
