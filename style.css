@@ -408,6 +408,20 @@ h2.title{
     margin-bottom: 12px;
   }
 }
+/* Карточка-ссылка целиком */
+a.initiative-item{
+  display:block;
+  color:inherit;
+  text-decoration:none;
+}
+a.initiative-item:focus-visible{
+  outline:3px solid var(--purple-400);
+  outline-offset:3px;
+}
+/* «Читать в Telegram» внутри карточки — визуальная подпись, не отдельная ссылка */
+.initiative-content .news-link{
+  pointer-events:none; /* клик уходит на карточку */
+}
 
 /* На мобильных текст виден сразу, чтобы не было проблем с наведением */
 @media (max-width: 768px) {
