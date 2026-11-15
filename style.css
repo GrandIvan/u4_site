@@ -354,7 +354,7 @@ h2.title{
 }
 .news-card:hover .news-link{gap:14px}
 
-/* ---------- INITIATIVES (Квадратные карточки с оверлеем) ---------- */
+/* ---------- INITIATIVES (Единая матрица 3×2) ---------- */
 .initiatives{background:var(--purple-50);position:relative;overflow:hidden}
 .initiatives::before{
   content:"";position:absolute;width:520px;height:520px;border-radius:50%;
@@ -363,36 +363,54 @@ h2.title{
 }
 .initiatives .container{position:relative;z-index:1}
 
+/* Общая матрица: одна рамка, скруглённые только внешние углы */
 .initiatives-grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:24px;
+  gap:0;
+  border:1px solid var(--purple-200);
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-sm);
+  background:var(--purple-200);
+  position:relative;
 }
 
-/* Карточка — она же ссылка целиком */
+/* Ячейка матрицы */
 a.initiative-item{
   position:relative;
   display:block;
   aspect-ratio:1 / 1;
-  border-radius:var(--radius);
   overflow:hidden;
-  border:1px solid var(--purple-200);
-  background:linear-gradient(140deg,var(--purple-800),var(--purple-600) 60%,var(--purple-500));
-  box-shadow:var(--shadow-sm);
   color:inherit;
   text-decoration:none;
   cursor:pointer;
   isolation:isolate;
-  transition:box-shadow .4s var(--ease), transform .4s var(--ease), border-color .4s var(--ease);
+  background:linear-gradient(140deg,var(--purple-800),var(--purple-600) 60%,var(--purple-500));
+  box-shadow:inset -1px 0 0 var(--purple-200), inset 0 -1px 0 var(--purple-200);
+  transition:box-shadow .35s var(--ease), transform .35s var(--ease);
 }
+/* Убираем правый разделитель у последней колонки */
+a.initiative-item:nth-child(3n){
+  box-shadow:inset 0 -1px 0 var(--purple-200);
+}
+/* Убираем нижний разделитель у последнего ряда */
+a.initiative-item:nth-child(n+4){
+  box-shadow:inset -1px 0 0 var(--purple-200);
+}
+a.initiative-item:nth-child(3n):nth-child(n+4){
+  box-shadow:none;
+}
+/* Ховер: ячейка чуть приподнимается и получает тень поверх соседей */
 a.initiative-item:hover{
-  box-shadow:var(--shadow-md);
-  border-color:var(--purple-300);
-  transform:translateY(-4px);
+  z-index:3;
+  transform:scale(1.02);
+  box-shadow:0 12px 32px rgba(42,7,49,.28);
 }
 a.initiative-item:focus-visible{
   outline:3px solid var(--purple-400);
-  outline-offset:3px;
+  outline-offset:-3px;
+  z-index:4;
 }
 
 /* Фото */
@@ -496,12 +514,31 @@ a.initiative-item:hover .initiative-content .news-link{
   .initiative-content p{-webkit-line-clamp:3}
 }
 
-/* Адаптив сетки инициатив */
+/* Адаптив матрицы */
 @media (max-width:1024px){
   .initiatives-grid{grid-template-columns:repeat(2,1fr)}
+  a.initiative-item:nth-child(3n),
+  a.initiative-item:nth-child(n+4){
+    box-shadow:inset -1px 0 0 var(--purple-200), inset 0 -1px 0 var(--purple-200);
+  }
+  a.initiative-item:nth-child(2n){
+    box-shadow:inset 0 -1px 0 var(--purple-200);
+  }
+  a.initiative-item:nth-child(n+5){
+    box-shadow:inset -1px 0 0 var(--purple-200);
+  }
+  a.initiative-item:nth-child(2n):nth-child(n+5){
+    box-shadow:none;
+  }
 }
 @media (max-width:640px){
-  .initiatives-grid{grid-template-columns:1fr;gap:18px}
+  .initiatives-grid{grid-template-columns:1fr}
+  a.initiative-item{
+    box-shadow:inset 0 -1px 0 var(--purple-200);
+  }
+  a.initiative-item:last-child{
+    box-shadow:none;
+  }
   .initiative-content{padding:20px 18px}
   .initiative-content h3{font-size:1.05rem}
   .initiative-content p{font-size:.84rem;-webkit-line-clamp:3}
