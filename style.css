@@ -355,6 +355,7 @@ h2.title{
 .news-card:hover .news-link{gap:14px}
 
 /* ---------- INITIATIVES (Светло-фиолетовый) ---------- */
+/* ---------- INITIATIVES (Светло-фиолетовый) ---------- */
 .initiatives{background:var(--purple-25);position:relative;overflow:hidden}
 .initiatives::before{
   content:"";position:absolute;width:520px;height:520px;border-radius:50%;
