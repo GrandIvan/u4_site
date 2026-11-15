@@ -392,41 +392,31 @@ h2.title{
   z-index: 1;
 }
 
-/* ---------- АККОРДЕОН В ИНИЦИАТИВАХ ---------- */
-.initiative-card .news-full-text {
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  transition: max-height 0.4s ease, opacity 0.4s ease, margin 0.4s ease;
+/* ---------- АККОРДЕОН ПРИ НАВЕДЕНИИ (Только для ПК) ---------- */
+@media (hover: hover) and (min-width: 769px) {
+  .initiative-card .news-full-text {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.4s ease, opacity 0.4s ease, margin 0.4s ease;
+  }
+  
+  .initiative-card:hover .news-full-text {
+    max-height: 300px;
+    opacity: 1;
+    margin-top: 12px;
+    margin-bottom: 12px;
+  }
 }
-.initiative-card.is-open .news-full-text {
-  max-height: 300px;
-  opacity: 1;
-  margin-top: 12px;
-  margin-bottom: 12px;
-}
-.news-toggle {
-  margin-top: 16px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 700;
-  font-size: .9rem;
-  color: var(--purple-600);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  transition: gap 0.3s ease;
-}
-.news-toggle:hover {
-  gap: 12px;
-}
-.initiative-card.is-open .news-toggle svg {
-  transform: rotate(180deg);
-}
-.news-toggle svg {
-  transition: transform 0.3s ease;
+
+/* На мобильных текст виден сразу, чтобы не было проблем с наведением */
+@media (max-width: 768px) {
+  .initiative-card .news-full-text {
+    max-height: none;
+    opacity: 1;
+    margin-top: 12px;
+    display: block;
+  }
 }
 
 /* ---------- NEWS (Белый) ---------- */
