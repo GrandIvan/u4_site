@@ -354,7 +354,7 @@ h2.title{
 }
 .news-card:hover .news-link{gap:14px}
 
-/* ---------- INITIATIVES (Светло-фиолетовый) ---------- */
+/* ---------- INITIATIVES (Светло-фиолетовый + Квадратные картинки) ---------- */
 .initiatives{background:var(--purple-50);position:relative;overflow:hidden}
 .initiatives::before{
   content:"";position:absolute;width:520px;height:520px;border-radius:50%;
@@ -364,8 +364,69 @@ h2.title{
 }
 .initiatives .container{position:relative;z-index:1}
 .initiatives .news-card{border-color:var(--purple-200)}
-.initiatives .news-thumb{
-  background:linear-gradient(140deg,var(--purple-800),var(--purple-600) 60%,var(--purple-500));
+
+/* Делаем картинку в инициативах квадратной */
+.initiatives .news-thumb {
+  background: linear-gradient(140deg,var(--purple-800),var(--purple-600) 60%,var(--purple-500));
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.initiatives .news-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.initiatives .initiative-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 6rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- АККОРДЕОН В ИНИЦИАТИВАХ ---------- */
+.initiative-card .news-full-text {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.4s ease, opacity 0.4s ease, margin 0.4s ease;
+}
+.initiative-card.is-open .news-full-text {
+  max-height: 300px;
+  opacity: 1;
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+.news-toggle {
+  margin-top: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: .9rem;
+  color: var(--purple-600);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: gap 0.3s ease;
+}
+.news-toggle:hover {
+  gap: 12px;
+}
+.initiative-card.is-open .news-toggle svg {
+  transform: rotate(180deg);
+}
+.news-toggle svg {
+  transition: transform 0.3s ease;
 }
 
 /* ---------- NEWS (Белый) ---------- */
