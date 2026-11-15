@@ -392,40 +392,78 @@ h2.title{
   z-index: 1;
 }
 
-/* ---------- АККОРДЕОН ПРИ НАВЕДЕНИИ (Только для ПК) ---------- */
-@media (hover: hover) and (min-width: 769px) {
-  /* Основной текст всегда виден, снимаем ограничение строк */
-  .initiative-card .news-body > p {
-    display: block;
-    -webkit-line-clamp: unset;
-    overflow: visible;
-    max-height: none;
-  }
-
-  /* Скрываем только дополнительный текст */
-  .initiative-card .news-full-text {
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    transition: max-height 0.4s ease, opacity 0.4s ease, margin 0.4s ease;
-  }
-  
-  /* Показываем дополнительный текст при наведении */
-  .initiative-card:hover .news-full-text {
-    max-height: 300px;
-    opacity: 1;
-    margin-top: 12px;
-    margin-bottom: 12px;
-  }
+/* ---------- INITIATIVES (Светло-фиолетовый + Квадратные картинки) ---------- */
+.initiatives{background:var(--purple-50);position:relative;overflow:hidden}
+.initiatives::before{
+  content:"";position:absolute;width:520px;height:520px;border-radius:50%;
+  background:radial-gradient(circle,rgba(188,61,208,.18),transparent 68%);
+  bottom:-240px;right:-180px;
+  pointer-events:none;
+}
+.initiatives .container{position:relative;z-index:1}
+.initiatives .news-card{
+  border-color:var(--purple-200);
+  position: relative;
+  overflow: hidden;
 }
 
-/* На мобильных дополнительный текст виден сразу */
+/* Делаем картинку в инициативах строго квадратной */
+.initiatives .news-thumb {
+  background: linear-gradient(140deg,var(--purple-800),var(--purple-600) 60%,var(--purple-500));
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0; /* Убираем отступы */
+}
+.initiatives .news-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.initiatives .initiative-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 6rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Прячем текст карточки инициативы */
+.initiatives .news-body {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  padding: 24px;
+  transform: translateY(100%); /* Прячем вниз */
+  opacity: 0;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  z-index: 2;
+  max-height: 100%;
+  overflow-y: auto; /* Если текста много, появится скролл */
+}
+
+/* При наведении выезжает наверх */
+.initiatives .news-card:hover .news-body {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* На телефонах текст всегда виден, карточка растягивается */
 @media (max-width: 768px) {
-  .initiative-card .news-full-text {
-    max-height: none;
+  .initiatives .news-body {
+    position: static;
+    transform: none;
     opacity: 1;
-    margin-top: 12px;
-    display: block;
+    padding: 22px;
   }
 }
 /* ---------- NEWS (Белый) ---------- */
