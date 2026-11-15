@@ -12,136 +12,6 @@
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="stylesheet" href="style.css">
-
-<!-- ===== Стили только для новой секции инициатив (не трогают style.css) ===== -->
-<style>
-/* Квадратные карточки инициатив с оверлеем */
-.initiatives-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:24px;
-}
-.initiative-item{
-  position:relative;
-  aspect-ratio:1 / 1;
-  border-radius:var(--radius);
-  overflow:hidden;
-  border:1px solid var(--purple-200);
-  background:linear-gradient(140deg,var(--purple-800),var(--purple-600) 60%,var(--purple-500));
-  box-shadow:var(--shadow-sm);
-  cursor:pointer;
-  isolation:isolate;
-  transition:box-shadow .4s var(--ease), transform .4s var(--ease), border-color .4s var(--ease);
-}
-.initiative-item:hover{
-  box-shadow:var(--shadow-md);
-  border-color:var(--purple-300);
-  transform:translateY(-4px);
-}
-.initiative-thumb{
-  position:absolute;
-  inset:0;
-  z-index:0;
-}
-.initiative-thumb img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
-  transition:transform .6s var(--ease);
-}
-.initiative-item:hover .initiative-thumb img{
-  transform:scale(1.06);
-}
-.initiative-placeholder{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:5rem;
-  z-index:0;
-}
-/* Оверлей с текстом — выезжает снизу при наведении */
-.initiative-content{
-  position:absolute;
-  inset:0;
-  z-index:2;
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-end;
-  padding:26px 24px;
-  color:#fff;
-  background:linear-gradient(
-      to top,
-      rgba(42,7,49,.92) 0%,
-      rgba(42,7,49,.78) 45%,
-      rgba(42,7,49,.20) 80%,
-      rgba(42,7,49,0) 100%
-    );
-  opacity:0;
-  transform:translateY(24px);
-  transition:opacity .4s var(--ease), transform .45s var(--ease);
-}
-.initiative-item:hover .initiative-content,
-.initiative-item:focus-within .initiative-content{
-  opacity:1;
-  transform:translateY(0);
-}
-.initiative-content .news-meta{
-  color:var(--purple-200);
-  margin-bottom:8px;
-}
-.initiative-content h3{
-  font-size:1.15rem;
-  font-weight:800;
-  letter-spacing:-.02em;
-  line-height:1.3;
-  margin-bottom:8px;
-  color:#fff;
-}
-.initiative-content p{
-  font-size:.88rem;
-  line-height:1.55;
-  color:rgba(255,255,255,.85);
-  margin-bottom:14px;
-  display:-webkit-box;
-  -webkit-line-clamp:4;
-  -webkit-box-orient:vertical;
-  overflow:hidden;
-}
-.initiative-content .news-link{
-  color:#fff;
-  opacity:.9;
-}
-.initiative-item:hover .initiative-content .news-link{
-  gap:13px;
-  opacity:1;
-}
-
-/* На тач-устройствах оверлей виден всегда */
-@media (hover: none){
-  .initiative-content{
-    opacity:1;
-    transform:none;
-    background:linear-gradient(to top,
-      rgba(42,7,49,.92) 0%,
-      rgba(42,7,49,.55) 55%,
-      rgba(42,7,49,.05) 100%);
-  }
-  .initiative-content p{-webkit-line-clamp:3}
-}
-
-@media (max-width:1024px){
-  .initiatives-grid{grid-template-columns:repeat(2,1fr)}
-}
-@media (max-width:640px){
-  .initiatives-grid{grid-template-columns:1fr;gap:18px}
-  .initiative-content{padding:20px 18px}
-  .initiative-content h3{font-size:1.05rem}
-  .initiative-content p{font-size:.84rem;-webkit-line-clamp:3}
-}
-</style>
 </head>
 <body>
 
@@ -268,106 +138,106 @@
 
     <div class="initiatives-grid">
       <!-- Карточка 1 -->
-      <article class="initiative-item">
+      <a class="initiative-item" href="https://t.me/uchastie_official/72" target="_blank" rel="noopener" aria-label="Доступный транспорт — читать в Telegram">
         <div class="initiative-thumb">
-          <img src="transport.jpg" alt="Доступный транспорт" onerror="this.style.display='none'; this.parentElement.querySelector('.initiative-placeholder').style.display='flex';">
+          <img src="transport.jpg" alt="" onerror="this.style.display='none'; this.parentElement.querySelector('.initiative-placeholder').style.display='flex';">
           <div class="initiative-placeholder" style="display:none;">🚌</div>
         </div>
         <div class="initiative-content">
           <div class="news-meta"><span>Кампания</span></div>
           <h3>Доступный транспорт</h3>
           <p>Подняли тему грабительских цен на проезд в Петербурге. Поддержали активных молодых петербуржцев и показали общественный запрос на то, чтобы город работал на человека.</p>
-          <a href="https://t.me/uchastie_official/72" class="news-link" target="_blank" rel="noopener">
+          <span class="news-link">
             Читать в Telegram
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </a>
+          </span>
         </div>
-      </article>
+      </a>
 
       <!-- Карточка 2 -->
-      <article class="initiative-item">
+      <a class="initiative-item" href="https://t.me/luxury_tax_2026" target="_blank" rel="noopener" aria-label="Налог на роскошь — читать в Telegram">
         <div class="initiative-thumb">
-          <img src="nolog_logo.png" alt="Налог на роскошь" onerror="this.style.display='none'; this.parentElement.querySelector('.initiative-placeholder').style.display='flex';">
+          <img src="nolog_logo.png" alt="" onerror="this.style.display='none'; this.parentElement.querySelector('.initiative-placeholder').style.display='flex';">
           <div class="initiative-placeholder" style="display:none;">🏦</div>
         </div>
         <div class="initiative-content">
           <div class="news-meta"><span>Кампания</span></div>
           <h3>Налог на роскошь</h3>
           <p>Федеральная кампания ради жилья для молодых. Поддержка десятков кандидатов от КПРФ, «Яблока» и «Зелёных», победа на дебатах, эфиры на «Живом Гвозде» и «Авроре», штабы в 10 регионах.</p>
-          <a href="https://t.me/luxury_tax_2026" class="news-link" target="_blank" rel="noopener">
+          <span class="news-link">
             Читать в Telegram
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </a>
+          </span>
         </div>
-      </article>
+      </a>
 
       <!-- Карточка 3 -->
-      <article class="initiative-item">
+      <a class="initiative-item" href="https://t.me/uchastie_official/229" target="_blank" rel="noopener" aria-label="Наблюдатели и поддержка — читать в Telegram">
         <div class="initiative-thumb">
-          <img src="nbaludatel.jpg" alt="Наблюдатели и поддержка" onerror="this.style.display='none'; this.parentElement.querySelector('.initiative-placeholder').style.display='flex';">
+          <img src="nbaludatel.jpg" alt="" onerror="this.style.display='none'; this.parentElement.querySelector('.initiative-placeholder').style.display='flex';">
           <div class="initiative-placeholder" style="display:none;">✉️</div>
         </div>
         <div class="initiative-content">
           <div class="news-meta"><span>Выборы</span></div>
           <h3>Наблюдатели и поддержка</h3>
           <p>Поддержали прогрессивных кандидатов, призвали всех голосовать, а сами пошли в наблюдатели. Столкнулись с давлением, но защищали голос народа.</p>
-          <a href="https://t.me/uchastie_official/229" class="news-link" target="_blank" rel="noopener">
+          <span class="news-link">
             Читать в Telegram
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </a>
+          </span>
         </div>
-      </article>
+      </a>
 
       <!-- Карточка 4 -->
-      <article class="initiative-item">
+      <a class="initiative-item" href="https://t.me/uchastie_official/179" target="_blank" rel="noopener" aria-label="Пикеты и обращения — читать в Telegram">
         <div class="initiative-thumb">
-          <img src="picet.jpg" alt="Пикеты и обращения" onerror="this.style.display='none'; this.parentElement.querySelector('.initiative-placeholder').style.display='flex';">
+          <img src="picet.jpg" alt="" onerror="this.style.display='none'; this.parentElement.querySelector('.initiative-placeholder').style.display='flex';">
           <div class="initiative-placeholder" style="display:none;">❌</div>
         </div>
         <div class="initiative-content">
           <div class="news-meta"><span>Улица</span></div>
           <h3>Пикеты и обращения</h3>
           <p>Провели одиночные пикеты в 5 городах (в Ижевске — 7 раз). Массовая подача 500 писем помогла добиться, чтобы депутаты приняли наше обращение.</p>
-          <a href="https://t.me/uchastie_official/179" class="news-link" target="_blank" rel="noopener">
+          <span class="news-link">
             Читать в Telegram
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </a>
+          </span>
         </div>
-      </article>
+      </a>
 
       <!-- Карточка 5 -->
-      <article class="initiative-item">
+      <a class="initiative-item" href="https://t.me/uchastie_official/130" target="_blank" rel="noopener" aria-label="Против мессенджера МАХ — читать в Telegram">
         <div class="initiative-thumb">
-          <img src="max.jpg" alt="Против мессенджера МАХ" onerror="this.style.display='none'; this.parentElement.querySelector('.initiative-placeholder').style.display='flex';">
+          <img src="max.jpg" alt="" onerror="this.style.display='none'; this.parentElement.querySelector('.initiative-placeholder').style.display='flex';">
           <div class="initiative-placeholder" style="display:none;">🏴‍☠️</div>
         </div>
         <div class="initiative-content">
           <div class="news-meta"><span>Борьба</span></div>
           <h3>Против мессенджера МАХ</h3>
           <p>Вместе с САФ и другими движениями стоим фронтом против навязывания студентам мессенджера МАХ. Дали студентам чёткий план, как отказываться от него в вузах.</p>
-          <a href="https://t.me/uchastie_official/130" class="news-link" target="_blank" rel="noopener">
+          <span class="news-link">
             Читать в Telegram
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </a>
+          </span>
         </div>
-      </article>
+      </a>
 
       <!-- Карточка 6 -->
-      <article class="initiative-item">
+      <a class="initiative-item" href="https://t.me/uchastie_official/63" target="_blank" rel="noopener" aria-label="Защита Битцевского леса — читать в Telegram">
         <div class="initiative-thumb">
-          <img src="eco.jpg" alt="Защита Битцевского леса" onerror="this.style.display='none'; this.parentElement.querySelector('.initiative-placeholder').style.display='flex';">
+          <img src="eco.jpg" alt="" onerror="this.style.display='none'; this.parentElement.querySelector('.initiative-placeholder').style.display='flex';">
           <div class="initiative-placeholder" style="display:none;">🌱</div>
         </div>
         <div class="initiative-content">
           <div class="news-meta"><span>Экология</span></div>
           <h3>Защита Битцевского леса</h3>
           <p>Выступили против лыжероллерной трассы. Нашли союзников среди столичных экологистов, с которыми будем осваивать институт общественных инспекторов.</p>
-          <a href="https://t.me/uchastie_official/63" class="news-link" target="_blank" rel="noopener">
+          <span class="news-link">
             Читать в Telegram
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </a>
+          </span>
         </div>
-      </article>
+      </a>
     </div>
   </div>
 </section>
