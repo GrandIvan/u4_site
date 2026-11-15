@@ -29,23 +29,22 @@
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
   window.addEventListener('resize', () => { if (window.innerWidth > 860) closeMenu(); });
 
-  /* ---------- Scroll reveal ---------- */
   /* ---------- Scroll reveal (для целых секций) ---------- */
-const revealEls = document.querySelectorAll('.reveal');
-if ('IntersectionObserver' in window) {
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        // Без задержек, появляется весь блок сразу
-        entry.target.classList.add('in');
-        io.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.05, rootMargin: '0px 0px -50px 0px' }); // Чуть ниже, чтобы срабатывало плавнее
-  revealEls.forEach(el => io.observe(el));
-} else {
-  revealEls.forEach(el => el.classList.add('in'));
-}
+  const revealEls = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          // Без задержек, появляется весь блок сразу
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.05, rootMargin: '0px 0px -50px 0px' });
+    revealEls.forEach(el => io.observe(el));
+  } else {
+    revealEls.forEach(el => el.classList.add('in'));
+  }
 
   /* ---------- ЭМОДЗИ И ЗАГРУЗКА ---------- */
   const EMOJI_MAP = {
@@ -177,7 +176,7 @@ if ('IntersectionObserver' in window) {
       const imgClass = item.image ? '' : 'is-full';
 
       const card = document.createElement('article');
-card.className = 'news-card'; // Убрали reveal и задержку
+      card.className = 'news-card';
 
       card.innerHTML =
         '<div class="news-thumb">' +
@@ -204,8 +203,6 @@ card.className = 'news-card'; // Убрали reveal и задержку
     });
 
     if (loading) loading.remove();
-
-    
   }
 
   async function loadBlock(jsonPath, gridId, loadingId, cfg) {
