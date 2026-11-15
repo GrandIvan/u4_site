@@ -394,11 +394,12 @@ h2.title{
 
 /* ---------- АККОРДЕОН ПРИ НАВЕДЕНИИ (Только для ПК) ---------- */
 @media (hover: hover) and (min-width: 769px) {
-  /* Основной текст всегда виден */
+  /* Основной текст всегда виден, снимаем ограничение строк */
   .initiative-card .news-body > p {
     display: block;
     -webkit-line-clamp: unset;
     overflow: visible;
+    max-height: none;
   }
 
   /* Скрываем только дополнительный текст */
@@ -427,7 +428,6 @@ h2.title{
     display: block;
   }
 }
-
 /* ---------- NEWS (Белый) ---------- */
 #news {
   background: #fff;
