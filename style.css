@@ -394,6 +394,14 @@ h2.title{
 
 /* ---------- АККОРДЕОН ПРИ НАВЕДЕНИИ (Только для ПК) ---------- */
 @media (hover: hover) and (min-width: 769px) {
+  /* Основной текст всегда виден */
+  .initiative-card .news-body > p {
+    display: block;
+    -webkit-line-clamp: unset;
+    overflow: visible;
+  }
+
+  /* Скрываем только дополнительный текст */
   .initiative-card .news-full-text {
     max-height: 0;
     overflow: hidden;
@@ -401,6 +409,7 @@ h2.title{
     transition: max-height 0.4s ease, opacity 0.4s ease, margin 0.4s ease;
   }
   
+  /* Показываем дополнительный текст при наведении */
   .initiative-card:hover .news-full-text {
     max-height: 300px;
     opacity: 1;
@@ -409,7 +418,7 @@ h2.title{
   }
 }
 
-/* На мобильных текст виден сразу, чтобы не было проблем с наведением */
+/* На мобильных дополнительный текст виден сразу */
 @media (max-width: 768px) {
   .initiative-card .news-full-text {
     max-height: none;
