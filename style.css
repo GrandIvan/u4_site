@@ -271,27 +271,30 @@ h2.title{
 .about-content p{ margin-bottom: 20px; }
 .about-content strong{ color: var(--accent-text); }
 
-/* Блок с левой полоской и фиолетовой тенью */
+/* Блок с широкой скругленной полоской и тенью */
 .about-cta{
   margin-top: 40px;
   padding: 30px;
   background: var(--purple-50);
-  border-radius: 0 var(--radius) var(--radius) 0;
+  border-radius: var(--radius); 
   
   border: none;
-  border-left: 4px solid var(--purple-600);
+  border-left: 8px solid var(--purple-600); /* Широкая полоска слева */
   
-  box-shadow: 0 10px 30px rgba(135, 24, 157, 0.15);
+  box-shadow: 0 10px 30px rgba(135, 24, 157, 0.15); /* Фиолетовая тень */
   transition: background-color .3s ease, border-color .3s ease, box-shadow .3s ease, transform .3s ease;
   
   text-align: left; 
 }
+
+/* При наведении полоска чуть светлеет, тень усиливается */
 .about-cta:hover {
   border-left-color: var(--purple-500);
   box-shadow: 0 14px 40px rgba(135, 24, 157, 0.25);
   transform: translateY(-2px);
 }
 
+/* Темная тема для тени */
 [data-theme="dark"] .about-cta {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
@@ -299,11 +302,13 @@ h2.title{
   box-shadow: 0 14px 40px rgba(188, 61, 208, 0.15);
 }
 
+/* Текст внутри */
 .about-cta p {
   margin-bottom: 0;
   text-align: left;
 }
 
+/* Кнопка внутри */
 .about-cta .btn {
   margin-top: 20px;
   align-self: flex-start;
