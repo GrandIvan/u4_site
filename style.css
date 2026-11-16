@@ -31,7 +31,9 @@
   --card-shadow-hover: 0 12px 24px rgba(42,7,49,.12);
 }
 
-/* ТЁМНАЯ ТЕМА */
+/* ============================================
+   ТЁМНАЯ ТЕМА
+   ============================================ */
 [data-theme="dark"]{
   color-scheme: dark;
   --white: #120c18;
@@ -269,16 +271,40 @@ h2.title{
 .about-content p{ margin-bottom: 20px; }
 .about-content strong{ color: var(--accent-text); }
 
-/* Рамка вокруг блока "Подписывайтесь" */
+/* Блок с яркой тенью вместо рамки */
 .about-cta{
   margin-top: 40px;
   padding: 30px;
   background: var(--purple-50);
   border-radius: var(--radius);
-  border: 1.5px solid var(--purple-300);
-  transition: background-color .3s ease, border-color .3s ease;
+  
+  border: none;
+  box-shadow: 0 12px 32px rgba(135, 24, 157, 0.15);
+  transition: box-shadow .3s ease, transform .3s ease;
+  
+  text-align: left; 
 }
-.about-cta:hover { border-color: var(--purple-500); }
+.about-cta:hover {
+  box-shadow: 0 16px 40px rgba(135, 24, 157, 0.25);
+  transform: translateY(-2px);
+}
+[data-theme="dark"] .about-cta {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+[data-theme="dark"] .about-cta:hover {
+  box-shadow: 0 16px 40px rgba(188, 61, 208, 0.2);
+}
+
+.about-cta p {
+  margin-bottom: 0;
+  text-align: left;
+}
+
+.about-cta .btn {
+  margin-top: 20px;
+  align-self: flex-start;
+  display: inline-flex; 
+}
 
 /* ---------- INITIATIVES ---------- */
 .initiatives{background:var(--purple-50);position:relative;overflow:hidden;transition:background-color .3s ease}
@@ -588,7 +614,7 @@ a.initiative-item:hover .initiative-content .news-link{ gap:13px; opacity:1; }
     background: rgba(18,12,24,.95);
   }
 
-  /* Исправленная мобильная шторка */
+  /* Мобильная шторка (центрированная) */
   .nav{
     position: fixed;
     top: 0;
@@ -611,22 +637,20 @@ a.initiative-item:hover .initiative-content .news-link{ gap:13px; opacity:1; }
   
   .nav.open { transform: none; }
   
-  /* Выравниваем текст по центру у всех ссылок в шторке */
   .nav a {
     color: var(--ink) !important;
     padding: 14px 18px;
     font-size: 1.05rem;
     border-radius: 12px;
-    justify-content: center; /* Центрируем текст */
-    text-align: center;      /* Центрируем сам текст, если он в 2 строки */
+    justify-content: center;
+    text-align: center;
     max-width: none;
     white-space: normal;
-    width: 100%;             /* Ссылки занимают всю ширину для ровного вида */
+    width: 100%;
   }
   
   .nav a:hover { background: var(--purple-100); }
   
-  /* Кнопка "Присоединиться" */
   .nav .nav-cta {
     margin: 20px 0 0;
     justify-content: center;
@@ -635,14 +659,13 @@ a.initiative-item:hover .initiative-content .news-link{ gap:13px; opacity:1; }
     width: 100%;
   }
   
-  /* Кнопка "Светлая/Тёмная тема" */
   .theme-toggle {
     order: 2;
     margin: 10px 0 0;
     padding: 14px 18px;
     color: var(--ink);
     border-radius: 12px;
-    justify-content: center; /* Центрируем текст и иконку */
+    justify-content: center;
     text-align: center;
     width: 100%;
     font-size: 1.05rem;
@@ -653,7 +676,6 @@ a.initiative-item:hover .initiative-content .news-link{ gap:13px; opacity:1; }
   .theme-toggle-text { display: inline-block; }
   .theme-toggle svg { width: 20px; height: 20px; }
 
-  /* Кнопка-крестик */
   .burger {
     display: block;
     position: relative;
