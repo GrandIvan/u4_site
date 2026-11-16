@@ -31,9 +31,6 @@
   --card-shadow-hover: 0 12px 24px rgba(42,7,49,.12);
 }
 
-/* ============================================
-   ТЁМНАЯ ТЕМА
-   ============================================ */
 [data-theme="dark"]{
   color-scheme: dark;
   --white: #120c18;
@@ -274,18 +271,13 @@ h2.title{
 }
 .about-content p{ margin-bottom: 20px; }
 .about-content strong{ color: var(--accent-text); }
-
-/* Рамка вокруг блока "Подписывайтесь" */
 .about-cta{
   margin-top: 40px;
   padding: 30px;
   background: var(--purple-50);
   border-radius: var(--radius);
-  border: 1.5px solid var(--purple-300); /* Полная рамка по периметру */
-  transition: background-color .3s ease, border-color .3s ease;
-}
-.about-cta:hover {
-  border-color: var(--purple-500);
+  border-left: 4px solid var(--purple-600);
+  transition: background-color .3s ease;
 }
 
 /* ---------- INITIATIVES ---------- */
