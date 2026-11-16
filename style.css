@@ -271,7 +271,7 @@ h2.title{
 .about-content p{ margin-bottom: 20px; }
 .about-content strong{ color: var(--accent-text); }
 
-/* Блок с широкой скругленной полоской и тенью */
+/* Блок с широкой полоской и насыщенной тенью */
 .about-cta{
   margin-top: 40px;
   padding: 30px;
@@ -281,25 +281,34 @@ h2.title{
   border: none;
   border-left: 8px solid var(--purple-600); /* Широкая полоска слева */
   
-  box-shadow: 0 10px 30px rgba(135, 24, 157, 0.15); /* Фиолетовая тень */
+  /* Насыщенная фиолетовая тень + легкое свечение */
+  box-shadow: 
+    0 10px 30px rgba(135, 24, 157, 0.2), 
+    0 0 0 1px rgba(135, 24, 157, 0.05); 
+    
   transition: background-color .3s ease, border-color .3s ease, box-shadow .3s ease, transform .3s ease;
-  
   text-align: left; 
 }
 
-/* При наведении полоска чуть светлеет, тень усиливается */
+/* При наведении тень становится еще глубже */
 .about-cta:hover {
   border-left-color: var(--purple-500);
-  box-shadow: 0 14px 40px rgba(135, 24, 157, 0.25);
-  transform: translateY(-2px);
+  box-shadow: 
+    0 15px 40px rgba(135, 24, 157, 0.35), 
+    0 0 0 1px rgba(135, 24, 157, 0.1);
+  transform: translateY(-3px);
 }
 
-/* Темная тема для тени */
+/* Темная тема для блока */
 [data-theme="dark"] .about-cta {
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 [data-theme="dark"] .about-cta:hover {
-  box-shadow: 0 14px 40px rgba(188, 61, 208, 0.15);
+  box-shadow: 
+    0 15px 40px rgba(188, 61, 208, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 /* Текст внутри */
