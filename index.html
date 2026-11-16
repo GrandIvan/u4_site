@@ -3,6 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Скрипт темы (должен быть до CSS, чтобы не мигало) -->
+<script>
+  (function() {
+    try {
+      var stored = localStorage.getItem('theme');
+      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var theme = stored || (prefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  })();
+</script>
 <title>Участие — движение рациональных левых</title>
 <meta name="description" content="Вместе боремся за свободу, демократию, равенство, права трудящихся. За новую Россию и новый мир.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,6 +43,18 @@
       <a href="concept.html">Концептуальная основа</a>
       <a href="#news">Публикации</a>
       <a href="#join">УЧАСТВОВАТЬ</a>
+
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему" aria-pressed="false">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+        <span class="theme-toggle-text">Тёмная тема</span>
+      </button>
+
       <a href="https://t.me/Uchastie_join_bot" class="nav-cta">Присоединиться</a>
     </nav>
 
@@ -63,7 +88,7 @@
   </div>
 </section>
 
-<!-- ================= ABOUT (Кто мы?) ================= -->
+<!-- ================= ABOUT ================= -->
 <section class="section about-section reveal" id="about">
   <div class="container">
     <div class="section-head">
@@ -86,7 +111,7 @@
   </div>
 </section>
 
-<!-- ================= INITIATIVES (Наша работа) ================= -->
+<!-- ================= INITIATIVES ================= -->
 <section class="section initiatives reveal" id="initiatives">
   <div class="container">
     <div class="section-head">
@@ -96,7 +121,6 @@
     </div>
 
     <div class="initiatives-grid">
-      <!-- Карточка 1 -->
       <a class="initiative-item" href="https://t.me/uchastie_official/72" target="_blank" rel="noopener" aria-label="Доступный транспорт — читать в Telegram">
         <div class="initiative-thumb">
           <img src="transport.jpg" alt="" onerror="this.style.display='none'; this.parentElement.querySelector('.initiative-placeholder').style.display='flex';">
@@ -106,14 +130,10 @@
           <div class="news-meta"><span>Кампания</span></div>
           <h3>Доступный транспорт</h3>
           <p>Подняли тему грабительских цен на проезд в Петербурге. Поддержали активных молодых петербуржцев и показали общественный запрос на то, чтобы город работал на человека.</p>
-          <span class="news-link">
-            Читать в Telegram
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </span>
+          <span class="news-link">Читать в Telegram <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
         </div>
       </a>
 
-      <!-- Карточка 2 -->
       <a class="initiative-item" href="https://t.me/luxury_tax_2026" target="_blank" rel="noopener" aria-label="Налог на роскошь — читать в Telegram">
         <div class="initiative-thumb">
           <img src="nolog_logo.png" alt="" onerror="this.style.display='none'; this.parentElement.querySelector('.initiative-placeholder').style.display='flex';">
@@ -123,14 +143,10 @@
           <div class="news-meta"><span>Кампания</span></div>
           <h3>Налог на роскошь</h3>
           <p>Федеральная кампания ради жилья для молодых. Поддержка десятков кандидатов от КПРФ, «Яблока» и «Зелёных», победа на дебатах, эфиры на «Живом Гвозде» и «Авроре», штабы в 10 регионах.</p>
-          <span class="news-link">
-            Читать в Telegram
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </span>
+          <span class="news-link">Читать в Telegram <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
         </div>
       </a>
 
-      <!-- Карточка 3 -->
       <a class="initiative-item" href="https://t.me/uchastie_official/229" target="_blank" rel="noopener" aria-label="Наблюдатели и поддержка — читать в Telegram">
         <div class="initiative-thumb">
           <img src="nbaludatel.jpg" alt="" onerror="this.style.display='none'; this.parentElement.querySelector('.initiative-placeholder').style.display='flex';">
@@ -140,14 +156,10 @@
           <div class="news-meta"><span>Выборы</span></div>
           <h3>Наблюдатели и поддержка</h3>
           <p>Поддержали прогрессивных кандидатов, призвали всех голосовать, а сами пошли в наблюдатели. Столкнулись с давлением, но защищали голос народа.</p>
-          <span class="news-link">
-            Читать в Telegram
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </span>
+          <span class="news-link">Читать в Telegram <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
         </div>
       </a>
 
-      <!-- Карточка 4 -->
       <a class="initiative-item" href="https://t.me/uchastie_official/179" target="_blank" rel="noopener" aria-label="Пикеты и обращения — читать в Telegram">
         <div class="initiative-thumb">
           <img src="picet.jpg" alt="" onerror="this.style.display='none'; this.parentElement.querySelector('.initiative-placeholder').style.display='flex';">
@@ -157,14 +169,10 @@
           <div class="news-meta"><span>Улица</span></div>
           <h3>Пикеты и обращения</h3>
           <p>Провели одиночные пикеты в 5 городах (в Ижевске — 7 раз). Массовая подача 500 писем помогла добиться, чтобы депутаты приняли наше обращение.</p>
-          <span class="news-link">
-            Читать в Telegram
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </span>
+          <span class="news-link">Читать в Telegram <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
         </div>
       </a>
 
-      <!-- Карточка 5 -->
       <a class="initiative-item" href="https://t.me/uchastie_official/130" target="_blank" rel="noopener" aria-label="Против мессенджера МАХ — читать в Telegram">
         <div class="initiative-thumb">
           <img src="max.jpg" alt="" onerror="this.style.display='none'; this.parentElement.querySelector('.initiative-placeholder').style.display='flex';">
@@ -174,14 +182,10 @@
           <div class="news-meta"><span>Борьба</span></div>
           <h3>Против мессенджера МАХ</h3>
           <p>Вместе с САФ и другими движениями стоим фронтом против навязывания студентам мессенджера МАХ. Дали студентам чёткий план, как отказываться от него в вузах.</p>
-          <span class="news-link">
-            Читать в Telegram
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </span>
+          <span class="news-link">Читать в Telegram <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
         </div>
       </a>
 
-      <!-- Карточка 6 -->
       <a class="initiative-item" href="https://t.me/uchastie_official/63" target="_blank" rel="noopener" aria-label="Защита Битцевского леса — читать в Telegram">
         <div class="initiative-thumb">
           <img src="eco.jpg" alt="" onerror="this.style.display='none'; this.parentElement.querySelector('.initiative-placeholder').style.display='flex';">
@@ -191,10 +195,7 @@
           <div class="news-meta"><span>Экология</span></div>
           <h3>Защита Битцевского леса</h3>
           <p>Выступили против лыжероллерной трассы. Нашли союзников среди столичных экологистов, с которыми будем осваивать институт общественных инспекторов.</p>
-          <span class="news-link">
-            Читать в Telegram
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </span>
+          <span class="news-link">Читать в Telegram <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
         </div>
       </a>
     </div>
@@ -209,12 +210,8 @@
       <h2 class="title">Наши материалы, мнения и аналитика</h2>
       <p class="lead">Последние публикации из нашего Telegram-канала и статьи участников.</p>
     </div>
-
     <div class="news-grid" id="newsGrid"></div>
-
-    <p id="newsLoading" style="color:var(--muted); text-align:center; padding:20px 0;">
-      Загружаем новости…
-    </p>
+    <p id="newsLoading" class="loading-text">Загружаем новости…</p>
   </div>
 </section>
 
@@ -225,16 +222,12 @@
       <span class="eyebrow">Авторские материалы</span>
       <h2 class="title">Мнения и аналитика</h2>
     </div>
-
     <div class="news-grid" id="authorsGrid"></div>
-
-    <p id="authorsLoading" style="color:var(--muted); text-align:center; padding:20px 0;">
-      Загружаем материалы…
-    </p>
+    <p id="authorsLoading" class="loading-text">Загружаем материалы…</p>
   </div>
 </section>
 
-<!-- ================= VALUES (Принципы) ================= -->
+<!-- ================= VALUES ================= -->
 <section class="section values reveal" id="values">
   <div class="container">
     <div class="section-head">
@@ -245,77 +238,42 @@
 
     <div class="value-list">
       <div class="value-item">
-        <div class="value-header">
-          <div class="value-num">01</div>
-          <h4>Рациональность</h4>
-        </div>
-        <div class="value-desc">
-          Это наш главный метод. Мы выбираем концепцию политики, ориентированную на результат. Организация основывает свои действия и анализ на объективных условиях и фактах и исходя из них пытается выбрать наиболее эффективные решения. Мы пытаемся найти практические способы реализации наших целей и левых демократических идей, опираясь на трезвый расчёт. Подходить к политике нужно стратегически, а не эмоционально.
-        </div>
+        <div class="value-header"><div class="value-num">01</div><h4>Рациональность</h4></div>
+        <div class="value-desc">Это наш главный метод. Мы выбираем концепцию политики, ориентированную на результат. Организация основывает свои действия и анализ на объективных условиях и фактах и исходя из них пытается выбрать наиболее эффективные решения. Мы пытаемся найти практические способы реализации наших целей и левых демократических идей, опираясь на трезвый расчёт. Подходить к политике нужно стратегически, а не эмоционально.</div>
       </div>
-
       <div class="value-item">
-        <div class="value-header">
-          <div class="value-num">02</div>
-          <h4>Политическая борьба</h4>
-        </div>
-        <div class="value-desc">
-          Мы существуем, чтобы добиться изменений, чтобы воплощать левые демократические принципы и построить справедливое общество.
-        </div>
+        <div class="value-header"><div class="value-num">02</div><h4>Политическая борьба</h4></div>
+        <div class="value-desc">Мы существуем, чтобы добиться изменений, чтобы воплощать левые демократические принципы и построить справедливое общество.</div>
       </div>
-
       <div class="value-item">
-        <div class="value-header">
-          <div class="value-num">03</div>
-          <h4>Мы — протопартия</h4>
-        </div>
-        <div class="value-desc">
-          Мы надеемся стать значимой силой, способной влиять не только на локальную, но и на глобальную российскую политику. Наша цель — не создание закрытой секты, клуба или избы-читальни для самоутверждения в узком кругу, а построение широкого, открытого и эффективного движения, способного бороться за интересы людей.
-        </div>
+        <div class="value-header"><div class="value-num">03</div><h4>Мы — протопартия</h4></div>
+        <div class="value-desc">Мы надеемся стать значимой силой, способной влиять не только на локальную, но и на глобальную российскую политику. Наша цель — не создание закрытой секты, клуба или избы-читальни для самоутверждения в узком кругу, а построение широкого, открытого и эффективного движения, способного бороться за интересы людей.</div>
       </div>
-
       <div class="value-item">
-        <div class="value-header">
-          <div class="value-num">04</div>
-          <h4>Активное участие в самых разных инициативах</h4>
-        </div>
-        <div class="value-desc">
-          Ошибиться и сделать что-то лучше, чем отказаться от действий. Политическая борьба требует смелости, гибкости и готовности пробовать новые пути, даже если они кажутся неидеальными.
-        </div>
+        <div class="value-header"><div class="value-num">04</div><h4>Активное участие в самых разных инициативах</h4></div>
+        <div class="value-desc">Ошибиться и сделать что-то лучше, чем отказаться от действий. Политическая борьба требует смелости, гибкости и готовности пробовать новые пути, даже если они кажутся неидеальными.</div>
       </div>
-
       <div class="value-item">
-        <div class="value-header">
-          <div class="value-num">05</div>
-          <h4>Солидарность</h4>
-        </div>
-        <div class="value-desc">
-          Мы стремимся к сотрудничеству с другими демократическими организациями, в первую очередь левыми, а также с независимыми общественными деятелями: прогрессивными кандидатами на выборах, блогерами и другими.
-        </div>
+        <div class="value-header"><div class="value-num">05</div><h4>Солидарность</h4></div>
+        <div class="value-desc">Мы стремимся к сотрудничеству с другими демократическими организациями, в первую очередь левыми, а также с независимыми общественными деятелями: прогрессивными кандидатами на выборах, блогерами и другими.</div>
       </div>
     </div>
     
     <div style="margin-top: 40px;">
-      <a href="printsipy.html" class="btn btn-ghost" style="color: var(--purple-700); border-color: var(--purple-200); background: var(--purple-50);">
-        Читать полный документ
-      </a>
+      <a href="printsipy.html" class="btn btn-soft">Читать полный документ</a>
     </div>
   </div>
 </section>
 
-<!-- ================= JOIN (А ты участвуешь..?) ================= -->
+<!-- ================= JOIN ================= -->
 <section class="section join-cta reveal" id="join">
   <div class="container join-cta-inner">
     <h2 class="title">А ты Участвуешь..?</h2>
     <p class="lead">Пишите в бот вступления, если хотите вступить в Участие и начать участвовать. Или в бот связи, если хотите сотрудничать и предложить идеи.</p>
     
     <div class="join-cta-actions">
-      <a href="https://t.me/Uchastie_join_bot" class="btn btn-primary">
-        Бот вступления
-      </a>
-      <a href="https://t.me/Uchastie_contact_bot" class="btn btn-ghost">
-        Бот связи
-      </a>
+      <a href="https://t.me/Uchastie_join_bot" class="btn btn-primary">Бот вступления</a>
+      <a href="https://t.me/Uchastie_contact_bot" class="btn btn-ghost">Бот связи</a>
     </div>
   </div>
 </section>
@@ -371,5 +329,30 @@
 </footer>
 
 <script src="app.js"></script>
+<!-- Переключатель темы -->
+<script>
+  (function() {
+    var root = document.documentElement;
+    var btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    var label = btn.querySelector('.theme-toggle-text');
+
+    function sync() {
+      var isDark = root.getAttribute('data-theme') === 'dark';
+      btn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+      btn.setAttribute('aria-label', isDark ? 'Включить светлую тему' : 'Включить тёмную тему');
+      if (label) label.textContent = isDark ? 'Светлая тема' : 'Тёмная тема';
+    }
+
+    sync();
+
+    btn.addEventListener('click', function() {
+      var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) {}
+      sync();
+    });
+  })();
+</script>
 </body>
 </html>
