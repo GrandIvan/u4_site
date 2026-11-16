@@ -271,28 +271,32 @@ h2.title{
 .about-content p{ margin-bottom: 20px; }
 .about-content strong{ color: var(--accent-text); }
 
-/* Блок с яркой тенью вместо рамки */
+/* Блок с левой полоской и фиолетовой тенью */
 .about-cta{
   margin-top: 40px;
   padding: 30px;
   background: var(--purple-50);
-  border-radius: var(--radius);
+  border-radius: 0 var(--radius) var(--radius) 0;
   
   border: none;
-  box-shadow: 0 12px 32px rgba(135, 24, 157, 0.15);
-  transition: box-shadow .3s ease, transform .3s ease;
+  border-left: 4px solid var(--purple-600);
+  
+  box-shadow: 0 10px 30px rgba(135, 24, 157, 0.15);
+  transition: background-color .3s ease, border-color .3s ease, box-shadow .3s ease, transform .3s ease;
   
   text-align: left; 
 }
 .about-cta:hover {
-  box-shadow: 0 16px 40px rgba(135, 24, 157, 0.25);
+  border-left-color: var(--purple-500);
+  box-shadow: 0 14px 40px rgba(135, 24, 157, 0.25);
   transform: translateY(-2px);
 }
+
 [data-theme="dark"] .about-cta {
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 [data-theme="dark"] .about-cta:hover {
-  box-shadow: 0 16px 40px rgba(188, 61, 208, 0.2);
+  box-shadow: 0 14px 40px rgba(188, 61, 208, 0.15);
 }
 
 .about-cta p {
