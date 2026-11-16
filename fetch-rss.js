@@ -2,21 +2,26 @@ const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
 
+// Укажите ваши каналы
 const NEWS_CHANNEL = 'uchastie_official';
 const INIT_CHANNEL = 'luxury_tax_2026';
-const AVTOR_CHANNEL = 'uchastie_lite'; // ← ВПИШИТЕ ИМЯ КАНАЛА
+const AVTOR_CHANNEL = 'uchastie_lite';
 
 const IMAGES_DIR = 'images';
 
-// Функция скачивания картинки
+// Функция скачивания картинки с защитой от протокол-относительных ссылок (//...)
 async function downloadImage(url, filename) {
   try {
+    // Telegram часто отдает ссылки вида //cdn4.telegram-cdn.org/...
+    if (url.startsWith('//')) url = 'https:' + url;
+    
     const res = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Referer': 'https://t.me/'
       }
     });
+    
     if (!res.ok) return false;
     const buffer = await res.arrayBuffer();
     fs.writeFileSync(path.join(IMAGES_DIR, filename), Buffer.from(buffer));
@@ -29,7 +34,7 @@ async function downloadImage(url, filename) {
 
 async function fetchTelegram(channel, limit) {
   const url = `https://t.me/s/${channel}`;
-  console.log(`Скачиваем: ${url}`);
+  console.log(`\n--- Скачиваем: ${url} ---`);
 
   const res = await fetch(url, {
     headers: {
@@ -41,97 +46,142 @@ async function fetchTelegram(channel, limit) {
   const html = await res.text();
   const $ = cheerio.load(html);
 
-  const items = [];
+  // 1. ГРУППИРУЕМ ПОСТЫ ПО ID (чтобы альбомы и фото+текст не разрывались)
+  const postsMap = new Map();
 
   $('.tgme_widget_message_wrap').each((i, el) => {
-    const isForwarded = $(el).find('.tgme_widget_message_forwarded_from').length > 0;
-    if (isForwarded) return;
+    const $el = $(el);
+    const $msg = $el.find('.tgme_widget_message');
+    const postId = $msg.attr('data-post'); // например, "uchastie_lite/1234"
 
-    const textEl = $(el).find('.tgme_widget_message_text');
-    textEl.find('br').replaceWith('\n');
-    const text = textEl.text().trim();
+    if (!postId) return;
 
-    const link = $(el).find('.tgme_widget_message_date').attr('href') || '';
-    const date = $(el).find('time').attr('datetime') || '';
-
-    let imageUrl = '';
-
-    // Фото
-    const photoWrap = $(el).find('.tgme_widget_message_photo_wrap');
-    if (photoWrap.length) {
-      const style = photoWrap.attr('style') || '';
-      const match = style.match(/background-image:\s*url\(['"]?([^'")]+)['"]?\)/);
-      if (match) imageUrl = match[1];
+    // Отсеиваем репосты (пересланные сообщения)
+    const isForwarded = $el.find('.tgme_widget_message_forwarded_from, .tgme_widget_message_from_author').length > 0;
+    // Если в тексте есть "Переслано от" или "Forwarded from", тоже пропускаем
+    const forwardText = $el.find('.tgme_widget_message_from_author').text();
+    if (isForwarded || forwardText.includes('Переслано от') || forwardText.includes('Forwarded from')) {
+      return;
     }
 
-    // Видео
-    if (!imageUrl) {
-      const videoThumb = $(el).find('.tgme_widget_message_video_thumb');
-      if (videoThumb.length) {
-        const style = videoThumb.attr('style') || '';
-        const match = style.match(/background-image:\s*url\(['"]?([^'")]+)['"]?\)/);
-        if (match) imageUrl = match[1];
+    // Если пост еще нет в карте, создаем для него запись
+    if (!postsMap.has(postId)) {
+      postsMap.set(postId, {
+        id: postId,
+        text: '',
+        images: [],
+        date: '',
+        link: ''
+      });
+    }
+
+    const post = postsMap.get(postId);
+
+    // Извлекаем дату и ссылку (они могут быть в любом из блоков, берем первый попавшийся)
+    if (!post.date) post.date = $el.find('time').attr('datetime') || '';
+    if (!post.link) {
+      const href = $el.find('.tgme_widget_message_date').attr('href') || '';
+      post.link = href.startsWith('http') ? href : 'https://t.me/' + href.replace(/^\//, '');
+    }
+
+    // Извлекаем текст
+    const $textEl = $el.find('.tgme_widget_message_text');
+    if ($textEl.length) {
+      // Заменяем переносы строк на \n, чтобы сохранить абзацы
+      $textEl.find('br').replaceWith('\n');
+      const partText = $textEl.text().trim();
+      if (partText) {
+        post.text += (post.text ? '\n' : '') + partText;
       }
     }
 
-    // Ссылка
-    if (!imageUrl) {
-      const linkThumb = $(el).find('.tgme_widget_message_link_preview_thumb');
-      if (linkThumb.length) {
-        const style = linkThumb.attr('style') || '';
-        const match = style.match(/background-image:\s*url\(['"]?([^'")]+)['"]?\)/);
-        if (match) imageUrl = match[1];
-      }
-    }
+    // Извлекаем ВСЕ возможные медиа (фото, видео, превью ссылок, документы, стикеры)
+    const mediaSelectors = [
+      '.tgme_widget_message_photo_wrap', 
+      '.tgme_widget_message_video_thumb', 
+      '.tgme_widget_message_link_preview_thumb', 
+      '.tgme_widget_message_document_thumb',
+      '.tgme_widget_message_sticker'
+    ];
 
+    mediaSelectors.forEach(selector => {
+      $el.find(selector).each((j, media) => {
+        let imgUrl = '';
+        const style = $(media).attr('style') || '';
+        const match = style.match(/background-image:\s*url\(['"]?([^'")]+)['"]?\)/);
+        
+        if (match) {
+          imgUrl = match[1];
+        } else if ($(media).is('img')) {
+          imgUrl = $(media).attr('src');
+        } else if ($(media).is('video')) {
+          imgUrl = $(media).attr('src'); // На случай прямых видео
+        }
+
+        if (imgUrl && !post.images.includes(imgUrl)) {
+          post.images.push(imgUrl);
+        }
+      });
+    });
+  });
+
+  // 2. ПРЕВРАЩАЕМ КАРТУ В МАССИВ И ОБРАБАТЫВАЕМ ТЕКСТ
+  const items = Array.from(postsMap.values()).map(post => {
     let title = '';
-    let description = '';
+    let description = post.text;
 
-    if (text) {
-      const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-      if (lines.length > 1 && lines[0].length <= 100) {
+    // Логика разделения на заголовок и описание
+    if (post.text) {
+      const lines = post.text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      
+      if (lines.length > 1 && lines[0].length <= 120) {
+        // Если первая строка короткая, берем ее как заголовок
         title = lines[0];
-        description = lines.slice(1).join(' ');
+        description = lines.slice(1).join('\n');
       } else {
-        const match = text.match(/^(.{10,120}?[.!?])(\s|$)/);
+        // Иначе ищем первое предложение
+        const match = post.text.match(/^(.{10,120}?[.!?])(\s|$)/);
         if (match) {
           title = match[1].trim();
-          description = text.slice(match[0].length).trim();
+          description = post.text.slice(match[0].length).trim();
         } else {
-          title = text.slice(0, 110).trim();
-          description = text.slice(110).trim();
+          // Если вообще нет точек, просто режем текст
+          title = post.text.slice(0, 110).trim() + '...';
+          description = post.text;
         }
       }
     }
 
-    if (!title && imageUrl) title = 'Новый пост';
+    if (!title && post.images.length > 0) title = 'Новый пост';
+    if (!title) title = 'Без названия';
 
-    if (text.length > 3 || imageUrl) {
-      items.push({
-        title: title,
-        description: description,
-        pubDate: date,
-        link: link.startsWith('http') ? link : 'https://t.me/' + link.replace(/^\//, ''),
-        imageUrl: imageUrl,  // временно
-        image: ''            // сюда запишем локальный путь
-      });
-    }
+    return {
+      title: title,
+      description: description,
+      pubDate: post.date,
+      link: post.link,
+      imageUrls: post.images, // массив всех картинок поста
+      image: '' // сюда запишем локальный путь
+    };
   });
 
-  // Ограничиваем количество
+  // Ограничиваем количество (берем самые свежие посты)
+  // В t.me/s/ посты идут от старых к новым, поэтому делаем reverse
   const result = items.reverse().slice(0, limit);
 
-  // Скачиваем картинки
+  // 3. СКАЧИВАЕМ КАРТИНКИ
   for (let i = 0; i < result.length; i++) {
     const item = result[i];
-    if (item.imageUrl) {
-      const filename = `${channel}_${Date.now()}_${i}.jpg`;
-      const ok = await downloadImage(item.imageUrl, filename);
+    // Скачиваем только ПЕРВУЮ картинку поста (для превью), чтобы не забивать диск
+    if (item.imageUrls && item.imageUrls.length > 0) {
+      const filename = `${channel}_${item.link.split('/').pop()}_${i}.jpg`;
+      const ok = await downloadImage(item.imageUrls[0], filename);
       if (ok) {
         item.image = IMAGES_DIR + '/' + filename;
       }
     }
-    delete item.imageUrl;
+    // Удаляем массив ссылок, чтобы не раздувать JSON
+    delete item.imageUrls; 
   }
 
   return result;
@@ -141,36 +191,34 @@ async function start() {
   if (!fs.existsSync(IMAGES_DIR)) {
     fs.mkdirSync(IMAGES_DIR);
   } else {
-    // Очищаем старые картинки, чтобы не забивать репозиторий
-    fs.readdirSync(IMAGES_DIR).forEach(f => fs.unlinkSync(path.join(IMAGES_DIR, f)));
+    // Очищаем старые картинки
+    fs.readdirSync(IMAGES_DIR).forEach(f => {
+      try { fs.unlinkSync(path.join(IMAGES_DIR, f)); } catch(e) {}
+    });
   }
 
-  try {
-    console.log(`--- Новости ---`);
-    const news = await fetchTelegram(NEWS_CHANNEL, 6);
-    fs.writeFileSync('news.json', JSON.stringify(news, null, 2));
-    console.log(`✓ news.json (${news.length} шт)`);
-  } catch (e) {
-    console.error(`✗ ${e.message}`);
-  }
+  const channels = [
+    { name: NEWS_CHANNEL, file: 'news.json', limit: 6, label: 'Новости' },
+    { name: INIT_CHANNEL, file: 'initiatives.json', limit: 3, label: 'Инициативы' },
+    { name: AVTOR_CHANNEL, file: 'avtory.json', limit: 6, label: 'Авторские материалы' }
+  ];
 
-  try {
-    console.log(`--- Инициативы ---`);
-    const inits = await fetchTelegram(INIT_CHANNEL, 3);
-    fs.writeFileSync('initiatives.json', JSON.stringify(inits, null, 2));
-    console.log(`✓ initiatives.json (${inits.length} шт)`);
-  } catch (e) {
-    console.error(`✗ ${e.message}`);
-  }
-
-  try {
-    console.log(`--- Авторские материалы ---`);
-    const avtory = await fetchTelegram(AVTOR_CHANNEL, 6);
-    fs.writeFileSync('avtory.json', JSON.stringify(avtory, null, 2));
-    console.log(`✓ avtory.json (${avtory.length} шт)`);
-  } catch (e) {
-    console.error(`✗ ${e.message}`);
+  for (const ch of channels) {
+    try {
+      console.log(`--- ${ch.label} ---`);
+      const items = await fetchTelegram(ch.name, ch.limit);
+      fs.writeFileSync(ch.file, JSON.stringify(items, null, 2));
+      console.log(`✓ ${ch.file} (${items.length} шт)`);
+    } catch (e) {
+      console.error(`✗ Ошибка в канале ${ch.name}: ${e.message}`);
+    }
   }
 }
+
+// Обработка неотловленных ошибок, чтобы скрипт не падал молча
+process.on('unhandledRejection', error => {
+  console.error('КРИТИЧЕСКАЯ ОШИБКА:', error);
+  process.exit(1);
+});
 
 start();
