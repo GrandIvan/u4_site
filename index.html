@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Скрипт темы (должен быть до CSS, чтобы не мигало) -->
+<!-- Скрипт темы -->
 <script>
   (function() {
     try {
@@ -63,6 +63,9 @@
     </button>
   </div>
 </header>
+
+<!-- Затемнение фона при открытом меню -->
+<div class="nav-overlay" id="navOverlay"></div>
 
 <main id="top">
 
@@ -329,29 +332,69 @@
 </footer>
 
 <script src="app.js"></script>
-<!-- Переключатель темы -->
+<!-- Скрипты темы и меню -->
 <script>
   (function() {
+    // Тема
     var root = document.documentElement;
     var btn = document.getElementById('themeToggle');
-    if (!btn) return;
-    var label = btn.querySelector('.theme-toggle-text');
-
-    function sync() {
-      var isDark = root.getAttribute('data-theme') === 'dark';
-      btn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
-      btn.setAttribute('aria-label', isDark ? 'Включить светлую тему' : 'Включить тёмную тему');
-      if (label) label.textContent = isDark ? 'Светлая тема' : 'Тёмная тема';
+    if (btn) {
+      var label = btn.querySelector('.theme-toggle-text');
+      function sync() {
+        var isDark = root.getAttribute('data-theme') === 'dark';
+        btn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+        btn.setAttribute('aria-label', isDark ? 'Включить светлую тему' : 'Включить тёмную тему');
+        if (label) label.textContent = isDark ? 'Светлая тема' : 'Тёмная тема';
+      }
+      sync();
+      btn.addEventListener('click', function() {
+        var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', next);
+        try { localStorage.setItem('theme', next); } catch (e) {}
+        sync();
+      });
     }
 
-    sync();
+    // Мобильное меню и оверлей
+    var burger = document.getElementById('burger');
+    var nav = document.getElementById('nav');
+    var overlay = document.getElementById('navOverlay');
+    var header = document.getElementById('header');
 
-    btn.addEventListener('click', function() {
-      var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      root.setAttribute('data-theme', next);
-      try { localStorage.setItem('theme', next); } catch (e) {}
-      sync();
-    });
+    function closeMenu() {
+      nav.classList.remove('open');
+      burger.classList.remove('open');
+      header.classList.remove('menu-open');
+      overlay.classList.remove('active');
+      burger.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+
+    function openMenu() {
+      nav.classList.add('open');
+      burger.classList.add('open');
+      header.classList.add('menu-open');
+      overlay.classList.add('active');
+      burger.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden'; // Блокируем скролл страницы
+    }
+
+    if (burger && nav && overlay) {
+      burger.addEventListener('click', function() {
+        if (nav.classList.contains('open')) closeMenu();
+        else openMenu();
+      });
+
+      overlay.addEventListener('click', closeMenu);
+      
+      nav.querySelectorAll('a').forEach(function(a) {
+        a.addEventListener('click', closeMenu);
+      });
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeMenu();
+      });
+    }
   })();
 </script>
 </body>
