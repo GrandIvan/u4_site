@@ -2,17 +2,14 @@ const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
 
-// Укажите ваши каналы
 const NEWS_CHANNEL = 'uchastie_official';
 const INIT_CHANNEL = 'luxury_tax_2026';
 const AVTOR_CHANNEL = 'uchastie_lite';
 
 const IMAGES_DIR = 'images';
 
-// Функция скачивания картинки с защитой от протокол-относительных ссылок (//...)
 async function downloadImage(url, filename) {
   try {
-    // Telegram часто отдает ссылки вида //cdn4.telegram-cdn.org/...
     if (url.startsWith('//')) url = 'https:' + url;
     
     const res = await fetch(url, {
@@ -46,29 +43,30 @@ async function fetchTelegram(channel, limit) {
   const html = await res.text();
   const $ = cheerio.load(html);
 
-  // 1. ГРУППИРУЕМ ПОСТЫ ПО ID (чтобы альбомы и фото+текст не разрывались)
   const postsMap = new Map();
 
   $('.tgme_widget_message_wrap').each((i, el) => {
     const $el = $(el);
     const $msg = $el.find('.tgme_widget_message');
-    const postId = $msg.attr('data-post'); // например, "uchastie_lite/1234"
+    const postId = $msg.attr('data-post');
 
     if (!postId) return;
 
-    // Отсеиваем репосты (пересланные сообщения)
-    const isForwarded = $el.find('.tgme_widget_message_forwarded_from, .tgme_widget_message_from_author').length > 0;
-    // Если в тексте есть "Переслано от" или "Forwarded from", тоже пропускаем
-    const forwardText = $el.find('.tgme_widget_message_from_author').text();
-    if (isForwarded || forwardText.includes('Переслано от') || forwardText.includes('Forwarded from')) {
-      return;
+    // === 1. ЖЕСТКИЙ ФИЛЬТР РЕПОСТОВ ===
+    // Ищем блок с пересылкой или текст "сделал репост"
+    const $forwardBlock = $el.find('.tgme_widget_message_forwarded_from, .tgme_widget_message_from_author');
+    const forwardText = $forwardBlock.text().toLowerCase();
+    
+    if ($forwardBlock.length > 0 || forwardText.includes('репост') || forwardText.includes('forwarded')) {
+      return; // Пропускаем этот пост
     }
 
-    // Если пост еще нет в карте, создаем для него запись
     if (!postsMap.has(postId)) {
       postsMap.set(postId, {
         id: postId,
         text: '',
+        linkTitle: '',
+        linkDesc: '',
         images: [],
         date: '',
         link: ''
@@ -77,17 +75,15 @@ async function fetchTelegram(channel, limit) {
 
     const post = postsMap.get(postId);
 
-    // Извлекаем дату и ссылку (они могут быть в любом из блоков, берем первый попавшийся)
     if (!post.date) post.date = $el.find('time').attr('datetime') || '';
     if (!post.link) {
       const href = $el.find('.tgme_widget_message_date').attr('href') || '';
       post.link = href.startsWith('http') ? href : 'https://t.me/' + href.replace(/^\//, '');
     }
 
-    // Извлекаем текст
+    // === 2. ИЗВЛЕКАЕМ ТЕКСТ ПОСТА ===
     const $textEl = $el.find('.tgme_widget_message_text');
     if ($textEl.length) {
-      // Заменяем переносы строк на \n, чтобы сохранить абзацы
       $textEl.find('br').replaceWith('\n');
       const partText = $textEl.text().trim();
       if (partText) {
@@ -95,11 +91,28 @@ async function fetchTelegram(channel, limit) {
       }
     }
 
-    // Извлекаем ВСЕ возможные медиа (фото, видео, превью ссылок, документы, стикеры)
+    // === 3. ИЗВЛЕКАЕМ ДАННЫЕ ПРЕВЬЮ ССЫЛКИ (если пост состоит только из ссылки) ===
+    const $linkPreview = $el.find('.tgme_widget_message_link_preview');
+    if ($linkPreview.length) {
+      // Берем заголовок и описание ссылки
+      if (!post.linkTitle) post.linkTitle = $linkPreview.find('.tgme_widget_message_link_preview_title').text().trim();
+      if (!post.linkDesc) post.linkDesc = $linkPreview.find('.tgme_widget_message_link_preview_description').text().trim();
+      
+      // Берем картинку из превью ссылки
+      const $thumb = $linkPreview.find('.tgme_widget_message_link_preview_thumb');
+      if ($thumb.length) {
+        const style = $thumb.attr('style') || '';
+        const match = style.match(/background-image:\s*url\(['"]?([^'")]+)['"]?\)/);
+        if (match && !post.images.includes(match[1])) {
+          post.images.push(match[1]);
+        }
+      }
+    }
+
+    // === 4. ИЗВЛЕКАЕМ КАРТИНКИ/ВИДЕО ===
     const mediaSelectors = [
       '.tgme_widget_message_photo_wrap', 
       '.tgme_widget_message_video_thumb', 
-      '.tgme_widget_message_link_preview_thumb', 
       '.tgme_widget_message_document_thumb',
       '.tgme_widget_message_sticker'
     ];
@@ -110,13 +123,9 @@ async function fetchTelegram(channel, limit) {
         const style = $(media).attr('style') || '';
         const match = style.match(/background-image:\s*url\(['"]?([^'")]+)['"]?\)/);
         
-        if (match) {
-          imgUrl = match[1];
-        } else if ($(media).is('img')) {
-          imgUrl = $(media).attr('src');
-        } else if ($(media).is('video')) {
-          imgUrl = $(media).attr('src'); // На случай прямых видео
-        }
+        if (match) imgUrl = match[1];
+        else if ($(media).is('img')) imgUrl = $(media).attr('src');
+        else if ($(media).is('video')) imgUrl = $(media).attr('src');
 
         if (imgUrl && !post.images.includes(imgUrl)) {
           post.images.push(imgUrl);
@@ -125,62 +134,62 @@ async function fetchTelegram(channel, limit) {
     });
   });
 
-  // 2. ПРЕВРАЩАЕМ КАРТУ В МАССИВ И ОБРАБАТЫВАЕМ ТЕКСТ
+  // === 5. ФОРМИРУЕМ ЧИСТЫЕ ДАННЫЕ ===
   const items = Array.from(postsMap.values()).map(post => {
-    let title = '';
-    let description = post.text;
+    let finalText = post.text;
+    
+    // Если в самом сообщении нет текста, но есть превью ссылки — используем его
+    if (!finalText && (post.linkTitle || post.linkDesc)) {
+      finalText = (post.linkTitle ? post.linkTitle + '\n' : '') + post.linkDesc;
+    }
 
-    // Логика разделения на заголовок и описание
-    if (post.text) {
-      const lines = post.text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    let title = '';
+    let description = finalText;
+
+    if (finalText) {
+      const lines = finalText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
       
       if (lines.length > 1 && lines[0].length <= 120) {
-        // Если первая строка короткая, берем ее как заголовок
         title = lines[0];
         description = lines.slice(1).join('\n');
       } else {
-        // Иначе ищем первое предложение
-        const match = post.text.match(/^(.{10,120}?[.!?])(\s|$)/);
+        const match = finalText.match(/^(.{10,120}?[.!?])(\s|$)/);
         if (match) {
           title = match[1].trim();
-          description = post.text.slice(match[0].length).trim();
+          description = finalText.slice(match[0].length).trim();
         } else {
-          // Если вообще нет точек, просто режем текст
-          title = post.text.slice(0, 110).trim() + '...';
-          description = post.text;
+          title = finalText.slice(0, 110).trim() + (finalText.length > 110 ? '...' : '');
+          description = finalText;
         }
       }
     }
 
-    if (!title && post.images.length > 0) title = 'Новый пост';
-    if (!title) title = 'Без названия';
+    // Если совсем нет текста, но есть картинка
+    if (!title && post.images.length > 0) title = 'Медиа';
+    if (!title) title = 'Новый пост';
 
     return {
       title: title,
       description: description,
       pubDate: post.date,
       link: post.link,
-      imageUrls: post.images, // массив всех картинок поста
-      image: '' // сюда запишем локальный путь
+      imageUrls: post.images,
+      image: ''
     };
   });
 
-  // Ограничиваем количество (берем самые свежие посты)
-  // В t.me/s/ посты идут от старых к новым, поэтому делаем reverse
   const result = items.reverse().slice(0, limit);
 
-  // 3. СКАЧИВАЕМ КАРТИНКИ
   for (let i = 0; i < result.length; i++) {
     const item = result[i];
-    // Скачиваем только ПЕРВУЮ картинку поста (для превью), чтобы не забивать диск
     if (item.imageUrls && item.imageUrls.length > 0) {
+      // Имя файла на основе ID поста (чтобы не перезаписывались)
       const filename = `${channel}_${item.link.split('/').pop()}_${i}.jpg`;
       const ok = await downloadImage(item.imageUrls[0], filename);
       if (ok) {
         item.image = IMAGES_DIR + '/' + filename;
       }
     }
-    // Удаляем массив ссылок, чтобы не раздувать JSON
     delete item.imageUrls; 
   }
 
@@ -191,7 +200,6 @@ async function start() {
   if (!fs.existsSync(IMAGES_DIR)) {
     fs.mkdirSync(IMAGES_DIR);
   } else {
-    // Очищаем старые картинки
     fs.readdirSync(IMAGES_DIR).forEach(f => {
       try { fs.unlinkSync(path.join(IMAGES_DIR, f)); } catch(e) {}
     });
@@ -215,7 +223,6 @@ async function start() {
   }
 }
 
-// Обработка неотловленных ошибок, чтобы скрипт не падал молча
 process.on('unhandledRejection', error => {
   console.error('КРИТИЧЕСКАЯ ОШИБКА:', error);
   process.exit(1);
