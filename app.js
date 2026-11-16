@@ -18,16 +18,18 @@
     burger.setAttribute('aria-expanded', 'false');
   }
 
-  burger.addEventListener('click', () => {
-    const open = nav.classList.toggle('open');
-    burger.classList.toggle('open', open);
-    header.classList.toggle('menu-open', open);
-    burger.setAttribute('aria-expanded', String(open));
-  });
+  if (burger && nav) {
+    burger.addEventListener('click', () => {
+      const open = nav.classList.toggle('open');
+      burger.classList.toggle('open', open);
+      header.classList.toggle('menu-open', open);
+      burger.setAttribute('aria-expanded', String(open));
+    });
 
-  nav.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
-  window.addEventListener('resize', () => { if (window.innerWidth > 860) closeMenu(); });
+    nav.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+    window.addEventListener('resize', () => { if (window.innerWidth > 860) closeMenu(); });
+  }
 
   /* ---------- Scroll reveal (для целых секций) ---------- */
   const revealEls = document.querySelectorAll('.reveal');
@@ -35,7 +37,6 @@
     const io = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          // Без задержек, появляется весь блок сразу
           entry.target.classList.add('in');
           io.unobserve(entry.target);
         }
@@ -48,83 +49,32 @@
 
   /* ---------- ЭМОДЗИ И ЗАГРУЗКА ---------- */
   const EMOJI_MAP = {
-    '💢': 'emoji/fist.webp',
-    '🏦': 'emoji/building.webp',
-    '📉': 'emoji/down.webp',
-    '🔈': 'emoji/megaphone.webp',
-    '🔁': 'emoji/link.webp',
-    '⏩': 'emoji/arrows-circle.webp',
-    '⭐': 'emoji/idea.webp', 
-    '🌈': 'emoji/leaves.webp', 
-    '📋': 'emoji/list.webp',
-    '📎': 'emoji/clip.webp',
-    '📶': 'emoji/wifi.webp',
-    '✉️': 'emoji/chat.webp', 
-    '📨': 'emoji/chat.webp',
-    '🔧': 'emoji/wrench.webp',
-    '🏠': 'emoji/home.webp',
-    '🏢': 'emoji/building.webp',
-    '💰': 'emoji/money.webp',
-    '👥': 'emoji/crowd.webp',
-    '🔆': 'emoji/idea.webp',
-    '🔤': 'emoji/typewriter.webp',
-    '🧠': 'emoji/brain.webp',
-    '❗': 'emoji/alert.webp',
-    '📢': 'emoji/megaphone.webp',
-    '❓': 'emoji/question.webp',
-    '🔄': 'emoji/arrows-circle.webp',
-    '❌': 'emoji/crowd.webp',
-    '💯': 'emoji/hundred.webp',
-    '✨': 'emoji/idea.webp',
-    '✅': 'emoji/checkbox.webp',
-    '💬': 'emoji/chat.webp',
-    '🤝': 'emoji/handshake.webp',
-    '📓': 'emoji/typewriter.webp',
-    '💿': 'emoji/dot.webp',
-    '🏴‍☠️': 'emoji/flag.webp',
-    '🔴': 'emoji/dot.webp',
-    '✍️': 'emoji/hand-pen.webp',
-    '❤️': 'emoji/fire.webp', 
-    '🧱': 'emoji/building.webp',
-    '🪜': 'emoji/list.webp',
-    '🌱': 'emoji/leaves.webp',
-    '👉': 'emoji/arrows.webp',
-    '🖌️': 'emoji/feather.webp',
-    '✏️': 'emoji/feather.webp',
-    '⭕': 'emoji/dot.webp',
-    '👁️': 'emoji/search.webp',
-    '🚌': 'emoji/bus.webp',
-    '🚩': 'emoji/flag.webp',
-    '🕒': 'emoji/clock.webp',
-    '🪧': 'emoji/list.webp',
-    '🚫': 'emoji/alert.webp',
-    '⚪': 'emoji/dot.webp',
-    '⬆️': 'emoji/arrows.webp',
-    '↗️': 'emoji/arrows.webp',
-    '↩️': 'emoji/arrows.webp',
-    '🪝': 'emoji/trident.webp',
-    '♀️': 'emoji/feminist.webp',
-    '☑️': 'emoji/checkbox.webp',
-    '🪶': 'emoji/feather.webp',
-    '🔑': 'emoji/key.webp',
-    '💡': 'emoji/idea.webp',
-    '⛓️': 'emoji/chain.webp',
-    '🪢': 'emoji/chain.webp',
-    '♨️': 'emoji/fire.webp',
-    '✊': 'emoji/fist.webp',
-    '🕊️': 'emoji/dove.webp',
-    '🏳️': 'emoji/dove.webp',
-    '🎤': 'emoji/microphone.webp',
-    '📖': 'emoji/book.webp',
-    '🍃': 'emoji/leaves.webp',
-    '🚀': 'emoji/rocket.webp',
-    '🌐': 'emoji/globe.webp',
-    '🔍': 'emoji/search.webp',
-    '⚙️': 'emoji/gear.webp',
-    '🗯️': 'emoji/dots.webp',
-    '📍': 'emoji/location.webp',
-    '📅': 'emoji/calendar.webp',
-    '🏛️': 'emoji/building.webp'
+    '💢': 'emoji/fist.webp', '🏦': 'emoji/building.webp', '📉': 'emoji/down.webp',
+    '🔈': 'emoji/megaphone.webp', '🔁': 'emoji/link.webp', '⏩': 'emoji/arrows-circle.webp',
+    '⭐': 'emoji/idea.webp', '🌈': 'emoji/leaves.webp', '📋': 'emoji/list.webp',
+    '📎': 'emoji/clip.webp', '📶': 'emoji/wifi.webp', '✉️': 'emoji/chat.webp', 
+    '📨': 'emoji/chat.webp', '🔧': 'emoji/wrench.webp', '🏠': 'emoji/home.webp',
+    '🏢': 'emoji/building.webp', '💰': 'emoji/money.webp', '👥': 'emoji/crowd.webp',
+    '🔆': 'emoji/idea.webp', '🔤': 'emoji/typewriter.webp', '🧠': 'emoji/brain.webp',
+    '❗': 'emoji/alert.webp', '📢': 'emoji/megaphone.webp', '❓': 'emoji/question.webp',
+    '🔄': 'emoji/arrows-circle.webp', '❌': 'emoji/crowd.webp', '💯': 'emoji/hundred.webp',
+    '✨': 'emoji/idea.webp', '✅': 'emoji/checkbox.webp', '💬': 'emoji/chat.webp',
+    '🤝': 'emoji/handshake.webp', '📓': 'emoji/typewriter.webp', '💿': 'emoji/dot.webp',
+    '🏴‍☠️': 'emoji/flag.webp', '🔴': 'emoji/dot.webp', '✍️': 'emoji/hand-pen.webp',
+    '❤️': 'emoji/fire.webp', '🧱': 'emoji/building.webp', '🪜': 'emoji/list.webp',
+    '🌱': 'emoji/leaves.webp', '👉': 'emoji/arrows.webp', '🖌️': 'emoji/feather.webp',
+    '✏️': 'emoji/feather.webp', '⭕': 'emoji/dot.webp', '👁️': 'emoji/search.webp',
+    '🚌': 'emoji/bus.webp', '🚩': 'emoji/flag.webp', '🕒': 'emoji/clock.webp',
+    '🪧': 'emoji/list.webp', '🚫': 'emoji/alert.webp', '⚪': 'emoji/dot.webp',
+    '⬆️': 'emoji/arrows.webp', '↗️': 'emoji/arrows.webp', '↩️': 'emoji/arrows.webp',
+    '🪝': 'emoji/trident.webp', '♀️': 'emoji/feminist.webp', '☑️': 'emoji/checkbox.webp',
+    '🪶': 'emoji/feather.webp', '🔑': 'emoji/key.webp', '💡': 'emoji/idea.webp',
+    '⛓️': 'emoji/chain.webp', '🪢': 'emoji/chain.webp', '♨️': 'emoji/fire.webp',
+    '✊': 'emoji/fist.webp', '🕊️': 'emoji/dove.webp', '🏳️': 'emoji/dove.webp',
+    '🎤': 'emoji/microphone.webp', '📖': 'emoji/book.webp', '🍃': 'emoji/leaves.webp',
+    '🚀': 'emoji/rocket.webp', '🌐': 'emoji/globe.webp', '🔍': 'emoji/search.webp',
+    '⚙️': 'emoji/gear.webp', '🗯️': 'emoji/dots.webp', '📍': 'emoji/location.webp',
+    '📅': 'emoji/calendar.webp', '🏛️': 'emoji/building.webp'
   };
 
   function replaceEmojis(text) {
@@ -176,7 +126,7 @@
       const imgClass = item.image ? '' : 'is-full';
 
       const card = document.createElement('article');
-      card.className = 'news-card';
+      card.className = 'news-card reveal'; // Добавили класс reveal для анимации
 
       card.innerHTML =
         '<div class="news-thumb">' +
@@ -202,12 +152,20 @@
       grid.appendChild(card);
     });
 
+    // Принудительно запускаем анимацию для только что добавленных карточек
+    setTimeout(() => {
+      grid.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+    }, 50);
+
     if (loading) loading.remove();
   }
 
   async function loadBlock(jsonPath, gridId, loadingId, cfg) {
     const grid = document.getElementById(gridId);
     const loading = document.getElementById(loadingId);
+
+    // Если элемента на странице нет — просто выходим без ошибки
+    if (!grid) return;
 
     try {
       const res = await fetch('./' + jsonPath + '?t=' + Date.now());
@@ -223,6 +181,7 @@
     }
   }
 
+  /* ---------- ЗАГРУЗКА БЛОКОВ ---------- */
   loadBlock('news.json', 'newsGrid', 'newsLoading', {
     count: 6,
     favicon: 'android-chrome-512x512.png',
@@ -230,12 +189,13 @@
     linkText: 'Читать в Telegram'
   });
 
-  loadBlock('initiatives.json', 'initiativesGrid', 'initiativesLoading', {
+  // Блок инициатив теперь статический (в HTML), поэтому этот вызов закомментирован/удален
+  /* loadBlock('initiatives.json', 'initiativesGrid', 'initiativesLoading', {
     count: 3,
     favicon: 'nolog_logo.png',
     label: 'Инициатива',
     linkText: 'Читать в Telegram'
-  });
+  }); */
 
   loadBlock('avtory.json', 'authorsGrid', 'authorsLoading', {
     count: 6,
