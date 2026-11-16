@@ -38,8 +38,15 @@ async function fetchTelegram(channel, limit) {
 
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const html = await res.text();
-  const $ = cheerio.load(html);
+  
+  // СОХРАНЯЕМ HTML ДЛЯ ОТЛАДКИ
+  fs.writeFileSync(`debug_${channel}.html`, html);
+  
+  if (html.length < 5000) {
+    console.log(`⚠️ ВНИМАНИЕ: Получен слишком короткий HTML (${html.length} байт). Возможно, Telegram выдал капчу.`);
+  }
 
+  const $ = cheerio.load(html);
   const postsMap = new Map();
 
   $('.tgme_widget_message_wrap').each((i, el) => {
@@ -47,94 +54,62 @@ async function fetchTelegram(channel, limit) {
     const $msg = $el.find('.tgme_widget_message');
     if (!$msg.length) return;
 
-    const postId = $msg.attr('data-post') || $el.attr('data-post');
+    const postId = $msg.attr('data-post');
     if (!postId) return;
 
-    // Правильный фильтр репостов (только если есть блок "Переслано от")
+    // Фильтр репостов
     if ($el.find('.tgme_widget_message_forwarded_from').length > 0) {
       return; 
     }
 
-    if (!postsMap.has(postId)) {
-      postsMap.set(postId, {
-        id: postId,
-        text: '',
-        images: [],
-        date: '',
-        link: ''
-      });
-    }
+    // Ищем "пузырь" сообщения (там где лежит контент)
+    const $bubble = $el.find('.tgme_widget_message_bubble');
+    if (!$bubble.length) return;
 
-    const post = postsMap.get(postId);
+    // Клонируем пузырь, чтобы удалить лишнее и не сломать оригинал
+    const $clone = $bubble.clone();
 
-    if (!post.date) post.date = $el.find('time').attr('datetime') || '';
-    if (!post.link) {
-      const href = $el.find('.tgme_widget_message_date').attr('href') || '';
-      post.link = href.startsWith('http') ? href : 'https://t.me/' + href.replace(/^\//, '');
-    }
+    // УДАЛЯЕМ СЛУЖЕБНЫЙ МУСОР ИЗ КЛОНА:
+    // (имя канала, время, кнопки "Присоединиться", ответы, просмотры и т.д.)
+    $clone.find('.tgme_widget_message_user, .tgme_widget_message_footer, .tgme_widget_message_meta, .tgme_widget_message_views, .tgme_widget_message_author, .tgme_widget_message_reply, .tgme_widget_message_inline_keyboard, .tgme_widget_message_link_preview, .tgme_widget_message_forwarded_from').remove();
 
-    // 1. Извлекаем текст поста
-    const $textEl = $el.find('.tgme_widget_message_text');
-    if ($textEl.length) {
-      $textEl.find('br').replaceWith('\n');
-      const partText = $textEl.text().trim();
-      if (partText) {
-        post.text += (post.text ? '\n\n' : '') + partText;
-      }
-    }
+    // Заменяем переносы строк
+    $clone.find('br').replaceWith('\n');
+    
+    // Собираем оставшийся текст
+    let text = $clone.text().trim();
 
-    // 2. Извлекаем данные ПРЕВЬЮ ССЫЛКИ (исправлены классы!)
+    // Если внутри пузыря остались какие-то ссылки-превью, аккуратно достаем их
     const $linkPreview = $el.find('.tgme_widget_message_link_preview');
     if ($linkPreview.length) {
       const lpTitle = $linkPreview.find('.link_preview_title').text().trim();
       const lpDesc = $linkPreview.find('.link_preview_description').text().trim();
-      
-      if (lpTitle) post.text += (post.text ? '\n\n' : '') + lpTitle;
-      if (lpDesc) post.text += '\n' + lpDesc;
+      if (lpTitle) text += (text ? '\n' : '') + lpTitle;
+      if (lpDesc) text += '\n' + lpDesc;
+    }
 
-      // Картинка из превью ссылки
-      const $thumb = $linkPreview.find('.link_preview_image, .tgme_widget_message_link_preview_thumb');
-      if ($thumb.length) {
-        let imgUrl = '';
-        const style = $thumb.attr('style') || '';
-        const match = style.match(/background-image:\s*url\(['"]?([^'")]+)['"]?\)/);
-        if (match) imgUrl = match[1];
-        else if ($thumb.is('img')) imgUrl = $thumb.attr('src');
-        
-        if (imgUrl && !post.images.includes(imgUrl)) post.images.push(imgUrl);
+    // Ищем ВСЕ картинки внутри поста (по стилям background-image)
+    let images = [];
+    $el.find('a.tgme_widget_message_photo_wrap, a.tgme_widget_message_video_thumb, .tgme_widget_message_link_preview_thumb, .tgme_widget_message_document_thumb').each((j, media) => {
+      const style = $(media).attr('style') || '';
+      const match = style.match(/background-image:\s*url\(['"]?([^'")]+)['"]?\)/);
+      if (match && !images.includes(match[1])) {
+        images.push(match[1]);
       }
-    }
-
-    // 3. Извлекаем опросы (если вдруг попадется)
-    const $poll = $el.find('.tgme_widget_message_poll');
-    if ($poll.length) {
-      const pollQuestion = $poll.find('.tgme_widget_message_poll_question').text().trim();
-      if (pollQuestion) post.text += (post.text ? '\n\n' : '') + '📊 ' + pollQuestion;
-    }
-
-    // 4. Извлекаем медиафайлы (картинки, видео-превью, стикеры)
-    const mediaSelectors = [
-      '.tgme_widget_message_photo_wrap', 
-      '.tgme_widget_message_video_thumb', 
-      '.tgme_widget_message_document_thumb',
-      '.tgme_widget_message_sticker'
-    ];
-
-    mediaSelectors.forEach(selector => {
-      $el.find(selector).each((j, media) => {
-        let imgUrl = '';
-        const style = $(media).attr('style') || '';
-        const match = style.match(/background-image:\s*url\(['"]?([^'")]+)['"]?\)/);
-        
-        if (match) imgUrl = match[1];
-        else if ($(media).is('img')) imgUrl = $(media).attr('src');
-        else if ($(media).is('video')) imgUrl = $(media).attr('src');
-
-        if (imgUrl && !post.images.includes(imgUrl)) {
-          post.images.push(imgUrl);
-        }
-      });
     });
+
+    // Если нашли хоть какой-то текст или картинку — сохраняем
+    if (text || images.length > 0) {
+      postsMap.set(postId, {
+        id: postId,
+        text: text,
+        images: images,
+        date: $el.find('time').attr('datetime') || '',
+        link: 'https://t.me/' + postId
+      });
+    } else {
+      console.log(`[!] Пост ${postId} оказался абсолютно пустым (нет ни текста, ни картинок).`);
+    }
   });
 
   const items = Array.from(postsMap.values()).map(post => {
@@ -159,14 +134,12 @@ async function fetchTelegram(channel, limit) {
       }
     }
 
-    // Жесткая гарантия, что заголовок не будет пустым
     if (!title) {
-      if (post.images.length > 0) title = 'Медиа-пост';
-      else title = 'Новый пост';
+      title = post.images.length > 0 ? 'Медиа-пост' : 'Новый пост';
+      if (!description) description = 'Без описания';
     }
 
-    // Отладочный вывод в консоль
-    console.log(`[Пост ${post.id}] Заголовок: "${title.substring(0, 25)}...", Текст: ${finalText.length} симв., Картинок: ${post.images.length}`);
+    console.log(`[✓ Пост ${post.id}] Заголовок: "${title.substring(0, 30)}...", Текст: ${finalText.length} симв., Картинок: ${post.images.length}`);
 
     return {
       title: title,
