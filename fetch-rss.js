@@ -1,10 +1,11 @@
+
 const fs = require('fs');
 const path = require('path');
 const cheerio = require('cheerio');
 
 const NEWS_CHANNEL = 'uchastie_official';
 const INIT_CHANNEL = 'luxury_tax_2026';
-const AVTOR_CHANNEL = 'uchastie_lite';
+const AVTOR_CHANNEL = 'uchastie_lite'; // ← ВПИШИТЕ ИМЯ КАНАЛА
 
 const IMAGES_DIR = 'images';
 
@@ -56,18 +57,15 @@ async function fetchTelegram(channel, limit) {
 
     let imageUrl = '';
 
-    // 1. Ищем фото (включая группы фото)
-    const photoWrap = $(el).find('.tgme_widget_message_photo_wrap, .tgme_widget_message_photo_group a');
+    // Фото
+    const photoWrap = $(el).find('.tgme_widget_message_photo_wrap');
     if (photoWrap.length) {
       const style = photoWrap.attr('style') || '';
       const match = style.match(/background-image:\s*url\(['"]?([^'")]+)['"]?\)/);
       if (match) imageUrl = match[1];
-      
-      // Если вдруг ссылка лежит в data-src (новая верстка Telegram)
-      if (!imageUrl) imageUrl = photoWrap.attr('href') || photoWrap.attr('data-src');
     }
 
-    // 2. Ищем видео
+    // Видео
     if (!imageUrl) {
       const videoThumb = $(el).find('.tgme_widget_message_video_thumb');
       if (videoThumb.length) {
@@ -77,7 +75,7 @@ async function fetchTelegram(channel, limit) {
       }
     }
 
-    // 3. Ищем превью ссылок
+    // Ссылка
     if (!imageUrl) {
       const linkThumb = $(el).find('.tgme_widget_message_link_preview_thumb');
       if (linkThumb.length) {
@@ -92,27 +90,19 @@ async function fetchTelegram(channel, limit) {
 
     if (text) {
       const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-      
-      // Логика разбора:
-      // Если первая строка короткая (до 100 символов) и это не "Автор:...", считаем её заголовком
-      if (lines.length > 1) {
-        if (lines[0].length <= 120 && !lines[0].startsWith('Автор:')) {
-          title = lines[0];
-          description = lines.slice(1).join('\n\n');
-        } else {
-          // Если первая строка длинная или это автор, ищем заголовок дальше
-          title = lines.find(l => l.length <= 120 && !l.startsWith('Автор:')) || lines[0].slice(0, 100);
-          description = text.replace(title, '').trim();
-        }
+      if (lines.length > 1 && lines[0].length <= 100) {
+        title = lines[0];
+        description = lines.slice(1).join(' ');
       } else {
-        // Если одна строка
-        title = text.slice(0, 110).trim();
-        description = text.slice(110).trim();
+        const match = text.match(/^(.{10,120}?[.!?])(\s|$)/);
+        if (match) {
+          title = match[1].trim();
+          description = text.slice(match[0].length).trim();
+        } else {
+          title = text.slice(0, 110).trim();
+          description = text.slice(110).trim();
+        }
       }
-
-      // Если в описании осталась строка "Автор: ...", вынесем её в отдельное поле или оставим в тексте
-      // Для примера оставим в тексте, но уберем лишние переносы
-      description = description.replace(/\n{3,}/g, '\n\n');
     }
 
     if (!title && imageUrl) title = 'Новый пост';
@@ -123,14 +113,16 @@ async function fetchTelegram(channel, limit) {
         description: description,
         pubDate: date,
         link: link.startsWith('http') ? link : 'https://t.me/' + link.replace(/^\//, ''),
-        imageUrl: imageUrl,
-        image: ''
+        imageUrl: imageUrl,  // временно
+        image: ''            // сюда запишем локальный путь
       });
     }
   });
 
+  // Ограничиваем количество
   const result = items.reverse().slice(0, limit);
 
+  // Скачиваем картинки
   for (let i = 0; i < result.length; i++) {
     const item = result[i];
     if (item.imageUrl) {
@@ -150,6 +142,7 @@ async function start() {
   if (!fs.existsSync(IMAGES_DIR)) {
     fs.mkdirSync(IMAGES_DIR);
   } else {
+    // Очищаем старые картинки, чтобы не забивать репозиторий
     fs.readdirSync(IMAGES_DIR).forEach(f => fs.unlinkSync(path.join(IMAGES_DIR, f)));
   }
 
